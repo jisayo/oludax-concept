@@ -108,11 +108,19 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div key={item.id} className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4">
                     {/* Visual Item Avatar */}
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-panel border border-black/8 dark:border-[rgba(244,244,242,0.08)] shrink-0 flex items-center justify-center p-2">
-                      <div className="w-12 h-12 rounded-xl bg-accent/20 border border-accent/30 text-accent font-display font-semibold text-sm flex items-center justify-center shadow-inner">
-                        {item.name.split(" ")[0]?.[0]}
-                        {item.name.split(" ")[1]?.[0] || ""}
-                      </div>
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-panel border border-black/8 dark:border-[rgba(244,244,242,0.08)] shrink-0 flex items-center justify-center p-1.5 overflow-hidden relative">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-contain rounded-xl"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-accent/20 border border-accent/30 text-accent font-display font-semibold text-sm flex items-center justify-center shadow-inner">
+                          {item.name.split(" ")[0]?.[0]}
+                          {item.name.split(" ")[1]?.[0] || ""}
+                        </div>
+                      )}
                     </div>
 
                     {/* Content Details */}

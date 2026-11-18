@@ -168,7 +168,7 @@ export default function ProductDetailPage({
   )}`;
 
   return (
-    <div className="min-h-screen bg-base text-cloud pt-20 sm:pt-24 lg:pt-28 pb-16">
+    <div className="min-h-screen bg-base text-cloud pt-20 sm:pt-24 lg:pt-28 pb-28 sm:pb-16">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Breadcrumb Glass Banner */}
         <div className="glass rounded-[24px] p-4 sm:p-5 border border-black/8 dark:border-[rgba(244,244,242,0.08)] mb-8">
@@ -722,6 +722,50 @@ export default function ProductDetailPage({
             </div>
           </section>
         )}
+
+        {/* MOBILE STICKY PURCHASE BAR */}
+        <aside
+          aria-label="Mobile Checkout Actions"
+          className="fixed bottom-0 inset-x-0 z-40 sm:hidden glass bg-white/95 dark:bg-[#141418]/95 border-t border-black/15 dark:border-white/15 px-4 py-3 shadow-2xl backdrop-blur-xl"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="font-mono text-[10px] uppercase text-cloud/50 block truncate">
+                {selectedDesign ? selectedDesign.replace(/\s*\(₦[\d,]+\)/, "") : "Total"}
+              </span>
+              <span className="font-mono text-base font-bold text-accent">
+                {formatPrice(activePrice * quantity)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <a
+                href={whatsappOrderUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 rounded-full border border-emerald-500/40 text-emerald-400 bg-emerald-500/10 flex items-center justify-center shrink-0 active:scale-95 transition"
+                title="Order via WhatsApp"
+              >
+                <MessageCircle className="w-5 h-5 text-emerald-500" />
+              </a>
+
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={!product.inStock}
+                className={`px-5 py-2.5 rounded-full font-mono text-xs uppercase tracking-wider font-semibold transition active:scale-95 ${
+                  addedSuccess
+                    ? "bg-emerald-600 text-white"
+                    : product.inStock
+                    ? "bg-accent text-white"
+                    : "bg-black/10 dark:bg-white/10 text-cloud/40"
+                }`}
+              >
+                {addedSuccess ? "Added!" : "Add to Bag"}
+              </button>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );

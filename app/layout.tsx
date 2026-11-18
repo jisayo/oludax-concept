@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/theme-context";
 import { CartProvider } from "@/lib/cart-context";
@@ -7,6 +7,17 @@ import { AuthProvider } from "@/lib/auth-context";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import BottomNav from "@/components/BottomNav";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F8F8F6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0B0D" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: {
@@ -65,8 +76,9 @@ export default function RootLayout({
               <WishlistProvider>
                 <AnnouncementBar />
                 <Header />
-                <main className="flex-1">{children}</main>
+                <main className="flex-1 pb-16 sm:pb-0">{children}</main>
                 <Footer />
+                <BottomNav />
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>
