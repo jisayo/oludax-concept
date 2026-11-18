@@ -300,8 +300,8 @@ export const products: Product[] = [
     slug: "customized-mugs",
     price: 5500,
     compareAtPrice: 7000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-mug.png",
+    images: ["/images/products/custom-mug.png", "/images/catalog/price-list-mugs-caps.jpg"],
     description:
       "Signature Oludax Concept customized mug. Choose between our Normal Ceramic Mug (₦5,500), Mirror Finish Mug (₦6,500), or Magic Heat-Revealing Mug (₦7,500) that magically reveals your personalized picture and love quote when hot beverage is poured.",
     shortDescription: "Custom personalized ceramic, mirror, or heat-revealing magic mug",
@@ -347,8 +347,8 @@ export const products: Product[] = [
     slug: "customized-phone-pouch",
     price: 5000,
     compareAtPrice: 7500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/phone-pouch.png",
+    images: ["/images/products/phone-pouch.png", "/images/catalog/price-list-mugs-caps.jpg"],
     description:
       "Shockproof custom phone case with your high-definition portrait, romantic couples photo, or aesthetic artwork printed with scratch-resistant gloss finish. Android models: ₦5,000 | iPhone models: ₦6,000.",
     shortDescription: "Impact-absorbing custom photo printed phone case for iPhone & Android",
@@ -393,8 +393,8 @@ export const products: Product[] = [
     slug: "customized-headwears-bonnet",
     price: 3000,
     compareAtPrice: 5000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-headwears.png",
+    images: ["/images/products/custom-headwears.png", "/images/catalog/price-list-mugs-caps.jpg"],
     description:
       "Personalized headwear collection. Headband: ₦3,000 | Mulberry Satin Hair Bonnet: ₦4,000 | Custom Foam Trucker Hat: ₦6,000 | Custom Snapback: ₦8,000. Customized with your name, street moniker, or custom slogan.",
     shortDescription: "Personalized headbands, silk satin bonnets, trucker hats & snapbacks",
@@ -438,8 +438,8 @@ export const products: Product[] = [
     slug: "borderless-photo-frame",
     price: 4000,
     compareAtPrice: 6000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/borderless-frame.png",
+    images: ["/images/products/borderless-frame.png", "/images/catalog/price-list-borderless-bottles.jpg"],
     description:
       "Sleek borderless mounted photo frame. Your photo printed edge-to-edge on high-grade photographic paper sealed with anti-scratch UV protective lamination. Sizes: 5/7 (₦4,000) | 8/10 (₦5,000) | 10/12 (₦6,500) | 12/16 (₦8,500).",
     shortDescription: "Edge-to-edge borderless photo frame with laminate protection",
@@ -484,8 +484,8 @@ export const products: Product[] = [
     slug: "border-photo-frame",
     price: 8500,
     compareAtPrice: 11000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/border-frame.png",
+    images: ["/images/products/border-frame.png", "/images/catalog/price-list-frames-jewelry.jpg"],
     description:
       "Prestigious bordered frame with high-grade molding in Classic Black, Royal Gold, or Elegant Silver. Protected by clear glass face. Sizes: 8/10 (₦8,500) | 10/12 (₦11,000) | 12/16 (₦15,000).",
     shortDescription: "Elegant wooden & metallic bordered photo frame with glass cover",
@@ -530,8 +530,8 @@ export const products: Product[] = [
     slug: "customized-jewelry",
     price: 11000,
     compareAtPrice: 15000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-jewelry.png",
+    images: ["/images/products/custom-jewelry.png", "/images/catalog/price-list-frames-jewelry.jpg"],
     description:
       "Luxury personalized jewelry piece. Bar / Nameplate Necklace: ₦11,000 | Engraved ID Link Bracelet: ₦13,000 | Custom Engraved Wristwatch: ₦20,000. Precision laser engraved with names or initials (e.g. 'King ❤️', 'Queen ❤️').",
     shortDescription: "18K Gold PVD coated laser engraved necklace, bracelet, or wristwatch",
@@ -574,8 +574,8 @@ export const products: Product[] = [
     slug: "customized-throw-pillow",
     price: 10000,
     compareAtPrice: 13000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/throw-pillow.png",
+    images: ["/images/products/throw-pillow.png", "/images/catalog/price-list-frames-jewelry.jpg"],
     description:
       "Plush customized throw pillow. Normal Print Pillow: ₦10,000 | Royal (with vintage ornate gold frame pattern): ₦15,000 | Royalxx (luxury double-sided velvet): ₦18,000. Features rich color sublimation with fiber insert.",
     shortDescription: "Plush photo throw pillow with optional royal ornate gold framing",
@@ -619,8 +619,8 @@ export const products: Product[] = [
     slug: "customized-journal",
     price: 5500,
     compareAtPrice: 7500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-journal.png",
+    images: ["/images/products/custom-journal.png", "/images/catalog/price-list-borderless-bottles.jpg"],
     description:
       "A5 faux-leather notebook with debossed/engraved name. Elastic Holder: ₦5,500 | Buckle Magnetic Holder: ₦6,000 | With Magnetic Pen: ₦7,500 | With Customized Engraved Pen: ₦8,000. Available in Sky Blue, Crimson Red, Slate Grey, and Royal Purple.",
     shortDescription: "Faux-leather executive notebook with pen holder and engraved name",
@@ -664,8 +664,8 @@ export const products: Product[] = [
     slug: "customized-bottles-flask",
     price: 4000,
     compareAtPrice: 6000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-bottles.png",
+    images: ["/images/products/custom-bottles.png", "/images/catalog/price-list-borderless-bottles.jpg"],
     description:
       "Custom branded drinkware. Candy Bottle: ₦4,000 | Smart Temperature LED Bottle: ₦7,000 | Thermal Flask + 2 Cups Gift Set: ₦8,000 | Matte Luxury Vacuum Bottle: ₦10,000. Laser engraved or vinyl printed with custom names.",
     shortDescription: "Personalized smart temperature bottles, flasks with cups, and matte bottles",
@@ -709,8 +709,8 @@ export const products: Product[] = [
     slug: "customized-towel",
     price: 5500,
     compareAtPrice: 7500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-towel.png",
+    images: ["/images/products/custom-towel.png", "/images/catalog/price-list-towels-tshirts.jpg"],
     description:
       "100% combed cotton towel with custom name or monogram embroidery. Face Towel: ₦5,500 | Body Towel: ₦10,000 | Large Bath Towel: ₦12,000. Plush, absorbent, and skin-friendly.",
     shortDescription: "Plush 100% cotton towel with custom monogram or name embroidery",
@@ -753,8 +753,8 @@ export const products: Product[] = [
     slug: "customized-tshirt",
     price: 8500,
     compareAtPrice: 11000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-tshirt.png",
+    images: ["/images/products/custom-tshirt.png", "/images/catalog/price-list-towels-tshirts.jpg"],
     description:
       "Premium 220gsm cotton t-shirt with DTF or screen printing. Basic (pocket logo/monogram): ₦8,500 | Normal (large front graphic): ₦10,000 | Complex (multi-side + QR codes): ₦12,000.",
     shortDescription: "Premium heavyweight cotton t-shirt with custom print or QR code",
@@ -800,8 +800,8 @@ export const products: Product[] = [
     slug: "personalized-souvenirs",
     price: 1200,
     compareAtPrice: 2000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/personalized-items.png",
+    images: ["/images/products/personalized-items.png", "/images/catalog/price-list-towels-tshirts.jpg"],
     description:
       "Everyday personalized keepsakes and wedding/event souvenirs. Clear Acrylic Photo Key Holder: ₦1,200 | Custom Engraved Metallic Pen: ₦2,000 | Personalized Celebration Hand Fan: ₦2,000.",
     shortDescription: "Custom key holders, engraved pens, and celebration hand fans",
@@ -843,8 +843,8 @@ export const products: Product[] = [
     slug: "custom-cards-booklets",
     price: 1500,
     compareAtPrice: 2500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/custom-cards.png",
+    images: ["/images/products/custom-cards.png", "/images/catalog/price-list-cards-magazines.jpg"],
     description:
       "Handcrafted milestone greeting cards. Ready-made Card: ₦1,500 | Personalized Name Card: ₦2,000 | Mini Booklet Card: ₦2,500 | Full Booklet Card: ₦4,500. Created with bows, glitter embossing, and custom lettering.",
     shortDescription: "Personalized milestone birthday and celebration cards and mini booklets",
@@ -888,8 +888,8 @@ export const products: Product[] = [
     slug: "personalized-magazine",
     price: 6500,
     compareAtPrice: 9000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/magazine.png",
+    images: ["/images/products/magazine.png", "/images/catalog/price-list-cards-magazines.jpg"],
     description:
       "Turn your celebrant into a Vogue-style magazine cover star! 6 Pages Edition: ₦6,500 | 10 Pages Edition: ₦8,500 | 14 Pages Luxury Edition: ₦11,000. Features glossy cover, birthday interview, photo galleries, and heartfelt tributes.",
     shortDescription: "Glossy personalized celebrant magazine with custom cover and photo articles",
@@ -934,8 +934,8 @@ export const products: Product[] = [
     slug: "wall-photo-collages",
     price: 3000,
     compareAtPrice: 4500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/wall-collage.png",
+    images: ["/images/products/wall-collage.png", "/images/catalog/price-list-cards-magazines.jpg"],
     description:
       "Aesthetic wall gallery prints for bedrooms, living rooms, and dorms. Ready-made Set (10 pcs): ₦3,000 | Pinterest Frames: ₦3,500 | Personalized Collage (12 pcs): ₦4,000.",
     shortDescription: "Aesthetic aesthetic wall collage card prints and Pinterest frames",
@@ -974,8 +974,8 @@ export const products: Product[] = [
     slug: "brand-logo-stickers",
     price: 4000,
     compareAtPrice: 6000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/stickers-round.png",
+    images: ["/images/products/stickers-round.png", "/images/products/stickers-square.png", "/images/products/stickers-rectangle.png", "/images/catalog/price-list-stickers.jpg"],
     description:
       "Waterproof die-cut business logo stickers. Round (3x3 in): 50 pcs (₦4,000) / 100 pcs (₦7,500) | Square (3x3 in): 50 pcs (₦4,000) / 100 pcs (₦7,500) | Rectangle (3.5x5 in): 50 pcs (₦5,000) / 100 pcs (₦9,000).",
     shortDescription: "High-gloss waterproof die-cut product packaging and logo stickers",
@@ -1020,8 +1020,8 @@ export const products: Product[] = [
     slug: "customized-carrier-nylons",
     price: 10000,
     compareAtPrice: 14000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/nylons-small.png",
+    images: ["/images/products/nylons-small.png", "/images/products/nylons-medium.png", "/images/products/nylons-large.png", "/images/catalog/price-list-nylons.jpg"],
     description:
       "Branded shopping carrier bags for boutiques, perfumes, clothing, and food brands. Small: 50 pcs (₦10,000) / 100 pcs (₦16,000) | Medium: 50 pcs (₦14,000) / 100 pcs (₦19,000) | Large: 50 pcs (₦19,500) / 100 pcs (₦28,000).",
     shortDescription: "Custom printed business merchandise bags with your logo and social handles",
@@ -1071,8 +1071,8 @@ export const products: Product[] = [
     slug: "thank-you-cards",
     price: 4000,
     compareAtPrice: 6000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/thankyou-cards.png",
+    images: ["/images/products/thankyou-cards.png", "/images/catalog/price-list-business-cards-flyers.jpg"],
     description:
       "Deep wine / berry floral thank-you cards for client packages. 50 pcs (Single side): ₦4,000 | 100 pcs (Single side): ₦7,000 | 50 pcs (Front & Back): ₦6,000. Features soft-touch silk matte lamination.",
     shortDescription: "Custom gratitude thank you cards for packaging and celebrations",
@@ -1116,8 +1116,8 @@ export const products: Product[] = [
     slug: "business-cards",
     price: 6500,
     compareAtPrice: 9000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/business-cards.png",
+    images: ["/images/products/business-cards.png", "/images/catalog/price-list-business-cards-flyers.jpg"],
     description:
       "Executive business cards with high impact presentation. 50 pcs (Single side): ₦6,500 | 100 pcs (Single side): ₦11,000 | 50 pcs (Front & Back): ₦8,000. Printed on heavy 400gsm cardstock.",
     shortDescription: "Professional double or single-sided luxury corporate business cards",
@@ -1162,8 +1162,8 @@ export const products: Product[] = [
     slug: "paper-flyers",
     price: 5000,
     compareAtPrice: 7500,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/paper-flyers.png",
+    images: ["/images/products/paper-flyers.png", "/images/catalog/price-list-business-cards-flyers.jpg"],
     description:
       "Vibrant full-color promotional flyers. A5 Size: 50 pcs (₦5,000) / 100 pcs (₦9,500) | A4 Size: 50 pcs (₦8,000) / 100 pcs (₦15,000). High gloss 150gsm paper for crystal clear images and QR codes.",
     shortDescription: "Full-colour marketing and event flyers in A5 and A4 formats",
@@ -1206,8 +1206,8 @@ export const products: Product[] = [
     slug: "luxury-celebration-hamper",
     price: 25000,
     compareAtPrice: 32000,
-    primaryImage: "",
-    images: [],
+    primaryImage: "/images/products/giftbox-luxury.png",
+    images: ["/images/products/giftbox-luxury.png"],
     description:
       "All-in-one celebration hamper curated by Oludax Concept. Contains a custom ceramic mug, personalized journal, stainless pen, scented candle, and luxury greeting card enclosed in a rigid keepsake box tied with satin ribbon.",
     shortDescription: "Curated celebration hamper with personalized mug, journal, pen and greeting card",
@@ -1299,4 +1299,17 @@ export function formatPrice(amount: number): string {
     return `${NGN_CURRENCY_SYMBOL}0`;
   }
   return `${NGN_CURRENCY_SYMBOL}${amount.toLocaleString("en-NG")}`;
+}
+
+export function extractPriceFromVariant(
+  variantString?: string,
+  defaultPrice: number = 0
+): number {
+  if (!variantString) return defaultPrice;
+  const match = variantString.match(/₦\s*([\d,]+)/);
+  if (match && match[1]) {
+    const parsed = parseInt(match[1].replace(/,/g, ""), 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return defaultPrice;
 }

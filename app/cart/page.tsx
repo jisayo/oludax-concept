@@ -11,6 +11,7 @@ import {
   Shield,
   Truck,
   Sparkles,
+  MessageCircle,
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/products";
@@ -255,6 +256,20 @@ export default function CartPage() {
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
+
+                <a
+                  href={`https://wa.me/2348144412006?text=${encodeURIComponent(
+                    `Hello Oludax Concept! 🛍️\nI want to place an order for my shopping bag:\n\n` +
+                    items.map((i, idx) => `${idx + 1}. *${i.name}* (x${i.qty}) - ${formatPrice(i.price * i.qty)}${i.customization?.customerName ? `\n   • Custom Name: ${i.customization.customerName}` : ""}${i.customization?.designPreference ? `\n   • Option: ${i.customization.designPreference}` : ""}`).join("\n\n") +
+                    `\n\n*Total:* ${formatPrice(total)}\n\nPlease confirm availability!`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-3 rounded-full font-mono text-xs uppercase tracking-[0.14em] flex items-center justify-center gap-2 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 transition shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4 text-emerald-500" />
+                  <span>Order Entire Bag via WhatsApp</span>
+                </a>
 
                 <div className="pt-4 border-t border-black/8 dark:border-[rgba(244,244,242,0.08)] space-y-3 font-mono text-[11px] text-cloud/50">
                   <div className="flex items-center gap-2">

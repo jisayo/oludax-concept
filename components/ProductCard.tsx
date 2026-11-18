@@ -79,7 +79,7 @@ export default function ProductCard({ product }: { product: Product }) {
               src={product.primaryImage}
               alt={product.name}
               loading="lazy"
-              className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+              className="h-full w-full object-contain p-2 transition duration-500 group-hover:scale-105"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
                 const fallback = e.currentTarget.parentElement?.querySelector(

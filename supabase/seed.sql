@@ -1,174 +1,255 @@
--- OLUDAX CONCEPT Seed Data
+-- OLUDAX CONCEPT Seed Data (21 Verified Official Products)
 
--- 1. Categories
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-frames', 'Frames & Keepsakes', 'frames', 'Borderless, acrylic, polaroid, and personalized wall collages', 16, '🖼️') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-branding', 'Branding & Merchandise', 'branding', 'Mugs, thermal bottles, journals, satin bonnets, tote bags & nylons', 22, '✨') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-prints', 'Prints & Stationery', 'prints', 'Magazines, booklets, luxury invitations, programs & certificates', 14, '📜') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-1', 'Personalized Gifts', 'personalized-gifts', 'Unique gifts with a personal touch', 12, '🎁') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-2', 'Gift Boxes', 'gift-boxes', 'Beautifully curated gift box sets', 8, '📦') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-3', 'Flowers', 'flowers', 'Fresh flower bouquets and arrangements', 10, '💐') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-4', 'Customized Mugs', 'customized-mugs', 'Mugs with your own design or text', 15, '☕') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-5', 'Apparel', 'apparel', 'Custom printed clothing items', 9, '👕') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-6', 'Accessories', 'accessories', 'Personalized accessories and jewelry', 11, '💍') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-7', 'Birthday Gifts', 'birthday-gifts', 'Perfect gifts for birthday celebrations', 14, '🎂') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-8', 'Anniversary Gifts', 'anniversary-gifts', 'Celebrate love with special gifts', 7, '💕') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-9', 'Corporate Gifts', 'corporate-gifts', 'Professional gifts for business occasions', 6, '💼') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
-INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-10', 'Celebration Packages', 'celebration-packages', 'Complete celebration setup packages', 5, '🎉') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
+-- Products
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-custom-mug', 'Customized Ceramic Mug (Normal / Mirror / Magic)', 'customized-mugs', 5500, '/images/products/custom-mug.png', 'Signature Oludax Concept customized mug. Choose between our Normal Ceramic Mug (₦5,500), Mirror Finish Mug (₦6,500), or Magic Heat-Revealing Mug (₦7,500) that magically reveals your personalized picture and love quote when hot beverage is poured.', 'Mugs & Bottles', 'mugs-bottles',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
 
--- 2. Products
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-1', 'Personalized Ceramic Mug', 'personalized-mug', 8000, 10000, '', '[]'::jsonb,
-  'A high-quality ceramic mug, customizable with your name, favourite quote or design. Perfect for daily use or as a thoughtful gift. Each mug is carefully printed using heat-press technology for lasting colour and durability.', 'Custom ceramic mug with your name or artwork', 'Customized Mugs', 'customized-mugs', '{"mug","personalized","gift","custom","ceramic"}',
-  true, 50, 4.8, 124, true,
-  '{"allowName":true,"namePrompt":"Enter name or initials","nameMaxLength":25,"allowMessage":true,"messagePrompt":"Personal quote or message","messageMaxLength":100,"allowColor":true,"colors":["#F42E91","#171016","#FFFFFF","#FF75B5","#6B21A8"],"allowDesign":true,"designs":["Classic Script","Modern Sans","Floral Frame","Minimalist Monogram","Crown Crest"],"allowImage":true,"imagePrompt":"Upload reference photo or logo","instructionsHelpText":"Final design placement will be reviewed before heat pressing."}'::jsonb, true, false, true,
-  '{"Material":"Premium Ceramic","Capacity":"350ml (11 oz)","Print Method":"Heat Press / Sublimation","Dishwasher Safe":"Yes (top rack recommended)","Finish":"Glossy White Base"}'::jsonb, 'Ships within 2-3 business days after customization approval.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-phone-pouch', 'Customized Photo Phone Case (Android & iPhone)', 'customized-phone-pouch', 5000, '/images/products/phone-pouch.png', 'Shockproof custom phone case with your high-definition portrait, romantic couples photo, or aesthetic artwork printed with scratch-resistant gloss finish. Android models: ₦5,000 | iPhone models: ₦6,000.', 'Jewelry & Accessories', 'jewelry-accessories',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-2', 'Luxury Fresh Flower Bouquet', 'luxury-flower-bouquet', 20000, 25000, '', '[]'::jsonb,
-  'A stunning arrangement of fresh, hand-picked seasonal flowers wrapped in premium tissue and kraft paper. Lovingly assembled with a complimentary gift card for your heartfelt message.', 'Hand-picked fresh floral bouquet with ribbon wrapping', 'Flowers', 'flowers', '{"flowers","bouquet","luxury","fresh","roses"}',
-  true, 20, 4.9, 89, true,
-  '{"allowMessage":true,"messagePrompt":"Gift card note for the recipient","messageMaxLength":180,"allowColor":true,"colors":["#F42E91","#FF0000","#FFFFFF","#FFD700","#FF69B4"],"instructionsHelpText":"Let us know your preferred ribbon shade or delivery notes."}'::jsonb, true, true, true,
-  '{"Flower Stems":"12-15 fresh seasonal stems","Wrapping":"Double-layered premium kraft with satin ribbon","Freshness":"5-7 days with recommended water care","Includes":"Care instructions card and floral nutrient pack"}'::jsonb, 'Same-day delivery available for orders confirmed before 12:00 PM.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-headwears', 'Customized Headwears & Satin Hair Bonnet', 'customized-headwears-bonnet', 3000, '/images/products/custom-headwears.png', 'Personalized headwear collection. Headband: ₦3,000 | Mulberry Satin Hair Bonnet: ₦4,000 | Custom Foam Trucker Hat: ₦6,000 | Custom Snapback: ₦8,000. Customized with your name, street moniker, or custom slogan.', 'Headwears & Apparel', 'headwears-apparel',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-3', 'Custom Curated Gift Box', 'custom-gift-box', 15000, 18000, '', '[]'::jsonb,
-  'A beautifully presented rigid gift box filled with hand-selected treats, scented items, and custom keepsakes. Tied with an elegant silk ribbon and custom gift tag.', 'Curated gift box filled with treats and bespoke items', 'Gift Boxes', 'gift-boxes', '{"gift box","curated","personalized","luxury","hampers"}',
-  true, 30, 4.7, 67, true,
-  '{"allowName":true,"namePrompt":"Recipient name for outer box lid","nameMaxLength":30,"allowMessage":true,"messagePrompt":"Personal greeting card note","messageMaxLength":200,"allowDesign":true,"designs":["Classic Elegance","Celebration Confetti","Modern Minimalist","Romantic Pastel"],"instructionsHelpText":"Indicate dietary restrictions or special packaging requests."}'::jsonb, true, false, true,
-  '{"Dimensions":"30cm x 25cm x 12cm","Box Type":"Rigid board with magnetic snap closure","Contents":"4-6 curated lifestyle and treat items","Finishing":"Satin bow with embossed gift tag"}'::jsonb, 'Ships within 1-2 business days across Nigeria.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-borderless-frame', 'Custom Borderless Photo Frame (5/7 to 12/16)', 'borderless-photo-frame', 4000, '/images/products/borderless-frame.png', 'Sleek borderless mounted photo frame. Your photo printed edge-to-edge on high-grade photographic paper sealed with anti-scratch UV protective lamination. Sizes: 5/7 (₦4,000) | 8/10 (₦5,000) | 10/12 (₦6,500) | 12/16 (₦8,500).', 'Frames & Wall Art', 'frames',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-4', 'Plush Companion Teddy Bear', 'cute-teddy-bear', 12000, 14000, '', '[]'::jsonb,
-  'An ultra-soft cuddly companion teddy bear with a satin bow. Ideal on its own or paired with flowers and a personalized message ribbon.', 'Ultra-soft plush teddy bear with decorative ribbon', 'Personalized Gifts', 'personalized-gifts', '{"teddy","plush","soft toy","gift","companion"}',
-  true, 40, 4.6, 53, true,
-  '{"allowName":true,"namePrompt":"Name to print on ribbon tag","nameMaxLength":20,"allowMessage":true,"messagePrompt":"Short message for bear tag","messageMaxLength":60,"allowColor":true,"colors":["#F42E91","#8B4513","#FFFFFF","#FFB6C1","#DEB887"]}'::jsonb, false, true, true,
-  '{"Height":"30cm sitting height","Material":"Hypoallergenic plush with polyester filling","Safety":"Tested for all ages with securely stitched eyes"}'::jsonb, 'Ships within 1-2 business days.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-border-frame', 'Custom Classic Border Photo Frame (8/10 to 12/16)', 'border-photo-frame', 8500, '/images/products/border-frame.png', 'Prestigious bordered frame with high-grade molding in Classic Black, Royal Gold, or Elegant Silver. Protected by clear glass face. Sizes: 8/10 (₦8,500) | 10/12 (₦11,000) | 12/16 (₦15,000).', 'Frames & Wall Art', 'frames',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-5', 'Custom Embroidered Hoodie', 'custom-hoodie', 25000, 30000, '', '[]'::jsonb,
-  'Heavyweight cotton fleece hoodie tailored for comfort and durability. Add custom chest embroidery, back print, or your personalized initials.', 'Heavyweight fleece hoodie with custom print or embroidery', 'Apparel', 'apparel', '{"hoodie","custom","apparel","clothing","embroidered"}',
-  true, 25, 4.5, 38, true,
-  '{"allowName":true,"namePrompt":"Name or text to embroider/print","nameMaxLength":25,"allowColor":true,"colors":["#171016","#FFFFFF","#F42E91","#1F2937","#7C3AED"],"allowDesign":true,"designs":["Center Chest","Left Chest Minimal","Full Back Graphic","Sleeve Monogram"],"allowImage":true,"imagePrompt":"Upload logo or graphic vector/image","clothingSizes":["S","M","L","XL","XXL"],"instructionsHelpText":"Specify embroidery thread color or font preference."}'::jsonb, true, true, false,
-  '{"Fabric":"320gsm 80% Cotton, 20% Polyester fleece","Fit":"Unisex regular fit","Pocket":"Front kangaroo pouch","Care":"Machine wash cold inside-out, tumble dry low"}'::jsonb, 'Ships within 3-5 business days after artwork approval.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-jewelry', 'Custom Engraved Jewelry (Necklace, Bracelet, Wristwatch)', 'customized-jewelry', 11000, '/images/products/custom-jewelry.png', 'Luxury personalized jewelry piece. Bar / Nameplate Necklace: ₦11,000 | Engraved ID Link Bracelet: ₦13,000 | Custom Engraved Wristwatch: ₦20,000. Precision laser engraved with names or initials (e.g. ''King ❤️'', ''Queen ❤️'').', 'Jewelry & Accessories', 'jewelry-accessories',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-6', 'Organic Canvas Tote Bag', 'personalized-tote-bag', 10000, 12000, '', '[]'::jsonb,
-  'Eco-friendly 100% organic cotton canvas tote. Durable, spacious, and customized with your preferred graphic, phrase, or personalized monogram.', 'Reinforced organic canvas tote bag with custom print', 'Accessories', 'accessories', '{"tote","bag","custom","eco-friendly","canvas"}',
-  true, 60, 4.4, 42, true,
-  '{"allowName":true,"namePrompt":"Monogram or custom headline","nameMaxLength":24,"allowImage":true,"imagePrompt":"Upload illustration or custom artwork","allowColor":true,"colors":["#FFFFFF","#F5F5DC","#171016","#F42E91"]}'::jsonb, false, false, false,
-  '{"Material":"100% Certified Organic Cotton Canvas (12 oz)","Dimensions":"38cm x 42cm with 25cm drop handles","Capacity":"Approx. 15 Litres"}'::jsonb, 'Ships within 2-3 business days.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-throw-pillow', 'Customized Photo Throw Pillow (Normal / Royal / Royalxx)', 'customized-throw-pillow', 10000, '/images/products/throw-pillow.png', 'Plush customized throw pillow. Normal Print Pillow: ₦10,000 | Royal (with vintage ornate gold frame pattern): ₦15,000 | Royalxx (luxury double-sided velvet): ₦18,000. Features rich color sublimation with fiber insert.', 'Jewelry & Accessories', 'jewelry-accessories',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-7', 'Celebration Package - Gold Tier', 'celebration-package-gold', 45000, 55000, '', '[]'::jsonb,
-  'All-in-one celebration bundle containing a custom backdrop banner, balloon garland components, cake topper, and commemorative keepsake box.', 'Complete celebration party kit with personalized banner', 'Celebration Packages', 'celebration-packages', '{"celebration","party","package","birthday","anniversary"}',
-  true, 10, 4.9, 31, true,
-  '{"allowName":true,"namePrompt":"Celebrant name / Couple names","nameMaxLength":35,"allowMessage":true,"messagePrompt":"Banner subtitle (e.g. ''Happy 30th Birthday'')","messageMaxLength":80,"allowColor":true,"colors":["#FFD700","#F42E91","#C0C0C0","#FF69B4"],"allowDesign":true,"designs":["Birthday Milestone","Anniversary Elegance","Graduation Salute","Bridal Glow"]}'::jsonb, true, true, false,
-  '{"Includes":"Personalized banner (1.5m), 24 latex balloons, acrylic cake topper, confetti","Setup":"Step-by-step assembly guide included"}'::jsonb, 'Order at least 4 business days before your scheduled celebration.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-journal', 'Customized Executive Journal & Notebook', 'customized-journal', 5500, '/images/products/custom-journal.png', 'A5 faux-leather notebook with debossed/engraved name. Elastic Holder: ₦5,500 | Buckle Magnetic Holder: ₦6,000 | With Magnetic Pen: ₦7,500 | With Customized Engraved Pen: ₦8,000. Available in Sky Blue, Crimson Red, Slate Grey, and Royal Purple.', 'Journals & Stationery', 'stationery',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-8', 'Custom Protective Phone Case', 'custom-phone-case', 7000, 9000, '', '[]'::jsonb,
-  'Shockproof polycarbonate phone case with raised camera bevel and UV-cured scratch-resistant printing. Personalize with your picture, initials, or monogram art.', 'Impact-absorbing custom printed phone case', 'Accessories', 'accessories', '{"phone case","custom","accessories","tech","iphone","samsung"}',
-  true, 70, 4.3, 56, true,
-  '{"allowName":true,"namePrompt":"Initials or name on case","nameMaxLength":18,"allowImage":true,"imagePrompt":"Upload high-resolution photo for print","allowDesign":true,"designs":["Full Photo Wrap","Typography Minimal","Marble Pattern","Couples Portrait"],"phoneModels":["iPhone 13","iPhone 13 Pro","iPhone 14","iPhone 14 Pro","iPhone 15","iPhone 15 Pro","Samsung Galaxy S22","Samsung Galaxy S23","Samsung Galaxy S24"],"instructionsHelpText":"Please confirm your exact phone model to guarantee port alignment."}'::jsonb, false, true, false,
-  '{"Material":"Dual-layer TPU bumper + Polycarbonate hard back","DropProtection":"Tested for drops up to 1.5 metres","WirelessCharging":"Compatible with Qi chargers"}'::jsonb, 'Ships within 2-3 business days.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-bottles', 'Customized Water Bottles & Insulated Flask Set', 'customized-bottles-flask', 4000, '/images/products/custom-bottles.png', 'Custom branded drinkware. Candy Bottle: ₦4,000 | Smart Temperature LED Bottle: ₦7,000 | Thermal Flask + 2 Cups Gift Set: ₦8,000 | Matte Luxury Vacuum Bottle: ₦10,000. Laser engraved or vinyl printed with custom names.', 'Mugs & Bottles', 'mugs-bottles',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-9', 'Executive Corporate Gift Set', 'corporate-gift-set', 35000, 40000, '', '[]'::jsonb,
-  'Prestigious executive gift set featuring an A5 faux-leather notebook, matte metal ballpoint pen, stainless business card case, and thermal coaster.', 'Branded executive desk accessory and notebook set', 'Corporate Gifts', 'corporate-gifts', '{"corporate","business","professional","branded","executive"}',
-  true, 15, 4.7, 22, true,
-  '{"allowName":true,"namePrompt":"Executive name or title to engrave","nameMaxLength":30,"allowMessage":true,"messagePrompt":"Corporate message on inside card","messageMaxLength":150,"allowImage":true,"imagePrompt":"Upload company logo vector or PNG","allowDesign":true,"designs":["Laser Engraved","Gold Foil Embossed","Silver Foil Embossed","Debossed"],"instructionsHelpText":"Contact sales team for orders above 20 sets."}'::jsonb, true, false, false,
-  '{"Includes":"A5 Hardcover Notebook (192 pages), Metal Pen, Card Case, Luxury Gift Box","Branding":"Laser engraving or foil stamping available"}'::jsonb, 'Ships within 3-5 business days.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-towel', 'Custom Embroidered Towel (Face / Body / Bath)', 'customized-towel', 5500, '/images/products/custom-towel.png', '100% combed cotton towel with custom name or monogram embroidery. Face Towel: ₦5,500 | Body Towel: ₦10,000 | Large Bath Towel: ₦12,000. Plush, absorbent, and skin-friendly.', 'Headwears & Apparel', 'headwears-apparel',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-10', 'Rose Gold Name Bracelet', 'rose-gold-bracelet', 15000, 18000, '', '[]'::jsonb,
-  'Tarnish-resistant stainless steel bracelet finished in high-polish 18K rose gold plating. Features a dainty name bar with precision laser engraving.', '18K rose gold plated bar bracelet with custom engraving', 'Accessories', 'accessories', '{"bracelet","jewelry","rose gold","engraved","accessories"}',
-  true, 35, 4.8, 44, true,
-  '{"allowName":true,"namePrompt":"Name to engrave on bar plate","nameMaxLength":12,"allowMessage":true,"messagePrompt":"Secret message on back of bar (optional)","messageMaxLength":15}'::jsonb, false, true, true,
-  '{"Metal":"316L Surgical-Grade Stainless Steel","Plating":"18K Rose Gold PVD vacuum coating (hypoallergenic)","ChainLength":"16cm + 4cm extension link"}'::jsonb, 'Ships within 2-3 business days in a velvet gift pouch.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-tshirt', 'Customized Printed T-Shirt (Basic / Normal / Complex)', 'customized-tshirt', 8500, '/images/products/custom-tshirt.png', 'Premium 220gsm cotton t-shirt with DTF or screen printing. Basic (pocket logo/monogram): ₦8,500 | Normal (large front graphic): ₦10,000 | Complex (multi-side + QR codes): ₦12,000.', 'Headwears & Apparel', 'headwears-apparel',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-11', 'Custom Screen-Printed T-Shirt', 'custom-t-shirt', 12000, 15000, '', '[]'::jsonb,
-  '100% combed cotton jersey t-shirt with soft-touch feel and reinforced double-needle seams. Suitable for single bespoke prints or event batches.', 'Combed cotton crewneck t-shirt with custom print', 'Apparel', 'apparel', '{"t-shirt","custom","apparel","printed","cotton"}',
-  true, 45, 4.5, 61, true,
-  '{"allowName":true,"namePrompt":"Name or custom text line","nameMaxLength":25,"allowColor":true,"colors":["#FFFFFF","#171016","#F42E91","#1F2937","#DC2626"],"allowDesign":true,"designs":["Center Chest","Pocket Crest","Large Back Graphic"],"allowImage":true,"imagePrompt":"Upload graphic illustration or photo","clothingSizes":["S","M","L","XL","XXL"]}'::jsonb, false, false, false,
-  '{"Fabric":"100% Combed Ringspun Cotton (180 GSM)","Collar":"Seamless rib-knit collar with taped neck and shoulders","Care":"Machine wash warm inside out, non-chlorine bleach only"}'::jsonb, 'Ships within 3-5 business days.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-personalized-items', 'Personalized Souvenirs (Key Holder, Pen, Hand Fan)', 'personalized-souvenirs', 1200, '/images/products/personalized-items.png', 'Everyday personalized keepsakes and wedding/event souvenirs. Clear Acrylic Photo Key Holder: ₦1,200 | Custom Engraved Metallic Pen: ₦2,000 | Personalized Celebration Hand Fan: ₦2,000.', 'Jewelry & Accessories', 'jewelry-accessories',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
 INSERT INTO products (
-  id, name, slug, price, compare_at_price, primary_image, images,
-  description, short_description, category, category_slug, tags,
-  in_stock, stock_count, rating, review_count, customizable,
-  customization_options, featured, new_arrival, best_seller,
-  specifications, delivery_info, is_sample
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
 ) VALUES (
-  'prod-12', 'Deluxe Birthday Celebration Hamper', 'birthday-hamper-deluxe', 30000, 38000, '', '[]'::jsonb,
-  'Richly appointed birthday celebration hamper with personalized ceramic mug, artisanal scented candle, gourmet chocolates, and personalized birthday card.', 'Curated celebration hamper with treats and keepsake mug', 'Birthday Gifts', 'birthday-gifts', '{"birthday","hamper","gift set","celebration","luxury"}',
-  true, 12, 4.9, 73, true,
-  '{"allowName":true,"namePrompt":"Birthday celebrant name for mug & tag","nameMaxLength":25,"allowMessage":true,"messagePrompt":"Birthday greeting card text","messageMaxLength":180,"allowColor":true,"colors":["#F42E91","#FFD700","#FF69B4","#6B21A8"]}'::jsonb, true, false, true,
-  '{"HamperBasket":"Handwoven natural wicker basket with fabric lining","Contents":"Personalized 350ml mug, soy candle (200g), assorted chocolates (180g), greeting card","SafetyNote":"Chocolates may contain dairy, soy, and nut traces"}'::jsonb, 'Ships within 1-2 business days across Nigeria.', true
-) ON CONFLICT (id) DO NOTHING;
+  'prod-custom-cards', 'Custom Celebration Cards & Booklets', 'custom-cards-booklets', 1500, '/images/products/custom-cards.png', 'Handcrafted milestone greeting cards. Ready-made Card: ₦1,500 | Personalized Name Card: ₦2,000 | Mini Booklet Card: ₦2,500 | Full Booklet Card: ₦4,500. Created with bows, glitter embossing, and custom lettering.', 'Prints, Cards & Magazines', 'prints-cards',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-magazine', 'Personalized Milestone Magazine (6 / 10 / 14 Pages)', 'personalized-magazine', 6500, '/images/products/magazine.png', 'Turn your celebrant into a Vogue-style magazine cover star! 6 Pages Edition: ₦6,500 | 10 Pages Edition: ₦8,500 | 14 Pages Luxury Edition: ₦11,000. Features glossy cover, birthday interview, photo galleries, and heartfelt tributes.', 'Prints, Cards & Magazines', 'prints-cards',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-wall-collage', 'Aesthetic Wall Photo Collages & Pinterest Frames', 'wall-photo-collages', 3000, '/images/products/wall-collage.png', 'Aesthetic wall gallery prints for bedrooms, living rooms, and dorms. Ready-made Set (10 pcs): ₦3,000 | Pinterest Frames: ₦3,500 | Personalized Collage (12 pcs): ₦4,000.', 'Frames & Wall Art', 'frames',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-brand-stickers', 'Brand Logo Stickers (Round / Square / Rectangle)', 'brand-logo-stickers', 4000, '/images/products/stickers-round.png', 'Waterproof die-cut business logo stickers. Round (3x3 in): 50 pcs (₦4,000) / 100 pcs (₦7,500) | Square (3x3 in): 50 pcs (₦4,000) / 100 pcs (₦7,500) | Rectangle (3.5x5 in): 50 pcs (₦5,000) / 100 pcs (₦9,000).', 'Packaging & Stickers', 'packaging-stickers',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-custom-nylons', 'Customized Carrier Nylons (Small / Medium / Large)', 'customized-carrier-nylons', 10000, '/images/products/nylons-small.png', 'Branded shopping carrier bags for boutiques, perfumes, clothing, and food brands. Small: 50 pcs (₦10,000) / 100 pcs (₦16,000) | Medium: 50 pcs (₦14,000) / 100 pcs (₦19,000) | Large: 50 pcs (₦19,500) / 100 pcs (₦28,000).', 'Packaging & Stickers', 'packaging-stickers',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-thankyou-cards', 'Custom Luxury Thank You Cards (50 / 100 pcs)', 'thank-you-cards', 4000, '/images/products/thankyou-cards.png', 'Deep wine / berry floral thank-you cards for client packages. 50 pcs (Single side): ₦4,000 | 100 pcs (Single side): ₦7,000 | 50 pcs (Front & Back): ₦6,000. Features soft-touch silk matte lamination.', 'Prints, Cards & Magazines', 'prints-cards',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-business-cards', 'Custom Luxury Business Cards (50 / 100 pcs)', 'business-cards', 6500, '/images/products/business-cards.png', 'Executive business cards with high impact presentation. 50 pcs (Single side): ₦6,500 | 100 pcs (Single side): ₦11,000 | 50 pcs (Front & Back): ₦8,000. Printed on heavy 400gsm cardstock.', 'Prints, Cards & Magazines', 'prints-cards',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-flyers', 'Custom Promotional Paper Flyers (A5 & A4)', 'paper-flyers', 5000, '/images/products/paper-flyers.png', 'Vibrant full-color promotional flyers. A5 Size: 50 pcs (₦5,000) / 100 pcs (₦9,500) | A4 Size: 50 pcs (₦8,000) / 100 pcs (₦15,000). High gloss 150gsm paper for crystal clear images and QR codes.', 'Prints, Cards & Magazines', 'prints-cards',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
+INSERT INTO products (
+  id, name, slug, price, primary_image, description, category, category_slug,
+  in_stock, stock_count, rating, customizable, is_sample
+) VALUES (
+  'prod-giftbox-luxury', 'Oludax Concept Curated Luxury Celebration Hamper', 'luxury-celebration-hamper', 25000, '/images/products/giftbox-luxury.png', 'All-in-one celebration hamper curated by Oludax Concept. Contains a custom ceramic mug, personalized journal, stainless pen, scented candle, and luxury greeting card enclosed in a rigid keepsake box tied with satin ribbon.', 'Curated Gift Hampers', 'gift-boxes',
+  true, 50, 4.9, true, false
+) ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  price = EXCLUDED.price,
+  primary_image = EXCLUDED.primary_image,
+  description = EXCLUDED.description;
+
