@@ -535,8 +535,6 @@ export default function AdminDashboardPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <div className="min-h-screen bg-dark text-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-pink/10 rounded-full blur-3xl pointer-events-none" />
-
         <div className="max-w-md w-full mx-auto relative z-10 space-y-8">
           <div className="text-center space-y-2">
             <div className="w-16 h-16 rounded-2xl bg-pink/15 border border-pink/30 text-pink flex items-center justify-center mx-auto mb-4 shadow-lg shadow-pink/10">

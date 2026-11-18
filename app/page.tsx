@@ -30,28 +30,10 @@ export default function Home() {
   const bestSellers = getBestSellers().slice(0, 4);
   const newArrivals = getNewArrivals().slice(0, 4);
 
-  // Category gradients matching Ēlan's rich gradient overlays
-  const categoryGradients = [
-    "from-blue-500/30 to-cyan-500/20",
-    "from-amber-500/30 to-orange-500/20",
-    "from-rose-400/30 to-pink-500/20",
-    "from-teal-500/30 to-emerald-500/20",
-    "from-violet-500/30 to-purple-500/20",
-    "from-fuchsia-500/30 to-pink-500/20",
-    "from-sky-500/30 to-indigo-500/20",
-    "from-emerald-500/30 to-teal-500/20",
-    "from-red-500/30 to-rose-500/20",
-    "from-purple-500/30 to-indigo-500/20",
-  ];
-
   return (
     <div className="mx-auto w-full max-w-7xl space-y-20 px-3 py-6 pt-20 sm:px-4 sm:pt-24 md:px-6 lg:px-8 lg:py-12 lg:pt-28">
       {/* ===== HERO / EDITORIAL SPOTLIGHT ===== */}
       <section className="relative overflow-hidden rounded-[28px] glass p-6 sm:p-10 lg:p-16 border border-black/8 dark:border-[rgba(244,244,242,0.08)]">
-        {/* Ambient Glows */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/15 rounded-full blur-3xl pointer-events-none" />
-
         <div className="relative grid lg:grid-cols-2 gap-10 items-center">
           <div className="space-y-6 text-center lg:text-left">
             {/* Status Pill */}
@@ -170,38 +152,23 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* 5-Column Aspect-4/5 Grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.slice(0, 10).map((cat, idx) => (
+        {/* 5-Column Clean Category Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {categories.slice(0, 10).map((cat) => (
             <Link
               key={cat.id}
               href={`/shop?category=${cat.slug}`}
-              className="group relative aspect-4/5 overflow-hidden rounded-[20px] border border-black/8 bg-panel transition duration-300 hover:border-black/20 dark:border-[rgba(244,244,242,0.08)] dark:hover:border-[rgba(244,244,242,0.2)]"
+              className="group relative flex flex-col justify-between p-4 sm:p-5 rounded-[20px] border border-black/8 bg-panel dark:border-[rgba(244,244,242,0.08)] hover:border-accent/40 dark:hover:border-accent/40 transition-all duration-300 hover:shadow-md aspect-[4/5]"
             >
-              {/* Vibrant Atmospheric Linear Gradient */}
-              <div
-                aria-hidden="true"
-                className={`absolute inset-0 bg-gradient-to-br ${
-                  categoryGradients[idx % categoryGradients.length]
-                }`}
-              />
-
-              {/* Decorative Emoji Icon Centerpiece */}
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <span className="text-5xl group-hover:scale-125 transition-transform duration-500 select-none opacity-90 drop-shadow-md">
-                  {cat.icon}
-                </span>
+              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                {cat.icon}
               </div>
 
-              {/* Dark Gradient Overlay for Typography Readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-              {/* Bottom Category Label */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/70">
+              <div>
+                <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-cloud/50">
                   {cat.productCount} items
                 </p>
-                <h3 className="mt-0.5 font-display text-base sm:text-lg font-medium text-white truncate">
+                <h3 className="mt-1 font-display text-sm sm:text-base font-medium text-cloud group-hover:text-accent transition-colors truncate">
                   {cat.name}
                 </h3>
               </div>
@@ -240,7 +207,6 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Pillar 1: FRAME */}
           <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/10 rounded-full blur-2xl pointer-events-none" />
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
                 <Frame className="w-6 h-6" />
@@ -296,7 +262,6 @@ export default function Home() {
 
           {/* Pillar 2: BRAND */}
           <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#C40E75]/20 to-[#F68EA8]/10 rounded-full blur-2xl pointer-events-none" />
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
                 <Layers className="w-6 h-6" />
@@ -352,7 +317,6 @@ export default function Home() {
 
           {/* Pillar 3: PRINT */}
           <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#720D46]/20 to-[#00C2E4]/10 rounded-full blur-2xl pointer-events-none" />
             <div className="space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
                 <Printer className="w-6 h-6" />
@@ -521,8 +485,6 @@ export default function Home() {
 
       {/* ===== THE CEO & BRAND STORY (Precious Oluwatofunmi) ===== */}
       <section className="glass rounded-[28px] p-6 sm:p-10 lg:p-12 border border-black/8 dark:border-[rgba(244,244,242,0.08)] relative overflow-hidden">
-        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/20 rounded-full blur-3xl pointer-events-none" />
-
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
@@ -566,7 +528,7 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-5 flex justify-center">
-            <div className="p-6 rounded-[24px] bg-gradient-to-br from-[#720D46]/20 via-black/20 to-[#C40E75]/20 border border-accent/25 space-y-4 max-w-sm w-full">
+            <div className="p-6 rounded-[24px] glass border border-black/8 dark:border-[rgba(244,244,242,0.08)] space-y-4 max-w-sm w-full">
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
                   Client Proof & Trust

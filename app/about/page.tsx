@@ -86,7 +86,6 @@ export default function AboutPage() {
 
           {/* Visual Badge Card */}
           <div className="glass rounded-[28px] p-8 sm:p-10 flex flex-col items-center justify-center text-center border border-black/8 dark:border-[rgba(244,244,242,0.08)] relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#720D46]/15 via-transparent to-[#C40E75]/15 pointer-events-none" />
             <div className="w-20 h-20 rounded-2xl bg-accent/20 border border-accent/30 text-accent font-display font-semibold text-3xl flex items-center justify-center mx-auto mb-4 shadow-inner">
               OC
             </div>
@@ -104,7 +103,6 @@ export default function AboutPage() {
 
         {/* The CEO Story Section */}
         <section className="glass rounded-[28px] p-8 sm:p-12 border border-black/8 dark:border-[rgba(244,244,242,0.08)] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/20 rounded-full blur-3xl pointer-events-none" />
           <div className="max-w-3xl space-y-4">
             <span className="font-mono text-xs uppercase tracking-[0.16em] text-accent font-semibold">
               The CEO & Creative Mind

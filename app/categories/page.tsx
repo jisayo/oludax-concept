@@ -5,19 +5,6 @@ import { ArrowRight, ArrowUpRight, ChevronRight, Sparkles } from "lucide-react";
 import { categories } from "@/lib/products";
 
 export default function CategoriesPage() {
-  const categoryGradients = [
-    "from-blue-500/30 to-cyan-500/20",
-    "from-amber-500/30 to-orange-500/20",
-    "from-rose-400/30 to-pink-500/20",
-    "from-teal-500/30 to-emerald-500/20",
-    "from-violet-500/30 to-purple-500/20",
-    "from-fuchsia-500/30 to-pink-500/20",
-    "from-sky-500/30 to-indigo-500/20",
-    "from-emerald-500/30 to-teal-500/20",
-    "from-red-500/30 to-rose-500/20",
-    "from-purple-500/30 to-indigo-500/20",
-  ];
-
   return (
     <div className="min-h-screen bg-base text-cloud pt-20 sm:pt-24 lg:pt-28 pb-16">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
@@ -50,31 +37,23 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        {/* Categories Grid (Aspect 4/5 ĒLAN style) */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.map((cat, idx) => (
+        {/* Clean Categories Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/shop?category=${cat.slug}`}
-              className="group relative aspect-4/5 overflow-hidden rounded-[20px] border border-black/8 bg-panel transition duration-300 hover:border-black/20 dark:border-[rgba(244,244,242,0.08)] dark:hover:border-[rgba(244,244,242,0.2)]"
+              className="group relative flex flex-col justify-between p-4 sm:p-5 rounded-[20px] border border-black/8 bg-panel dark:border-[rgba(244,244,242,0.08)] hover:border-accent/40 dark:hover:border-accent/40 transition-all duration-300 hover:shadow-md aspect-[4/5]"
             >
-              <div
-                aria-hidden="true"
-                className={`absolute inset-0 bg-gradient-to-br ${
-                  categoryGradients[idx % categoryGradients.length]
-                }`}
-              />
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <span className="text-5xl group-hover:scale-125 transition-transform duration-500 select-none opacity-90 drop-shadow-md">
-                  {cat.icon}
-                </span>
+              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                {cat.icon}
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/70">
+
+              <div>
+                <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-cloud/50">
                   {cat.productCount} items
                 </p>
-                <h3 className="mt-0.5 font-display text-base sm:text-lg font-medium text-white truncate">
+                <h3 className="mt-1 font-display text-sm sm:text-base font-medium text-cloud group-hover:text-accent transition-colors truncate">
                   {cat.name}
                 </h3>
               </div>

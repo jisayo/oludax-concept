@@ -92,7 +92,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Monogram Fallback if image not provided or fails */}
           <div
-            className={`fallback-monogram h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 text-center transition duration-500 group-hover:scale-105 bg-gradient-to-br from-[#720D46]/10 via-panel to-[#C40E75]/10 dark:from-[#720D46]/30 dark:via-[#141419] dark:to-[#C40E75]/20 ${
+            className={`fallback-monogram h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 text-center transition duration-500 group-hover:scale-105 bg-panel ${
               product.primaryImage ? "hidden" : "flex"
             }`}
           >

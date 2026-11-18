@@ -218,7 +218,7 @@ export default function ProductDetailPage({
 
               {/* Monogram Fallback */}
               <div
-                className={`gallery-fb text-center flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#720D46]/10 via-panel to-[#C40E75]/10 dark:from-[#720D46]/30 dark:via-[#141419] dark:to-[#C40E75]/20 rounded-2xl w-full h-full ${
+                className={`gallery-fb text-center flex flex-col items-center justify-center p-8 bg-panel rounded-2xl w-full h-full ${
                   galleryImages[selectedImageIndex] ? "hidden" : "flex"
                 }`}
               >

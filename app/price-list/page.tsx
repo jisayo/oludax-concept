@@ -88,8 +88,6 @@ export default function PriceListPage() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 space-y-10">
         {/* Header Glass Banner */}
         <div className="glass rounded-[28px] p-6 sm:p-10 border border-black/8 dark:border-[rgba(244,244,242,0.08)] relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/20 rounded-full blur-3xl pointer-events-none" />
-
           <nav className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-cloud/40 mb-3">
             <Link href="/" className="hover:text-accent transition-colors">
               Home
