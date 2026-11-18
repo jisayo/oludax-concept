@@ -181,16 +181,19 @@ export default function ProductDetailPage({
                 />
               ) : null}
               <div
-                className={`gallery-fb text-center ${
-                  product.primaryImage ? "hidden" : ""
+                className={`gallery-fb text-center flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#720D46]/10 via-panel to-[#C40E75]/10 dark:from-[#720D46]/30 dark:via-[#141419] dark:to-[#C40E75]/20 rounded-2xl w-full h-full ${
+                  product.primaryImage ? "hidden" : "flex"
                 }`}
               >
                 <div className="w-28 h-28 rounded-3xl bg-accent/20 border border-accent/30 text-accent font-display font-semibold text-4xl flex items-center justify-center mx-auto shadow-inner mb-3">
                   {product.name.split(" ")[0]?.[0]}
                   {product.name.split(" ")[1]?.[0] || ""}
                 </div>
-                <span className="font-mono text-xs uppercase tracking-wider text-cloud/40">
-                  {product.category}
+                <span className="font-mono text-xs uppercase tracking-[0.2em] text-accent font-semibold">
+                  Oludax Concept
+                </span>
+                <span className="font-mono text-[11px] text-cloud/40 mt-1">
+                  Product Photo Coming Soon
                 </span>
               </div>
 

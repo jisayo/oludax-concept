@@ -92,14 +92,20 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Monogram Fallback if image not provided or fails */}
           <div
-            className={`fallback-monogram h-full w-full flex items-center justify-center p-4 transition duration-500 group-hover:scale-110 ${
-              product.primaryImage ? "hidden" : ""
+            className={`fallback-monogram h-full w-full flex flex-col items-center justify-center p-6 text-center transition duration-500 group-hover:scale-105 bg-gradient-to-br from-[#720D46]/10 via-panel to-[#C40E75]/10 dark:from-[#720D46]/30 dark:via-[#141419] dark:to-[#C40E75]/20 ${
+              product.primaryImage ? "hidden" : "flex"
             }`}
           >
-            <div className="w-16 h-16 rounded-2xl bg-accent/15 border border-accent/25 text-accent font-display font-semibold text-xl flex items-center justify-center shadow-inner">
+            <div className="w-16 h-16 rounded-2xl bg-accent/15 border border-accent/25 text-accent font-display font-semibold text-2xl flex items-center justify-center shadow-inner mb-2 group-hover:scale-110 transition-transform">
               {product.name.split(" ")[0]?.[0]}
               {product.name.split(" ")[1]?.[0] || ""}
             </div>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-accent font-semibold">
+              Oludax Concept
+            </span>
+            <span className="font-mono text-[10px] text-cloud/40 mt-0.5">
+              Photo Coming Soon
+            </span>
           </div>
 
           {/* Status Badges */}
