@@ -94,11 +94,42 @@ export default function ContactPage() {
                       Phone & WhatsApp
                     </span>
                     <a
-                      href="tel:+2348000000000"
-                      className="font-mono text-xs text-cloud/70 hover:text-accent transition-colors"
+                      href="https://wa.me/message/Y4CATULMNOZHK1"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-xs text-accent hover:underline font-semibold"
                     >
-                      +234 (0) 800 000 0000
+                      08144412006 (+234 814 441 2006)
                     </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="w-9 h-9 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0 mt-0.5 border border-accent/25">
+                    <MessageCircle className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-medium text-cloud block">
+                      WhatsApp Quick Links
+                    </span>
+                    <div className="flex flex-col gap-1 mt-0.5 font-mono text-xs">
+                      <a
+                        href="https://wa.me/c/2348144412006"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-cloud/70 hover:text-accent transition-colors"
+                      >
+                        • View WhatsApp Catalog ↗
+                      </a>
+                      <a
+                        href="https://wa.me/p/25445532225087863/2348144412006"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-cloud/70 hover:text-accent transition-colors"
+                      >
+                        • Client Testimonials & Proof ↗
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -125,11 +156,27 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="font-medium text-cloud block">
-                      Operating Location
+                      Social & Studio Location
                     </span>
-                    <p className="text-cloud/60 text-xs">
-                      Lagos, Nigeria (Dispatches Nationwide)
-                    </p>
+                    <div className="text-xs text-cloud/70 space-y-0.5 mt-0.5">
+                      <p>
+                        Instagram:{" "}
+                        <a
+                          href="https://instagram.com/oludax_concept"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-accent hover:underline font-mono"
+                        >
+                          @oludax_concept
+                        </a>
+                      </p>
+                      <p className="text-cloud/50">
+                        CEO: <span className="font-mono">@Oluwatitofunmi9</span>
+                      </p>
+                      <p className="text-cloud/60 text-[11px] pt-1">
+                        Lagos, Nigeria (Dispatches Nationwide)
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -152,11 +199,19 @@ export default function ContactPage() {
               <div className="glass rounded-2xl p-4 text-xs border border-emerald-500/30">
                 <span className="font-medium text-emerald-500 flex items-center gap-1.5 mb-1">
                   <MessageCircle className="w-4 h-4" />
-                  Urgent celebration delivery?
+                  Need an urgent bespoke commission?
                 </span>
-                <p className="text-cloud/60 text-[11px] leading-relaxed">
-                  Message us on WhatsApp for rapid confirmation of fresh blooms and express dispatch schedules.
+                <p className="text-cloud/60 text-[11px] leading-relaxed mb-3">
+                  Message Precious directly on WhatsApp for expedited production of frames, custom mugs, or event souvenirs.
                 </p>
+                <a
+                  href="https://wa.me/message/Y4CATULMNOZHK1"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] text-emerald-400 font-semibold hover:underline"
+                >
+                  Chat on WhatsApp: 08144412006 ↗
+                </a>
               </div>
             </div>
           </div>

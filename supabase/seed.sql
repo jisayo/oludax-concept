@@ -1,6 +1,9 @@
 -- OLUDAX CONCEPT Seed Data
 
 -- 1. Categories
+INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-frames', 'Frames & Keepsakes', 'frames', 'Borderless, acrylic, polaroid, and personalized wall collages', 16, '🖼️') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
+INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-branding', 'Branding & Merchandise', 'branding', 'Mugs, thermal bottles, journals, satin bonnets, tote bags & nylons', 22, '✨') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
+INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-prints', 'Prints & Stationery', 'prints', 'Magazines, booklets, luxury invitations, programs & certificates', 14, '📜') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-1', 'Personalized Gifts', 'personalized-gifts', 'Unique gifts with a personal touch', 12, '🎁') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-2', 'Gift Boxes', 'gift-boxes', 'Beautifully curated gift box sets', 8, '📦') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 INSERT INTO categories (id, name, slug, description, product_count, icon) VALUES ('cat-3', 'Flowers', 'flowers', 'Fresh flower bouquets and arrangements', 10, '💐') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;

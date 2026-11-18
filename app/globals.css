@@ -12,10 +12,16 @@
   --color-cloud: 10 10 12;       /* #0A0A0C Jet deep charcoal/black (WCAG AAA) */
   --color-border: 0 0 0;         /* black */
 
-  --pink: #F42E91;
-  --pink-secondary: #FF75B5;
-  --pink-soft: #FCE4EF;
-  --pink-light: #FFF8FB;
+  /* Authentic Canva Portfolio Palette: Rich Berry Magenta (#C40E75) & Deep Plum (#720D46) */
+  --pink: #C40E75;
+  --pink-secondary: #E01E8B;
+  --pink-soft: #FDE8F2;
+  --pink-light: #FFF5F9;
+  --plum: #720D46;
+  --plum-dark: #4A072C;
+  --rose-petal: #F68EA8;
+  --blush: #F2B0C0;
+  --cyan-accent: #00C2E4;
   --dark: #0B0B0D;
   --dark-plum: #1C141E;
 }

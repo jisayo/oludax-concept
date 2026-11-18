@@ -70,7 +70,7 @@ export default function Header() {
               Oludax
             </span>
             <span className="hidden sm:inline-block font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25">
-              Studio
+              Concept
             </span>
           </Link>
 

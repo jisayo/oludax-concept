@@ -20,7 +20,7 @@ export default function AnnouncementBar() {
           <span className="text-accent font-semibold">₦50,000</span>
           <span className="hidden md:inline">
             {" "}
-            — Bespoke Personalization Studio
+            — Your Number One Gift Plug ✨
           </span>
         </p>
         <button

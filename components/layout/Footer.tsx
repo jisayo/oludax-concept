@@ -19,36 +19,42 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-cloud/50 max-w-xs">
-              Bespoke gifting reimagined. Curated treasures that blend
-              Nigerian craftsmanship with modern personalization for every
-              milestone.
+              Your Number One Gift Plug. Turning special moments into beautiful keepsakes through bespoke frames, merchandise branding, and luxury prints.
             </p>
             <div className="flex items-center gap-2 text-xs font-mono text-cloud/60 pt-1">
               <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span>More Than a Gift... It&apos;s a Feeling</span>
+              <span>Est. 2022 • Lagos, Nigeria</span>
             </div>
           </div>
 
           {/* Shop Col */}
           <div className="space-y-3">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cloud/40">
-              Shop Collections
+              Core Offerings
             </p>
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/shop"
+                  href="/shop?category=frames"
                   className="text-sm text-cloud/60 transition hover:text-cloud"
                 >
-                  All Products
+                  Frames & Keepsakes
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/shop?category=personalized-gifts"
+                  href="/shop?category=branding"
                   className="text-sm text-cloud/60 transition hover:text-cloud"
                 >
-                  Personalized Gifts
+                  Branding & Merchandise
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/shop?category=prints"
+                  className="text-sm text-cloud/60 transition hover:text-cloud"
+                >
+                  Prints & Stationery
                 </Link>
               </li>
               <li>
@@ -57,14 +63,6 @@ export default function Footer() {
                   className="text-sm text-cloud/60 transition hover:text-cloud"
                 >
                   Curated Gift Boxes
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/shop?category=flowers"
-                  className="text-sm text-cloud/60 transition hover:text-cloud"
-                >
-                  Fresh Blooms & Flowers
                 </Link>
               </li>
               <li>
@@ -127,32 +125,42 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="https://instagram.com"
+                  href="https://instagram.com/oludax_concept"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-cloud/60 transition hover:text-cloud flex items-center gap-2"
+                  className="text-sm text-cloud/60 transition hover:text-accent flex items-center gap-2"
                 >
-                  <span>Instagram</span>
+                  <span>Instagram (@oludax_concept)</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://wa.me/2340000000000"
+                  href="https://wa.me/message/Y4CATULMNOZHK1"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-cloud/60 transition hover:text-cloud flex items-center gap-2"
+                  className="text-sm text-emerald-500 font-semibold transition hover:underline flex items-center gap-2"
                 >
-                  <span>WhatsApp Concierge</span>
+                  <span>WhatsApp: 08144412006</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://twitter.com"
+                  href="https://wa.me/c/2348144412006"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sm text-cloud/60 transition hover:text-cloud"
+                  className="text-sm text-cloud/60 transition hover:text-accent"
                 >
-                  Twitter / X
+                  WhatsApp Catalog ↗
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://wa.me/p/25445532225087863/2348144412006"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm text-cloud/60 transition hover:text-accent"
+                >
+                  Client Reviews & Proof ↗
                 </a>
               </li>
               <li>

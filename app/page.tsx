@@ -11,6 +11,12 @@ import {
   RotateCcw,
   Headphones,
   Check,
+  Frame,
+  Layers,
+  Printer,
+  Heart,
+  MessageCircle,
+  ExternalLink,
 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import {
@@ -51,20 +57,19 @@ export default function Home() {
             {/* Status Pill */}
             <div className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.16em] text-accent">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Bespoke Gifting Studio • Lagos</span>
+              <span>Your Number One Gift Plug • Est. 2022</span>
             </div>
 
             {/* Editorial Headline */}
             <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl font-medium tracking-tight text-cloud leading-[1.08]">
               Gift More.
               <br />
-              <span className="text-accent italic font-normal">Create More.</span>
+              <span className="text-accent italic font-normal">Create Keepsakes.</span>
             </h1>
 
-            {/* Sub-description */}
+            {/* Sub-description with authentic story */}
             <p className="text-sm sm:text-base lg:text-lg leading-relaxed text-cloud/60 max-w-lg mx-auto lg:mx-0">
-              Thoughtfully curated bespoke gifts, engraved treasures, and personalized
-              celebration packages crafted for Nigeria&apos;s most meaningful moments.
+              Founded in 2022, <strong className="text-cloud font-semibold">Oludax Concept</strong> was born from a passion for creativity and the desire to bring beautiful ideas to life. From custom acrylic frames and personalized gift packages to business branding and luxury prints.
             </p>
 
             {/* CTA Buttons */}
@@ -76,19 +81,22 @@ export default function Home() {
                 Explore Catalog
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
-              <Link
-                href="/customize"
-                className="btn-outline w-full sm:w-auto px-8 py-3.5 text-xs font-mono uppercase tracking-[0.16em]"
+              <a
+                href="https://wa.me/message/Y4CATULMNOZHK1"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-outline w-full sm:w-auto px-6 py-3.5 text-xs font-mono uppercase tracking-[0.16em] inline-flex items-center justify-center gap-2"
               >
-                Customize Studio
-              </Link>
+                <MessageCircle className="w-4 h-4 text-emerald-500" />
+                <span>WhatsApp Plug</span>
+              </a>
             </div>
 
             {/* Micro Metadata */}
             <div className="flex items-center justify-center lg:justify-start gap-6 pt-4 font-mono text-xs text-cloud/50">
               <span className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-accent" />
-                Fast Dispatch
+                Frames • Brand • Print
               </span>
               <span className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-accent" />
@@ -96,7 +104,7 @@ export default function Home() {
               </span>
               <span className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-accent" />
-                100% Handcrafted
+                Nationwide Dispatch
               </span>
             </div>
           </div>
@@ -119,17 +127,20 @@ export default function Home() {
                 <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-accent mt-1">
                   Concept Studio
                 </span>
-                <p className="font-mono text-[11px] text-cloud/40 mt-3">
-                  ₦ Naira • Nationwide Delivery
+                <p className="font-mono text-[10px] text-cloud/50 mt-2">
+                  &ldquo;Your Number One Gift Plug&rdquo;
+                </p>
+                <p className="font-mono text-[11px] text-accent/80 font-semibold mt-1">
+                  Est. 2022 • Lagos, Nigeria
                 </p>
               </div>
 
               {/* Floating feature pills */}
-              <div className="absolute top-4 right-4 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md">
-                <span>🎁</span> Bespoke Hampers
+              <div className="absolute top-4 right-4 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md border border-accent/20">
+                <span>🖼️</span> Acrylic & Polaroid Frames
               </div>
-              <div className="absolute bottom-6 left-2 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md">
-                <span>✨</span> Custom Mugs
+              <div className="absolute bottom-6 left-2 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md border border-accent/20">
+                <span>✨</span> Custom Mugs & Bottles
               </div>
             </div>
           </div>
@@ -196,6 +207,204 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* ===== THE 3 SIGNATURE PILLARS: FRAME • BRAND • PRINT ===== */}
+      <section aria-labelledby="pillars-heading" className="space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.16em] text-accent mb-2">
+              <Sparkles className="w-3 h-3" />
+              <span>Our Core Offerings</span>
+            </div>
+            <h2
+              id="pillars-heading"
+              className="font-display text-2xl sm:text-3xl lg:text-4xl font-medium text-cloud tracking-tight"
+            >
+              The 3 Pillars of Oludax Concept
+            </h2>
+            <p className="text-xs sm:text-sm text-cloud/50 mt-1 max-w-xl">
+              From cherished photographic frames to corporate business branding and luxury print stationery.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="hidden items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-cloud/60 transition hover:text-accent sm:inline-flex"
+          >
+            Explore All Offerings
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Pillar 1: FRAME */}
+          <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
+                <Frame className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent font-semibold">
+                  Pillar 01 • Keepsakes
+                </span>
+                <h3 className="font-display text-2xl font-medium text-cloud">
+                  FRAME
+                </h3>
+                <p className="text-xs sm:text-sm text-cloud/60 italic leading-relaxed">
+                  &ldquo;Turning your special moments into beautiful keepsakes.&rdquo;
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-black/8 dark:border-white/10">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-cloud/40 mb-2.5">
+                  Available Formats:
+                </p>
+                <ul className="space-y-1.5 font-mono text-xs text-cloud/70">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Borderless & Border Frames
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Crystal Acrylic Floating Frames
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Vintage Polaroid Keepsake Frames
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Pinterest Aesthetic Displays
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Personalized Wall Photo Collages
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <Link
+              href="/shop?category=frames"
+              className="mt-6 btn-outline w-full py-2.5 text-xs font-mono uppercase tracking-[0.14em] text-center"
+            >
+              Shop Frames
+            </Link>
+          </div>
+
+          {/* Pillar 2: BRAND */}
+          <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#C40E75]/20 to-[#F68EA8]/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
+                <Layers className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent font-semibold">
+                  Pillar 02 • Merchandise
+                </span>
+                <h3 className="font-display text-2xl font-medium text-cloud">
+                  BRAND
+                </h3>
+                <p className="text-xs sm:text-sm text-cloud/60 italic leading-relaxed">
+                  &ldquo;Helping you gift personal gifts and give your business a look that stands out.&rdquo;
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-black/8 dark:border-white/10">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-cloud/40 mb-2.5">
+                  Available Items:
+                </p>
+                <ul className="space-y-1.5 font-mono text-xs text-cloud/70">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Customized Mugs & Thermal Bottles
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Executive Journals & Engraved Pens
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Custom T-Shirts & Face Caps
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Tote Bags & Silk Satin Bonnets
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Branded Retail Nylons & Souvenirs
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <Link
+              href="/shop?category=branding"
+              className="mt-6 btn-outline w-full py-2.5 text-xs font-mono uppercase tracking-[0.14em] text-center"
+            >
+              Explore Branding
+            </Link>
+          </div>
+
+          {/* Pillar 3: PRINT */}
+          <div className="glass rounded-[24px] p-6 sm:p-8 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex flex-col justify-between relative overflow-hidden group hover:border-accent/40 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#720D46]/20 to-[#00C2E4]/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent">
+                <Printer className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent font-semibold">
+                  Pillar 03 • Publishing
+                </span>
+                <h3 className="font-display text-2xl font-medium text-cloud">
+                  PRINT
+                </h3>
+                <p className="text-xs sm:text-sm text-cloud/60 italic leading-relaxed">
+                  &ldquo;Bringing your ideas to life through print.&rdquo;
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-black/8 dark:border-white/10">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-cloud/40 mb-2.5">
+                  Available Prints:
+                </p>
+                <ul className="space-y-1.5 font-mono text-xs text-cloud/70">
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Magazines & Mini Booklets
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Business Flyers, Banners & Posters
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Bespoke Invitations & Programmes
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Thank You & Luxury Greeting Cards
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    Commemorative Certificates
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <Link
+              href="/shop?category=prints"
+              className="mt-6 btn-outline w-full py-2.5 text-xs font-mono uppercase tracking-[0.14em] text-center"
+            >
+              Order Prints
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -307,6 +516,75 @@ export default function Home() {
           {newArrivals.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
+        </div>
+      </section>
+
+      {/* ===== THE CEO & BRAND STORY (Precious Oluwatofunmi) ===== */}
+      <section className="glass rounded-[28px] p-6 sm:p-10 lg:p-12 border border-black/8 dark:border-[rgba(244,244,242,0.08)] relative overflow-hidden">
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-gradient-to-br from-[#720D46]/20 to-[#C40E75]/20 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="grid lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7 space-y-5">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/10 px-3.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-accent">
+              <Heart className="w-3.5 h-3.5 fill-current" />
+              <span>Meet The CEO • The Creative Mind</span>
+            </div>
+
+            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-medium tracking-tight text-cloud">
+              Who is Oludax? Meet Precious Oluwatofunmi
+            </h2>
+
+            <p className="text-sm sm:text-base leading-relaxed text-cloud/70">
+              Meet <strong>Precious Oluwatofunmi</strong>, the student entrepreneur and creative mind behind <strong>Oludax Concept</strong>. With a love for creativity and an eye for beautiful things, Precious is passionate about creating pieces that feel personal, thoughtful, and special.
+            </p>
+
+            <p className="text-xs sm:text-sm leading-relaxed text-cloud/60">
+              Through Oludax Concept, she brings ideas to life through frames, customised gifts, business branding, and printing. As she continues to balance school and entrepreneurship, Precious is steadily building a brand that reflects her creativity, passion, and vision.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href="https://wa.me/p/25445532225087863/2348144412006"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-primary px-6 py-3 text-xs font-mono uppercase tracking-[0.14em] inline-flex items-center gap-2"
+              >
+                <span>Read Verified Client Reviews</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <a
+                href="https://wa.me/c/2348144412006"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-outline px-6 py-3 text-xs font-mono uppercase tracking-[0.14em] inline-flex items-center gap-2"
+              >
+                <span>View WhatsApp Catalog</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 flex justify-center">
+            <div className="p-6 rounded-[24px] bg-gradient-to-br from-[#720D46]/20 via-black/20 to-[#C40E75]/20 border border-accent/25 space-y-4 max-w-sm w-full">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
+                  Client Proof & Trust
+                </span>
+                <span className="text-xs text-amber-400 flex items-center gap-1 font-mono">
+                  <Star className="w-3.5 h-3.5 fill-current" />
+                  5.0 Rating
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed text-cloud/80 italic">
+                &ldquo;Testimonials from happy clients 💖✨ More than enough proof to trust our brand. From custom frames to thoughtful gift boxes, our clients always leave with smiles.&rdquo;
+              </p>
+              <div className="pt-2 flex items-center justify-between font-mono text-[11px] text-cloud/50">
+                <span>📍 Lagos, Nigeria</span>
+                <span className="text-emerald-500 font-medium">WhatsApp Verified</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
