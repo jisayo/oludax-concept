@@ -1,0 +1,52 @@
+import { NextRequest, NextResponse } from "next/server";
+import { saveContactMessage } from "@/lib/server/db";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { name, email, phone, subject, message } = body;
+
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return NextResponse.json(
+        { success: false, error: "Your name is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return NextResponse.json(
+        { success: false, error: "A valid email address is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!message || typeof message !== "string" || !message.trim()) {
+      return NextResponse.json(
+        { success: false, error: "Please enter your message or inquiry." },
+        { status: 400 }
+      );
+    }
+
+    const saved = await saveContactMessage({
+      name,
+      email,
+      phone,
+      subject: subject || "Custom Gift Inquiry",
+      message,
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Thank you! Our concierge team has received your inquiry.",
+        data: saved,
+      },
+      { status: 201 }
+    );
+  } catch (err: any) {
+    return NextResponse.json(
+      { success: false, error: err.message || "Failed to submit message." },
+      { status: 500 }
+    );
+  }
+}

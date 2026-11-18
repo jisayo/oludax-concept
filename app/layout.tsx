@@ -1,0 +1,77 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { ThemeProvider } from "@/lib/theme-context";
+import { CartProvider } from "@/lib/cart-context";
+import { WishlistProvider } from "@/lib/wishlist-context";
+import { AuthProvider } from "@/lib/auth-context";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+
+export const metadata: Metadata = {
+  title: {
+    default: "OLUDAX CONCEPT — Bespoke Gifting & Personalization Studio",
+    template: "%s | OLUDAX CONCEPT",
+  },
+  description:
+    "Thoughtfully curated gifts, custom-engraved treasures, and personalized creations for every special moment across Nigeria.",
+  keywords: [
+    "gifts",
+    "personalized gifts",
+    "custom gifts",
+    "gift boxes",
+    "celebration packages",
+    "Nigeria",
+    "Lagos",
+    "OLUDAX",
+  ],
+  openGraph: {
+    title: "OLUDAX CONCEPT — Bespoke Gifting & Personalization Studio",
+    description:
+      "Thoughtfully curated gifts, custom-engraved treasures, and personalized creations for every special moment across Nigeria.",
+    type: "website",
+    locale: "en_NG",
+    siteName: "OLUDAX CONCEPT",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="h-full antialiased dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var theme = localStorage.getItem('oludax_theme');
+                if (theme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-base text-cloud font-body">
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <AnnouncementBar />
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </WishlistProvider>
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

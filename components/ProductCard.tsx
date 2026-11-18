@@ -1,0 +1,230 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Heart,
+  ShoppingBag,
+  Sparkles,
+  Minus,
+  Plus,
+  Check,
+} from "lucide-react";
+import { useCart } from "@/lib/cart-context";
+import { useWishlist } from "@/lib/wishlist-context";
+import type { Product } from "@/lib/products";
+import { formatPrice } from "@/lib/products";
+
+export default function ProductCard({ product }: { product: Product }) {
+  const { addItem } = useCart();
+  const { isInWishlist, toggleItem } = useWishlist();
+  const [quantity, setQuantity] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
+
+  const isFavorited = isInWishlist(product.id);
+  const targetUrl = `/product/${product.slug || product.id}`;
+
+  const isAvailable =
+    product.inStock !== false &&
+    (product.stockCount === undefined || product.stockCount > 0);
+  const maxStock = product.stockCount ?? 99;
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity((prev) => Math.min(maxStock, prev + 1));
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAvailable) return;
+
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.primaryImage,
+      },
+      quantity
+    );
+
+    setJustAdded(true);
+    setTimeout(() => {
+      setJustAdded(false);
+      setQuantity(1);
+    }, 1500);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleItem(product.id);
+  };
+
+  return (
+    <article className="group glass flex flex-col overflow-hidden rounded-[20px] p-4 transition duration-300 hover:bg-black/[0.03] dark:hover:bg-[rgba(244,244,242,0.08)]">
+      <Link href={targetUrl} className="flex flex-1 flex-col">
+        {/* Product Image Frame */}
+        <div className="relative mb-4 h-52 shrink-0 overflow-hidden rounded-2xl border border-black/10 bg-panel dark:border-[rgba(244,244,242,0.12)]">
+          {product.primaryImage ? (
+            <img
+              src={product.primaryImage}
+              alt={product.name}
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.parentElement?.querySelector(
+                  ".fallback-monogram"
+                );
+                if (fallback) fallback.classList.remove("hidden");
+              }}
+            />
+          ) : null}
+
+          {/* Monogram Fallback if image not provided or fails */}
+          <div
+            className={`fallback-monogram h-full w-full flex items-center justify-center p-4 transition duration-500 group-hover:scale-110 ${
+              product.primaryImage ? "hidden" : ""
+            }`}
+          >
+            <div className="w-16 h-16 rounded-2xl bg-accent/15 border border-accent/25 text-accent font-display font-semibold text-xl flex items-center justify-center shadow-inner">
+              {product.name.split(" ")[0]?.[0]}
+              {product.name.split(" ")[1]?.[0] || ""}
+            </div>
+          </div>
+
+          {/* Status Badges */}
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 pointer-events-none">
+            {product.newArrival && (
+              <span className="glass rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-cloud font-semibold shadow-sm">
+                New
+              </span>
+            )}
+            {product.customizable && (
+              <span className="glass rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-accent font-semibold shadow-sm flex items-center gap-1 border border-accent/20">
+                <Sparkles className="w-2.5 h-2.5" /> Bespoke
+              </span>
+            )}
+          </div>
+
+          {/* Wishlist Button */}
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            aria-label={isFavorited ? "Remove from wishlist" : "Add to wishlist"}
+            className="absolute top-2.5 right-2.5 glass h-8 w-8 rounded-full flex items-center justify-center text-cloud/70 hover:text-accent transition-all z-10 cursor-pointer"
+          >
+            <Heart
+              className={`w-3.5 h-3.5 transition-colors ${
+                isFavorited ? "fill-accent text-accent" : ""
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Title */}
+        <h3 className="truncate capitalize font-display text-base sm:text-lg font-medium text-cloud group-hover:text-accent transition-colors">
+          {product.name}
+        </h3>
+
+        {/* Short Description */}
+        <div className="mt-1 flex-1">
+          <p className="text-xs leading-relaxed text-cloud/75 line-clamp-2">
+            {product.shortDescription ||
+              product.description ||
+              "Bespoke personalized gift crafted with love and care for memorable moments."}
+          </p>
+        </div>
+
+        {/* Price & Category Tag */}
+        <div className="mt-3.5 flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-1.5">
+            <p className="font-mono text-sm text-accent font-semibold">
+              {formatPrice(product.price)}
+            </p>
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="font-mono text-[11px] text-cloud/60 line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+          </div>
+          <span className="shrink-0 glass rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-cloud font-medium">
+            {product.category || "Gift"}
+          </span>
+        </div>
+      </Link>
+
+      {/* Stepper + Add to Cart Row */}
+      <div className="mt-3 flex items-center gap-2">
+        {isAvailable ? (
+          <>
+            {/* Quantity Stepper */}
+            <div className="glass flex items-center gap-1 rounded-full px-1 py-1 shrink-0">
+              <button
+                type="button"
+                onClick={handleDecrement}
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-cloud/70 transition hover:bg-black/8 dark:hover:bg-[rgba(244,244,242,0.12)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="flex h-7 min-w-6 items-center justify-center font-mono text-xs text-cloud select-none">
+                {quantity}
+              </span>
+              <button
+                type="button"
+                onClick={handleIncrement}
+                disabled={quantity >= maxStock}
+                aria-label="Increase quantity"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-cloud/70 transition hover:bg-black/8 dark:hover:bg-[rgba(244,244,242,0.12)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] transition active:scale-95 cursor-pointer ${
+                justAdded
+                  ? "bg-emerald-600 text-white"
+                  : "bg-accent/15 text-accent hover:bg-accent/25 dark:bg-accent/15 dark:hover:bg-accent/25"
+              }`}
+            >
+              {justAdded ? (
+                <>
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Added!</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="h-3.5 w-3.5" />
+                  <span>Add to Cart</span>
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="flex flex-1 items-center justify-center py-2.5 rounded-full font-mono text-[11px] uppercase tracking-[0.14em] bg-black/5 dark:bg-white/5 text-cloud/40 cursor-not-allowed"
+          >
+            Out of Stock
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}

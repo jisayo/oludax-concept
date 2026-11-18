@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-playfair: 'Playfair Display', Fraunces, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-inter: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* Light Mode Palette - Maximum Readability & Contrast */
+  --color-base: 248 248 246;     /* #F8F8F6 off-white */
+  --color-panel: 255 255 255;    /* #FFFFFF crisp white */
+  --color-cloud: 10 10 12;       /* #0A0A0C Jet deep charcoal/black (WCAG AAA) */
+  --color-border: 0 0 0;         /* black */
+
+  --pink: #F42E91;
+  --pink-secondary: #FF75B5;
+  --pink-soft: #FCE4EF;
+  --pink-light: #FFF8FB;
+  --dark: #0B0B0D;
+  --dark-plum: #1C141E;
+}
+
+.dark {
+  /* Dark Mode Palette - ĒLAN Obsidian Luxury with Crisp Radiant White Text */
+  --color-base: 11 11 13;        /* #0B0B0D matte obsidian */
+  --color-panel: 20 20 25;       /* #141419 elevated tactile panel */
+  --color-cloud: 255 255 255;    /* #FFFFFF Pure radiant white (WCAG AAA) */
+  --color-border: 255 255 255;   /* white border */
+}
+
+/* ---- Base ---- */
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  @apply bg-base text-cloud font-body min-h-full flex flex-col transition-colors duration-200 antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Glassmorphism Utility (Tactile, legible panels with deep contrast) ---- */
+.glass {
+  background-color: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass {
+  background-color: rgba(20, 20, 25, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Reusable Utility Components ---- */
+@layer components {
+  .btn-primary {
+    @apply bg-accent text-white font-mono text-xs uppercase tracking-[0.14em] rounded-full py-3 px-8 text-center
+           hover:brightness-110 active:scale-95 transition-all duration-200 inline-flex items-center justify-center gap-2 shadow-sm font-semibold;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-cloud border border-cloud/25 font-mono text-xs uppercase tracking-[0.14em] rounded-full py-3 px-8 text-center
+           hover:bg-cloud/5 active:scale-95 transition-all duration-200 inline-flex items-center justify-center gap-2 font-medium;
+  }
+
+  .card {
+    @apply glass rounded-2xl transition duration-300;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  .heading-lg {
+    @apply font-display text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-cloud;
+  }
+
+  .heading-md {
+    @apply font-display text-2xl md:text-3xl font-medium tracking-tight text-cloud;
+  }
+
+  .heading-sm {
+    @apply font-display text-xl md:text-2xl font-medium tracking-tight text-cloud;
+  }
+
+  .text-muted {
+    @apply text-cloud/80;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-black/15 dark:border-white/15 bg-white/95 dark:bg-panel text-sm text-cloud
+           placeholder:text-cloud/60 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all font-medium;
+  }
+
+  .badge-accent {
+    @apply bg-accent/10 text-accent font-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1 rounded-full font-semibold;
+  }
+}
+
+/* ---- High-Contrast Text Legibility Overrides (WCAG AAA Standards) ---- */
+/* Elevate low-opacity Tailwind classes to guarantee sharp readability across all themes */
+.text-cloud\/20 {
+  color: rgb(var(--color-cloud) / 0.60) !important;
+}
+.text-cloud\/30 {
+  color: rgb(var(--color-cloud) / 0.70) !important;
+}
+.text-cloud\/40 {
+  color: rgb(var(--color-cloud) / 0.80) !important;
+}
+.text-cloud\/50 {
+  color: rgb(var(--color-cloud) / 0.88) !important;
+}
+.text-cloud\/60 {
+  color: rgb(var(--color-cloud) / 0.92) !important;
+}
+.text-cloud\/70 {
+  color: rgb(var(--color-cloud) / 0.96) !important;
+}
+.text-cloud\/80 {
+  color: rgb(var(--color-cloud) / 0.98) !important;
+}
+
+/* Ensure input placeholders and form hints are always legible */
+::placeholder,
+.placeholder\:text-cloud\/40::placeholder,
+.placeholder\:text-cloud\/50::placeholder,
+.placeholder\:text-cloud\/60::placeholder {
+  color: rgb(var(--color-cloud) / 0.65) !important;
+  opacity: 1 !important;
+}
+
+/* Form control text sharpness */
+input, textarea, select {
+  color: rgb(var(--color-cloud));
+}
+
+/* ---- Custom Scrollbars ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-cloud) / 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-cloud) / 0.45);
+}
+
+/* ---- Text Selection ---- */
+::selection {
+  background-color: rgba(244, 46, 145, 0.35);
+  color: inherit;
+}
