@@ -91,47 +91,68 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero Visual Studio Badge */}
+          {/* Hero Visual Studio Showcase (Authentic Product Photography) */}
           <div className="relative hidden lg:flex items-center justify-center">
-            <div className="relative w-80 h-80 sm:w-96 sm:h-96 flex items-center justify-center">
-              {/* Rotating outer ring */}
-              <div className="absolute inset-0 rounded-full border border-cloud/10 animate-[spin_24s_linear_infinite]" />
-              <div className="absolute inset-6 rounded-full border border-dashed border-accent/30 animate-[spin_36s_linear_infinite_reverse]" />
-
-              {/* Central Elevated Glass Disc */}
-              <div className="glass w-64 h-64 rounded-full flex flex-col items-center justify-center text-center p-6 shadow-2xl border border-black/10 dark:border-white/10 group cursor-default">
-                <div className="w-16 h-16 rounded-2xl bg-accent/20 border border-accent/30 text-accent flex items-center justify-center mb-3 shadow-inner group-hover:scale-105 transition-transform">
-                  <Gift className="w-8 h-8" />
+            <div className="relative w-full max-w-md p-6 glass rounded-[32px] border border-black/10 dark:border-white/10 shadow-2xl space-y-4">
+              {/* Product Gallery Strip */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="aspect-square rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] p-2 flex items-center justify-center border border-black/8 dark:border-white/8 hover:scale-105 transition-transform duration-300">
+                  <img
+                    src="/images/products/giftbox-luxury.png"
+                    alt="Luxury Gift Hamper"
+                    className="w-full h-full object-contain drop-shadow"
+                  />
                 </div>
-                <span className="font-display text-2xl font-medium tracking-tight text-cloud">
-                  Oludax
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-accent mt-1">
-                  Concept Studio
-                </span>
-                <p className="font-mono text-[10px] text-cloud/50 mt-2">
-                  &ldquo;Your Number One Gift Plug&rdquo;
-                </p>
-                <p className="font-mono text-[11px] text-accent/80 font-semibold mt-1">
-                  Est. 2022 • Lagos, Nigeria
-                </p>
+                <div className="aspect-square rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] p-2 flex items-center justify-center border border-black/8 dark:border-white/8 hover:scale-105 transition-transform duration-300">
+                  <img
+                    src="/images/products/borderless-frame.png"
+                    alt="Keepsake Frame"
+                    className="w-full h-full object-contain drop-shadow"
+                  />
+                </div>
+                <div className="aspect-square rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] p-2 flex items-center justify-center border border-black/8 dark:border-white/8 hover:scale-105 transition-transform duration-300">
+                  <img
+                    src="/images/products/custom-mug.png"
+                    alt="Personalized Mug"
+                    className="w-full h-full object-contain drop-shadow"
+                  />
+                </div>
               </div>
 
-              {/* Floating feature pills */}
-              <div className="absolute top-4 right-4 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md border border-accent/20">
-                <span>🖼️</span> Acrylic & Polaroid Frames
-              </div>
-              <div className="absolute bottom-6 left-2 glass px-3.5 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider text-cloud flex items-center gap-1.5 shadow-md border border-accent/20">
-                <span>✨</span> Custom Mugs & Bottles
+              {/* Studio Bio Card */}
+              <div className="pt-2 border-t border-black/8 dark:border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-display font-medium text-lg text-cloud">
+                      Oludax Concept
+                    </h3>
+                    <p className="font-mono text-[11px] uppercase tracking-wider text-accent font-semibold">
+                      Your Number One Gift Plug
+                    </p>
+                  </div>
+                  <span className="font-mono text-[10px] text-cloud/60 bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full border border-black/8 dark:border-white/10">
+                    Est. 2022
+                  </span>
+                </div>
+                <p className="text-xs text-cloud/70 leading-relaxed">
+                  Lagos-based bespoke gifting & branding studio. Custom frames, personalized corporate souvenirs, luxury print stationery, and celebration packages.
+                </p>
+                <div className="flex items-center justify-between pt-2 text-[11px] font-mono text-cloud/60">
+                  <span className="flex items-center gap-1 text-emerald-500 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Accepting Orders
+                  </span>
+                  <span>📍 Lagos, Nigeria</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ===== SHOP BY CATEGORY (ĒLAN Aspect 4/5 Visual Grid) ===== */}
+      {/* ===== SHOP BY CATEGORY (Real Photography Grid) ===== */}
       <section aria-labelledby="categories-heading" className="space-y-6">
-        <div className="flex items-end justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
           <div>
             <h2
               id="categories-heading"
@@ -139,38 +160,61 @@ export default function Home() {
             >
               Shop by Category
             </h2>
-            <p className="text-xs sm:text-sm text-cloud/50 mt-1">
-              Curated collections for celebrations, corporate gifting, and intimate surprises.
+            <p className="text-xs sm:text-sm text-cloud/70 mt-1 max-w-xl">
+              Browse custom frames, personalized mugs, apparel, luxury hampers, and branded souvenirs.
             </p>
           </div>
           <Link
             href="/categories"
-            className="hidden items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-cloud/60 transition hover:text-accent sm:inline-flex"
+            className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-cloud/70 transition hover:text-accent font-medium self-start sm:self-auto"
           >
-            View All
+            <span>View All Collections</span>
             <ArrowUpRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        {/* 5-Column Clean Category Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {categories.slice(0, 10).map((cat) => (
+        {/* 4-Column Balanced Real Photography Grid (2 rows of 4 = 8 categories) */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
+          {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/shop?category=${cat.slug}`}
-              className="group relative flex flex-col justify-between p-4 sm:p-5 rounded-[20px] border border-black/8 bg-panel dark:border-[rgba(244,244,242,0.08)] hover:border-accent/40 dark:hover:border-accent/40 transition-all duration-300 hover:shadow-md aspect-[4/5]"
+              className="group relative flex flex-col rounded-[22px] border border-black/10 dark:border-white/10 bg-panel hover:border-accent/50 dark:hover:border-accent/50 transition-all duration-300 hover:shadow-xl overflow-hidden"
             >
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                {cat.icon}
+              {/* Product Photograph Container */}
+              <div className="aspect-square w-full bg-black/[0.02] dark:bg-white/[0.03] p-5 sm:p-6 flex items-center justify-center relative overflow-hidden">
+                {cat.image ? (
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500 drop-shadow-sm"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent text-2xl font-bold font-display">
+                    {cat.name.charAt(0)}
+                  </div>
+                )}
+                {/* Item Count Badge */}
+                <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider font-semibold uppercase bg-white/95 dark:bg-[#141418]/95 text-cloud border border-black/10 dark:border-white/15 shadow-sm">
+                  {cat.productCount} items
+                </span>
               </div>
 
-              <div>
-                <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-cloud/50">
-                  {cat.productCount} items
-                </p>
-                <h3 className="mt-1 font-display text-sm sm:text-base font-medium text-cloud group-hover:text-accent transition-colors truncate">
-                  {cat.name}
-                </h3>
+              {/* Category Info */}
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between border-t border-black/8 dark:border-white/8 bg-panel">
+                <div>
+                  <h3 className="font-display text-base sm:text-lg font-medium text-cloud group-hover:text-accent transition-colors">
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-cloud/60 mt-1 line-clamp-1 font-body">
+                    {cat.description}
+                  </p>
+                </div>
+                <div className="pt-3 mt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between font-mono text-[11px] text-accent font-semibold group-hover:translate-x-0.5 transition-transform">
+                  <span>Shop Collection</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
               </div>
             </Link>
           ))}
@@ -189,15 +233,15 @@ export default function Home() {
               id="pillars-heading"
               className="font-display text-2xl sm:text-3xl lg:text-4xl font-medium text-cloud tracking-tight"
             >
-              The 3 Pillars of Oludax Concept
+              Frames • Branding • Printing
             </h2>
-            <p className="text-xs sm:text-sm text-cloud/50 mt-1 max-w-xl">
-              From cherished photographic frames to corporate business branding and luxury print stationery.
+            <p className="text-xs sm:text-sm text-cloud/70 mt-1 max-w-xl">
+              From cherished photo frames to business branding and luxury print stationery.
             </p>
           </div>
           <Link
             href="/shop"
-            className="hidden items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-cloud/60 transition hover:text-accent sm:inline-flex"
+            className="hidden items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-cloud/70 transition hover:text-accent sm:inline-flex"
           >
             Explore All Offerings
             <ArrowUpRight className="h-3.5 w-3.5" />
@@ -213,12 +257,12 @@ export default function Home() {
               </div>
               <div className="space-y-1">
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent font-semibold">
-                  Pillar 01 • Keepsakes
+                  Keepsakes & Wall Art
                 </span>
                 <h3 className="font-display text-2xl font-medium text-cloud">
-                  FRAME
+                  FRAMES
                 </h3>
-                <p className="text-xs sm:text-sm text-cloud/60 italic leading-relaxed">
+                <p className="text-xs sm:text-sm text-cloud/70 italic leading-relaxed">
                   &ldquo;Turning your special moments into beautiful keepsakes.&rdquo;
                 </p>
               </div>
@@ -403,17 +447,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== HOW OLUDAX CRAFTS YOUR STYLE (ĒLAN Explainer Section) ===== */}
+      {/* ===== HOW ORDERING WORKS ===== */}
       <section aria-labelledby="explainer-heading" className="space-y-12">
         <div className="mx-auto max-w-xl text-center">
           <h2
             id="explainer-heading"
             className="font-display text-2xl font-medium text-cloud sm:text-3xl tracking-tight"
           >
-            How Oludax Crafts Your Style
+            How Ordering Works
           </h2>
-          <p className="mt-2 text-sm text-cloud/50">
-            Three simple steps from bespoke inspiration to unforgettable celebrations.
+          <p className="mt-2 text-sm text-cloud/70">
+            Three simple steps from selecting your gift to nationwide doorstep delivery.
           </p>
         </div>
 
@@ -421,33 +465,30 @@ export default function Home() {
           <div className="glass rounded-2xl p-6 transition duration-300 hover:bg-black/[0.04] dark:hover:bg-[rgba(244,244,242,0.08)] sm:p-8 space-y-3">
             <Eye className="h-6 w-6 text-accent mb-4" />
             <h3 className="font-display text-lg font-medium text-cloud">
-              1. Browse & Select
+              1. Choose Your Gift
             </h3>
-            <p className="text-sm leading-relaxed text-cloud/50">
-              Explore our curated gift boxes, personalized ceramic mugs, apparel, and
-              fresh blooms tailored to any recipient.
+            <p className="text-sm leading-relaxed text-cloud/70">
+              Browse our catalog of custom photo frames, personalized ceramic mugs, apparel, and luxury hampers.
             </p>
           </div>
 
           <div className="glass rounded-2xl p-6 transition duration-300 hover:bg-black/[0.04] dark:hover:bg-[rgba(244,244,242,0.08)] sm:p-8 space-y-3">
             <Sparkles className="h-6 w-6 text-accent mb-4" />
             <h3 className="font-display text-lg font-medium text-cloud">
-              2. Personalize Live
+              2. Add Personal Touch
             </h3>
-            <p className="text-sm leading-relaxed text-cloud/50">
-              Add recipient names, sentimental love notes, select custom colour palettes,
-              and upload photo memories via our Customization Studio.
+            <p className="text-sm leading-relaxed text-cloud/70">
+              Upload your photos, specify recipient names, add heartfelt messages, or choose your custom colors.
             </p>
           </div>
 
           <div className="glass rounded-2xl p-6 transition duration-300 hover:bg-black/[0.04] dark:hover:bg-[rgba(244,244,242,0.08)] sm:p-8 space-y-3">
             <Truck className="h-6 w-6 text-accent mb-4" />
             <h3 className="font-display text-lg font-medium text-cloud">
-              3. Nationwide Dispatch
+              3. Swift Nationwide Dispatch
             </h3>
-            <p className="text-sm leading-relaxed text-cloud/50">
-              Each package is hand-wrapped in luxury presentation boxes and delivered
-              speedily across all 36 Nigerian states.
+            <p className="text-sm leading-relaxed text-cloud/70">
+              Crafted in Lagos, beautifully packaged with love, and dispatched safely across all 36 Nigerian states.
             </p>
           </div>
         </div>

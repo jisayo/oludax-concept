@@ -37,25 +37,48 @@ export default function CategoriesPage() {
           </div>
         </div>
 
-        {/* Clean Categories Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {/* 4-Column Balanced Real Photography Grid (2 rows of 4 = 8 categories) */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 md:gap-6">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/shop?category=${cat.slug}`}
-              className="group relative flex flex-col justify-between p-4 sm:p-5 rounded-[20px] border border-black/8 bg-panel dark:border-[rgba(244,244,242,0.08)] hover:border-accent/40 dark:hover:border-accent/40 transition-all duration-300 hover:shadow-md aspect-[4/5]"
+              className="group relative flex flex-col rounded-[22px] border border-black/10 dark:border-white/10 bg-panel hover:border-accent/50 dark:hover:border-accent/50 transition-all duration-300 hover:shadow-xl overflow-hidden"
             >
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                {cat.icon}
+              {/* Product Photograph Container */}
+              <div className="aspect-square w-full bg-black/[0.02] dark:bg-white/[0.03] p-5 sm:p-6 flex items-center justify-center relative overflow-hidden">
+                {cat.image ? (
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500 drop-shadow-sm"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-accent/15 border border-accent/25 flex items-center justify-center text-accent text-2xl font-bold font-display">
+                    {cat.name.charAt(0)}
+                  </div>
+                )}
+                {/* Item Count Badge */}
+                <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider font-semibold uppercase bg-white/95 dark:bg-[#141418]/95 text-cloud border border-black/10 dark:border-white/15 shadow-sm">
+                  {cat.productCount} items
+                </span>
               </div>
 
-              <div>
-                <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-cloud/50">
-                  {cat.productCount} items
-                </p>
-                <h3 className="mt-1 font-display text-sm sm:text-base font-medium text-cloud group-hover:text-accent transition-colors truncate">
-                  {cat.name}
-                </h3>
+              {/* Category Info */}
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between border-t border-black/8 dark:border-white/8 bg-panel">
+                <div>
+                  <h3 className="font-display text-base sm:text-lg font-medium text-cloud group-hover:text-accent transition-colors">
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-cloud/60 mt-1 line-clamp-1 font-body">
+                    {cat.description}
+                  </p>
+                </div>
+                <div className="pt-3 mt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between font-mono text-[11px] text-accent font-semibold group-hover:translate-x-0.5 transition-transform">
+                  <span>Shop Collection</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
               </div>
             </Link>
           ))}

@@ -228,6 +228,7 @@ export const categories: Category[] = [
     slug: "frames",
     description: "Borderless frames, border frames, acrylic frames & aesthetic wall collages",
     productCount: 8,
+    image: "/images/products/borderless-frame.png",
     icon: "🖼️",
   },
   {
@@ -236,6 +237,7 @@ export const categories: Category[] = [
     slug: "mugs-bottles",
     description: "Normal, magic & mirror mugs, temperature LED bottles & insulated flask sets",
     productCount: 12,
+    image: "/images/products/custom-mug.png",
     icon: "☕",
   },
   {
@@ -244,6 +246,7 @@ export const categories: Category[] = [
     slug: "headwears-apparel",
     description: "Trucker hats, snapbacks, silk satin hair bonnets, custom T-shirts & towels",
     productCount: 10,
+    image: "/images/products/custom-headwears.png",
     icon: "🧢",
   },
   {
@@ -252,6 +255,7 @@ export const categories: Category[] = [
     slug: "stationery",
     description: "Elastic & buckle holder leather journals, magnetic pens & notebooks",
     productCount: 6,
+    image: "/images/products/custom-journal.png",
     icon: "📓",
   },
   {
@@ -260,6 +264,7 @@ export const categories: Category[] = [
     slug: "jewelry-accessories",
     description: "Custom engraved necklaces, bracelets, wristwatches, throw pillows & phone pouches",
     productCount: 9,
+    image: "/images/products/custom-jewelry.png",
     icon: "💍",
   },
   {
@@ -268,6 +273,7 @@ export const categories: Category[] = [
     slug: "packaging-stickers",
     description: "Custom printed carrier nylons (S/M/L) & die-cut brand logo stickers",
     productCount: 8,
+    image: "/images/products/nylons-medium.png",
     icon: "🛍️",
   },
   {
@@ -276,6 +282,7 @@ export const categories: Category[] = [
     slug: "prints-cards",
     description: "Milestone magazines, custom greeting cards, thank you cards, business cards & flyers",
     productCount: 14,
+    image: "/images/products/custom-cards.png",
     icon: "📜",
   },
   {
@@ -284,6 +291,7 @@ export const categories: Category[] = [
     slug: "gift-boxes",
     description: "Bespoke gift boxes filled with curated personalized items for celebrations",
     productCount: 6,
+    image: "/images/products/giftbox-luxury.png",
     icon: "🎁",
   },
 ];

@@ -255,10 +255,7 @@ function ShopContent() {
                             : "text-cloud/70 hover:bg-black/5 dark:hover:bg-white/5 hover:text-cloud"
                         }`}
                       >
-                        <span className="flex items-center gap-1.5 truncate">
-                          <span>{cat.icon}</span>
-                          <span className="truncate">{cat.name}</span>
-                        </span>
+                        <span className="truncate">{cat.name}</span>
                         <span className="font-mono text-[10px] opacity-70">
                           {cat.productCount}
                         </span>
@@ -408,14 +405,13 @@ function ShopContent() {
                         setSelectedCategory(cat.slug);
                         setCurrentPage(1);
                       }}
-                      className={`px-3 py-1 rounded-full font-mono text-xs transition flex items-center gap-1 ${
+                      className={`px-3 py-1 rounded-full font-mono text-xs transition ${
                         selectedCategory === cat.slug
                           ? "bg-accent text-white"
                           : "glass text-cloud/70"
                       }`}
                     >
-                      <span>{cat.icon}</span>
-                      <span>{cat.name}</span>
+                      {cat.name}
                     </button>
                   ))}
                 </div>
