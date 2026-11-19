@@ -8,6 +8,7 @@ import {
   OrderStatus,
   PaymentStatus,
 } from "@/lib/server/db";
+import { verifyAdminRequest } from "@/lib/server/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,15 @@ const VALID_ORDER_STATUSES: OrderStatus[] = [
 ];
 
 export async function GET(request: NextRequest) {
+  // Enforce administrative authorization
+  const auth = verifyAdminRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json(
+      { success: false, error: auth.error || "Administrative authorization required." },
+      { status: 401 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") || "All";
@@ -47,6 +57,15 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  // Enforce administrative authorization
+  const auth = verifyAdminRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json(
+      { success: false, error: auth.error || "Administrative authorization required." },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
     const {
@@ -136,6 +155,23 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  // Enforce administrative authorization
+  const auth = verifyAdminRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json(
+      { success: false, error: auth.error || "Administrative authorization required." },
+      { status: 401 }
+    );
+  }
+
+  // Only super_admin or admin can delete orders
+  if (auth.user?.role !== "super_admin" && auth.user?.role !== "admin") {
+    return NextResponse.json(
+      { success: false, error: "Forbidden: Super Administrator permissions required." },
+      { status: 403 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const orderRef = searchParams.get("ref");

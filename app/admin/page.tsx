@@ -257,9 +257,20 @@ export default function AdminDashboardPage() {
   const [cancelReason, setCancelReason] = useState("Customer requested cancellation via WhatsApp");
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
+  const getAdminHeaders = () => {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("oludax_admin_token")
+        : null;
+    return {
+      "Content-Type": "application/json",
+      ...(token ? { "x-admin-token": token, Authorization: `Bearer ${token}` } : {}),
+    };
+  };
+
   // Fetch orders from API on load
   useEffect(() => {
-    fetch("/api/admin/orders")
+    fetch("/api/admin/orders", { headers: getAdminHeaders() })
       .then((r) => r.json())
       .then((data) => {
         if (data.success && data.orders && data.orders.length > 0) {
@@ -283,34 +294,29 @@ export default function AdminDashboardPage() {
     setIsSubmittingAuth(true);
     setAdminAuthError(null);
     try {
-      await login(adminEmail, adminPassword);
-      if (
-        !adminEmail.toLowerCase().includes("admin") &&
-        !adminEmail.toLowerCase().includes("superadmin") &&
-        !adminEmail.toLowerCase().includes("manager") &&
-        !adminEmail.toLowerCase().includes("artisan") &&
-        !adminEmail.toLowerCase().includes("support") &&
-        adminPassword !== "admin2026" &&
-        adminPassword !== "admin"
-      ) {
-        setAdminAuthError(
-          "Access denied. You must provide authorized administrative credentials."
-        );
-      }
-    } catch {
-      setAdminAuthError("Authentication error. Please check your credentials.");
-    } finally {
-      setIsSubmittingAuth(false);
-    }
-  };
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: adminEmail.trim(),
+          password: adminPassword,
+        }),
+      });
 
-  const handleDemoAdminLogin = async (targetRole: Role = "super_admin") => {
-    setIsSubmittingAuth(true);
-    setAdminAuthError(null);
-    try {
-      setAdminEmail(`${targetRole}@oludaxconcept.com`);
-      setAdminPassword("admin2026");
-      await login(`${targetRole}@oludaxconcept.com`, "admin2026", targetRole);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setAdminAuthError(data.error || "Access denied. Invalid credentials.");
+        return;
+      }
+
+      if (data.token) {
+        localStorage.setItem("oludax_admin_token", data.token);
+      }
+
+      await login(data.user.email, undefined, data.user.role);
+      showToast(`Authenticated as ${data.user.name}`);
+    } catch {
+      setAdminAuthError("Authentication network error. Please try again.");
     } finally {
       setIsSubmittingAuth(false);
     }
@@ -330,7 +336,7 @@ export default function AdminDashboardPage() {
     try {
       await fetch("/api/admin/orders", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           orderRef,
           orderStatus: newStatus,
@@ -356,7 +362,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/orders", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           orderRef: editingOrder.orderRef,
           orderStatus: editingOrder.status,
@@ -415,7 +421,7 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch("/api/admin/orders", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAdminHeaders(),
         body: JSON.stringify({
           orderRef,
           action: "cancel",
@@ -466,6 +472,7 @@ export default function AdminDashboardPage() {
     try {
       await fetch(`/api/admin/orders?ref=${encodeURIComponent(orderRef)}`, {
         method: "DELETE",
+        headers: getAdminHeaders(),
       });
       setOrdersList((prev) => prev.filter((o) => o.orderRef !== orderRef));
       showToast(`Order #${orderRef} permanently deleted.`);
@@ -600,7 +607,7 @@ export default function AdminDashboardPage() {
                   required
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  placeholder="Enter passkey (e.g. admin2026)"
+                  placeholder="Enter administrator passkey"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-pink"
                 />
               </div>
@@ -616,31 +623,6 @@ export default function AdminDashboardPage() {
                 </span>
               </button>
             </form>
-
-            {/* Quick Demo Role Selector */}
-            <div className="pt-4 border-t border-white/10 space-y-3">
-              <p className="font-mono text-[10px] uppercase tracking-wider text-gray-400 text-center">
-                RBAC Staging Access (Choose Role to Test):
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { role: "super_admin", label: "Super Admin", color: "text-purple-400" },
-                  { role: "manager", label: "Operations Mgr", color: "text-blue-400" },
-                  { role: "artisan", label: "Artisan Lead", color: "text-amber-400" },
-                  { role: "support", label: "Support Desk", color: "text-emerald-400" },
-                ].map((item) => (
-                  <button
-                    key={item.role}
-                    type="button"
-                    onClick={() => handleDemoAdminLogin(item.role as Role)}
-                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 font-mono text-[11px] font-semibold text-left transition flex items-center justify-between"
-                  >
-                    <span className={item.color}>{item.label}</span>
-                    <ArrowRight className="w-3 h-3 text-gray-500" />
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className="text-center font-mono text-xs">
@@ -692,41 +674,54 @@ export default function AdminDashboardPage() {
 
         {/* RBAC Role Switcher & User Controls */}
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-          {/* Quick RBAC Role Switcher (For live testing different employee perspectives) */}
-          <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1">
-            <UserCheck className="w-3.5 h-3.5 text-pink shrink-0" />
-            <span className="font-mono text-[10px] uppercase text-gray-400 hidden lg:inline">
-              Role:
-            </span>
-            <select
-              value={role}
-              onChange={(e) => {
-                const newRole = e.target.value as Role;
-                setRole(newRole);
-                showToast(`Switched active RBAC role to: ${ROLES[newRole]?.name}`);
-              }}
-              className="bg-transparent text-white font-mono text-xs focus:outline-none cursor-pointer"
-            >
-              <option value="super_admin" className="bg-[#1C141E] text-white">
-                Super Admin (All Access)
-              </option>
-              <option value="admin" className="bg-[#1C141E] text-white">
-                Store Admin (Orders & Stock)
-              </option>
-              <option value="manager" className="bg-[#1C141E] text-white">
-                Operations Manager
-              </option>
-              <option value="artisan" className="bg-[#1C141E] text-white">
-                Bespoke Artisan Lead
-              </option>
-              <option value="support" className="bg-[#1C141E] text-white">
-                Concierge Support
-              </option>
-            </select>
-          </div>
+          {/* Role Badge / Switcher (Only super_admin can switch view) */}
+          {user?.role === "super_admin" ? (
+            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1">
+              <UserCheck className="w-3.5 h-3.5 text-pink shrink-0" />
+              <span className="font-mono text-[10px] uppercase text-gray-400 hidden lg:inline">
+                Role:
+              </span>
+              <select
+                value={role}
+                onChange={(e) => {
+                  const newRole = e.target.value as Role;
+                  setRole(newRole);
+                  showToast(`Switched active RBAC role to: ${ROLES[newRole]?.name}`);
+                }}
+                className="bg-transparent text-white font-mono text-xs focus:outline-none cursor-pointer"
+              >
+                <option value="super_admin" className="bg-[#1C141E] text-white">
+                  Super Admin (All Access)
+                </option>
+                <option value="admin" className="bg-[#1C141E] text-white">
+                  Store Admin (Orders & Stock)
+                </option>
+                <option value="manager" className="bg-[#1C141E] text-white">
+                  Operations Manager
+                </option>
+                <option value="artisan" className="bg-[#1C141E] text-white">
+                  Bespoke Artisan Lead
+                </option>
+                <option value="support" className="bg-[#1C141E] text-white">
+                  Concierge Support
+                </option>
+              </select>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs font-semibold bg-white/5 border-white/10 text-gray-200">
+              <Shield className="w-3.5 h-3.5 text-pink" />
+              <span>{ROLES[role]?.name || role}</span>
+            </div>
+          )}
 
           <button
-            onClick={logout}
+            onClick={() => {
+              fetch("/api/admin/auth", { method: "DELETE" }).catch(() => {});
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("oludax_admin_token");
+              }
+              logout();
+            }}
             className="text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1.5 rounded-xl border border-rose-500/20 flex items-center gap-1.5 transition-colors cursor-pointer font-mono"
             title="Lock and sign out of admin console"
           >
