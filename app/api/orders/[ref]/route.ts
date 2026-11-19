@@ -55,24 +55,47 @@ export async function GET(
         providedPhone.replace(/\D/g, "") ===
           order.customerPhone.replace(/\D/g, ""));
 
-    // If not verified, mask customer PII to prevent data harvesting
-    const sanitizedOrder = isVerifiedOwner
-      ? order
-      : {
-          ...order,
-          customerName: maskName(order.customerName),
-          customerEmail: maskEmail(order.customerEmail),
-          customerPhone: maskPhone(order.customerPhone),
-          deliveryAddress: `${order.deliveryCity}, ${order.deliveryState} (Specific street hidden for customer privacy)`,
-        };
-
     // Dynamic timeline milestones computed from order status
     const milestones = getTrackingMilestones(order);
 
+    // If verified owner or admin, return full order details
+    if (isVerifiedOwner) {
+      return NextResponse.json({
+        success: true,
+        verified: true,
+        order,
+        milestones,
+      });
+    }
+
+    // Strict privacy model: unverified tracking returns non-sensitive status & progress only
+    const publicSafeOrder = {
+      id: order.id,
+      orderRef: order.orderRef,
+      orderStatus: order.orderStatus,
+      paymentStatus: order.paymentStatus,
+      createdAt: order.createdAt,
+      customerName: maskName(order.customerName),
+      customerEmail: maskEmail(order.customerEmail),
+      customerPhone: maskPhone(order.customerPhone),
+      deliveryCity: order.deliveryCity,
+      deliveryState: order.deliveryState,
+      deliveryAddress: `${order.deliveryCity}, ${order.deliveryState} (Specific street hidden for privacy)`,
+      // Sanitize items: hide personal love notes / custom inscription text from unverified viewers
+      items: order.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+      })),
+      subtotal: order.subtotal,
+      deliveryFee: order.deliveryFee,
+      total: order.total,
+      currency: order.currency,
+    };
+
     return NextResponse.json({
       success: true,
-      verified: Boolean(isVerifiedOwner),
-      order: sanitizedOrder,
+      verified: false,
+      order: publicSafeOrder,
       milestones,
     });
   } catch (err: any) {
@@ -92,67 +115,74 @@ function getTrackingMilestones(order: any) {
       key: "payment",
       title: "Order Placed & Payment Confirmed",
       desc: isPaid
-        ? `Payment verified via ${order.paymentMethod.toUpperCase()}. Order sent to production queue.`
+        ? `Payment verified via ${order.paymentMethod?.toUpperCase() || 'OFFICIAL'}. Order sent to production queue.`
         : "Awaiting payment confirmation.",
       time: formatDate(order.createdAt),
       isCompleted: isPaid || status !== "Pending",
       isCurrent: status === "Pending" && !isPaid,
     },
     {
-      key: "customization",
-      title: "Artisan Customization & Proof Review",
-      desc: "Personalization text verified, artwork inspected, and heat-pressed/embroidered by artisans in Lagos.",
-      time: order.updatedAt ? formatDate(order.updatedAt) : "In progress",
+      key: "processing",
+      title: "Artisanal Production & Customization",
+      desc:
+        status === "Customization in Progress"
+          ? "Our artisans are currently engraving, printing, and assembling your bespoke pieces."
+          : "Personalization queue scheduled.",
+      time: status !== "Pending" ? "In Studio" : "Pending",
       isCompleted: [
         "Processing",
+        "Customization in Progress",
         "Ready for Dispatch",
         "Shipped",
         "Delivered",
       ].includes(status),
       isCurrent:
-        status === "Customization in Progress" ||
-        (isPaid && status === "Payment Confirmed"),
+        status === "Processing" || status === "Customization in Progress",
     },
     {
-      key: "packaging",
-      title: "Quality Inspection & Luxury Ribbon Packaging",
-      desc: "Carefully wrapped with satin ribbon, protective padding, and custom gift card attached.",
-      time: "Scheduled prior to dispatch",
-      isCompleted: ["Ready for Dispatch", "Shipped", "Delivered"].includes(status),
-      isCurrent: status === "Processing",
+      key: "quality_dispatch",
+      title: "Luxury Ribbon Packaging & Courier Handoff",
+      desc:
+        status === "Ready for Dispatch" || status === "Shipped"
+          ? "Package sealed with signature Oludax luxury boxing and handed to our logistics partner."
+          : "Quality control inspection upon production completion.",
+      time:
+        status === "Ready for Dispatch" ||
+        status === "Shipped" ||
+        status === "Delivered"
+          ? "Dispatched"
+          : "Awaiting QA",
+      isCompleted: ["Ready for Dispatch", "Shipped", "Delivered"].includes(
+        status
+      ),
+      isCurrent: status === "Ready for Dispatch",
     },
     {
-      key: "transit",
-      title: "Handed to Courier for Doorstep Transit",
-      desc: `Dispatched for delivery to ${order.deliveryCity}, ${order.deliveryState}.`,
-      time: "Expected 1-2 business days",
-      isCompleted: ["Shipped", "Delivered"].includes(status),
-      isCurrent: status === "Ready for Dispatch" || status === "Shipped",
-    },
-    {
-      key: "delivered",
-      title: "Delivered to Recipient",
-      desc: "Package safely handed to the celebrant/recipient at destination.",
-      time: status === "Delivered" ? "Delivered successfully" : "Pending transit",
+      key: "delivery",
+      title: "Doorstep Delivery & Celebration Handover",
+      desc:
+        status === "Delivered"
+          ? `Package safely received at destination (${order.deliveryCity}, ${order.deliveryState}). Thank you for choosing Oludax!`
+          : `En route to destination (${order.deliveryCity}, ${order.deliveryState}).`,
+      time: status === "Delivered" ? "Delivered" : "Estimated 2-4 business days",
       isCompleted: status === "Delivered",
-      isCurrent: false,
+      isCurrent: status === "Shipped",
     },
   ];
 
   return allStages;
 }
 
-function formatDate(isoString: string): string {
+function formatDate(iso: string): string {
   try {
-    const d = new Date(isoString);
+    const d = new Date(iso);
     return d.toLocaleDateString("en-NG", {
       month: "short",
       day: "numeric",
-      year: "numeric",
-      hour: "numeric",
+      hour: "2-digit",
       minute: "2-digit",
     });
   } catch {
-    return isoString;
+    return "Recent";
   }
 }

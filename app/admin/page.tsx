@@ -232,7 +232,7 @@ const initialOrders: AdminOrder[] = [
 ];
 
 export default function AdminDashboardPage() {
-  const { user, isAuthenticated, isAdmin, role, hasPermission, setRole, login, logout, isLoading } =
+  const { user, isAuthenticated, isAdmin, role, hasPermission, logout, refreshSession, isLoading } =
     useAuth();
 
   // Admin Portal Sign-in Gate state
@@ -258,13 +258,8 @@ export default function AdminDashboardPage() {
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   const getAdminHeaders = () => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("oludax_admin_token")
-        : null;
     return {
       "Content-Type": "application/json",
-      ...(token ? { "x-admin-token": token, Authorization: `Bearer ${token}` } : {}),
     };
   };
 
@@ -309,11 +304,7 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      if (data.token) {
-        localStorage.setItem("oludax_admin_token", data.token);
-      }
-
-      await login(data.user.email, undefined, data.user.role);
+      await refreshSession();
       showToast(`Authenticated as ${data.user.name}`);
     } catch {
       setAdminAuthError("Authentication network error. Please try again.");
@@ -672,55 +663,16 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* RBAC Role Switcher & User Controls */}
+        {/* Verified Staff Role & User Controls */}
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-          {/* Role Badge / Switcher (Only super_admin can switch view) */}
-          {user?.role === "super_admin" ? (
-            <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1">
-              <UserCheck className="w-3.5 h-3.5 text-pink shrink-0" />
-              <span className="font-mono text-[10px] uppercase text-gray-400 hidden lg:inline">
-                Role:
-              </span>
-              <select
-                value={role}
-                onChange={(e) => {
-                  const newRole = e.target.value as Role;
-                  setRole(newRole);
-                  showToast(`Switched active RBAC role to: ${ROLES[newRole]?.name}`);
-                }}
-                className="bg-transparent text-white font-mono text-xs focus:outline-none cursor-pointer"
-              >
-                <option value="super_admin" className="bg-[#1C141E] text-white">
-                  Super Admin (All Access)
-                </option>
-                <option value="admin" className="bg-[#1C141E] text-white">
-                  Store Admin (Orders & Stock)
-                </option>
-                <option value="manager" className="bg-[#1C141E] text-white">
-                  Operations Manager
-                </option>
-                <option value="artisan" className="bg-[#1C141E] text-white">
-                  Bespoke Artisan Lead
-                </option>
-                <option value="support" className="bg-[#1C141E] text-white">
-                  Concierge Support
-                </option>
-              </select>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs font-semibold bg-white/5 border-white/10 text-gray-200">
-              <Shield className="w-3.5 h-3.5 text-pink" />
-              <span>{ROLES[role]?.name || role}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs font-semibold bg-white/5 border-white/10 text-gray-200">
+            <Shield className="w-3.5 h-3.5 text-pink" />
+            <span>{ROLES[role]?.name || role}</span>
+          </div>
 
           <button
-            onClick={() => {
-              fetch("/api/admin/auth", { method: "DELETE" }).catch(() => {});
-              if (typeof window !== "undefined") {
-                localStorage.removeItem("oludax_admin_token");
-              }
-              logout();
+            onClick={async () => {
+              await logout();
             }}
             className="text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 hover:bg-rose-500/20 px-3 py-1.5 rounded-xl border border-rose-500/20 flex items-center gap-1.5 transition-colors cursor-pointer font-mono"
             title="Lock and sign out of admin console"
@@ -1261,20 +1213,15 @@ export default function AdminDashboardPage() {
                         </ul>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setRole(r);
-                          showToast(`Switched active RBAC role to: ${def.name}`);
-                        }}
-                        className={`w-full py-2 rounded-xl text-xs font-semibold transition mt-2 cursor-pointer ${
+                      <div
+                        className={`w-full py-2 rounded-xl text-xs font-semibold text-center transition mt-2 ${
                           isCurrent
-                            ? "bg-pink text-white"
-                            : "bg-white/10 hover:bg-white/20 text-gray-200"
+                            ? "bg-pink text-white shadow-sm"
+                            : "bg-white/5 text-gray-400 border border-white/10"
                         }`}
                       >
-                        {isCurrent ? "Currently Active" : "Adopt This Role →"}
-                      </button>
+                        {isCurrent ? "Your Active Verified Role" : `${def.name} Tier`}
+                      </div>
                     </div>
                   );
                 })}

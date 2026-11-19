@@ -437,8 +437,30 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
           }
         }
       }
-    } catch (err) {
-      console.warn("Supabase order insert failed, using memory store:", err);
+    } catch (err: any) {
+      console.error("Supabase order persistence failure:", err);
+      // In production or when DB is required, never report false success
+      if (
+        process.env.REQUIRE_DB === "true" ||
+        process.env.NODE_ENV === "production" ||
+        HAS_SUPABASE
+      ) {
+        throw new Error(
+          err.message || "Failed to persist order to database. Transaction rolled back."
+        );
+      }
+      console.warn("Dev fallback: using local memory store for development.");
+    }
+  }
+
+  // Deduct inventory stock for verified items
+  for (const item of newOrder.items) {
+    const prod = defaultProducts.find((p) => p.id === item.productId);
+    if (prod && typeof prod.stockCount === "number") {
+      prod.stockCount = Math.max(0, prod.stockCount - item.quantity);
+      if (prod.stockCount === 0) {
+        prod.inStock = false;
+      }
     }
   }
 
@@ -515,11 +537,22 @@ export async function updateOrderStatus(
       if (paymentStatus) updates.payment_status = paymentStatus;
       if (paystackRef) updates.paystack_reference = paystackRef;
 
-      await supabaseServerClient
+      const { error: updateErr } = await supabaseServerClient
         .from("orders")
         .update(updates)
         .eq("order_ref", normalizedRef);
-    } catch {}
+
+      if (updateErr) {
+        console.error("Supabase order status update error:", updateErr);
+        if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+          throw new Error(`Database order status update failed: ${updateErr.message}`);
+        }
+      }
+    } catch (err: any) {
+      if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+        throw err;
+      }
+    }
   }
 
   // Update in memory
@@ -571,11 +604,22 @@ export async function updateOrder(input: UpdateOrderInput): Promise<Order | null
       if (input.cancellationReason !== undefined) updates.cancellation_reason = input.cancellationReason;
       if (input.adminNotes !== undefined) updates.admin_notes = input.adminNotes;
 
-      await supabaseServerClient
+      const { error: updateErr } = await supabaseServerClient
         .from("orders")
         .update(updates)
         .eq("order_ref", normalizedRef);
-    } catch {}
+
+      if (updateErr) {
+        console.error("Supabase order status update error:", updateErr);
+        if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+          throw new Error(`Database order status update failed: ${updateErr.message}`);
+        }
+      }
+    } catch (err: any) {
+      if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+        throw err;
+      }
+    }
   }
 
   // Update in memory
@@ -617,11 +661,22 @@ export async function deleteOrder(orderRef: string): Promise<boolean> {
 
   if (supabaseServerClient) {
     try {
-      await supabaseServerClient
+      const { error: deleteErr } = await supabaseServerClient
         .from("orders")
         .delete()
         .eq("order_ref", normalizedRef);
-    } catch {}
+
+      if (deleteErr) {
+        console.error("Supabase order deletion error:", deleteErr);
+        if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+          throw new Error(`Database order deletion failed: ${deleteErr.message}`);
+        }
+      }
+    } catch (err: any) {
+      if (process.env.REQUIRE_DB === "true" || process.env.NODE_ENV === "production") {
+        throw err;
+      }
+    }
   }
 
   const idx = inMemoryOrders.findIndex(

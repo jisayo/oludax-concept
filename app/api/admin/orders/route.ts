@@ -9,6 +9,7 @@ import {
   PaymentStatus,
 } from "@/lib/server/db";
 import { verifyAdminRequest } from "@/lib/server/admin-auth";
+import { hasPermission } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -24,12 +25,20 @@ const VALID_ORDER_STATUSES: OrderStatus[] = [
 ];
 
 export async function GET(request: NextRequest) {
-  // Enforce administrative authorization
+  // Enforce administrative authentication
   const auth = verifyAdminRequest(request);
-  if (!auth.authorized) {
+  if (!auth.authorized || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || "Administrative authorization required." },
       { status: 401 }
+    );
+  }
+
+  // Enforce role-based permission
+  if (!hasPermission(auth.user.role, "view_orders")) {
+    return NextResponse.json(
+      { success: false, error: "Forbidden: Insufficient permissions to view orders." },
+      { status: 403 }
     );
   }
 
@@ -57,9 +66,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  // Enforce administrative authorization
+  // Enforce administrative authentication
   const auth = verifyAdminRequest(request);
-  if (!auth.authorized) {
+  if (!auth.authorized || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || "Administrative authorization required." },
       { status: 401 }
@@ -92,8 +101,21 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // Role-based authorization for order cancellation
     if (action === "cancel") {
-      const reason = cancellationReason || "Order cancelled by store administrator";
+      if (!hasPermission(auth.user.role, "cancel_order")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden: Your role does not possess permissions to cancel orders.",
+          },
+          { status: 403 }
+        );
+      }
+
+      const reason =
+        cancellationReason ||
+        `Order cancelled by staff (${auth.user.name} - ${auth.user.role})`;
       const cancelled = await cancelOrder(orderRef, reason);
       if (!cancelled) {
         return NextResponse.json(
@@ -108,13 +130,48 @@ export async function PATCH(request: NextRequest) {
       });
     }
 
-    if (orderStatus && !VALID_ORDER_STATUSES.includes(orderStatus)) {
+    // Role-based authorization for status changes
+    if (orderStatus) {
+      if (!hasPermission(auth.user.role, "edit_order_status")) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden: Your role cannot update order progress statuses.",
+          },
+          { status: 403 }
+        );
+      }
+
+      if (!VALID_ORDER_STATUSES.includes(orderStatus)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Invalid order status. Allowed: ${VALID_ORDER_STATUSES.join(", ")}`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Role-based authorization for customer details changes
+    const isModifyingDetails = Boolean(
+      customerName ||
+      customerEmail ||
+      customerPhone ||
+      deliveryAddress ||
+      deliveryCity ||
+      deliveryState ||
+      deliveryNotes ||
+      adminNotes
+    );
+
+    if (isModifyingDetails && !hasPermission(auth.user.role, "edit_order_details")) {
       return NextResponse.json(
         {
           success: false,
-          error: `Invalid order status. Allowed: ${VALID_ORDER_STATUSES.join(", ")}`,
+          error: "Forbidden: Your role cannot edit customer delivery details.",
         },
-        { status: 400 }
+        { status: 403 }
       );
     }
 
@@ -155,19 +212,22 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  // Enforce administrative authorization
+  // Enforce administrative authentication
   const auth = verifyAdminRequest(request);
-  if (!auth.authorized) {
+  if (!auth.authorized || !auth.user) {
     return NextResponse.json(
       { success: false, error: auth.error || "Administrative authorization required." },
       { status: 401 }
     );
   }
 
-  // Only super_admin or admin can delete orders
-  if (auth.user?.role !== "super_admin" && auth.user?.role !== "admin") {
+  // Strictly enforce delete_order permission (super_admin only)
+  if (!hasPermission(auth.user.role, "delete_order")) {
     return NextResponse.json(
-      { success: false, error: "Forbidden: Super Administrator permissions required." },
+      {
+        success: false,
+        error: "Forbidden: Only Super Administrators can permanently delete order records.",
+      },
       { status: 403 }
     );
   }

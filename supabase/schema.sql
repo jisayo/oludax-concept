@@ -189,18 +189,13 @@ CREATE POLICY "Public read categories" ON categories FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Public read products" ON products;
 CREATE POLICY "Public read products" ON products FOR SELECT USING (true);
 
--- 8.2 Orders: Public can only INSERT during checkout.
--- Public SELECT is DENIED to prevent customer PII exposure.
--- Order lookups and admin management are performed securely through the server using service_role.
+-- 8.2 Orders & Order Items: Locked down completely from public client access.
+-- All order creation, tracking verification, and admin operations are executed strictly server-side using service_role.
+-- Direct public client SELECT, INSERT, UPDATE, and DELETE are strictly DENIED.
 DROP POLICY IF EXISTS "Public can view own order by ref" ON orders;
 DROP POLICY IF EXISTS "Public can insert orders" ON orders;
-CREATE POLICY "Public can insert orders" ON orders FOR INSERT WITH CHECK (true);
-
--- 8.3 Order Items: Public can only INSERT during checkout.
--- Public SELECT is DENIED to protect order contents and customer notes.
 DROP POLICY IF EXISTS "Public can read order items" ON order_items;
 DROP POLICY IF EXISTS "Public can insert order items" ON order_items;
-CREATE POLICY "Public can insert order items" ON order_items FOR INSERT WITH CHECK (true);
 
 -- 8.4 Contact Messages: Public can INSERT inquiries. No public SELECT.
 DROP POLICY IF EXISTS "Public can insert contact messages" ON contact_messages;

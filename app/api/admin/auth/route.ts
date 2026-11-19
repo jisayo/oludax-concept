@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateAdminUser, verifyAdminRequest } from "@/lib/server/admin-auth";
+import {
+  authenticateAdminUser,
+  verifyAdminRequest,
+  revokeAdminToken,
+  TOKEN_LIFETIME_MS,
+} from "@/lib/server/admin-auth";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Check if current user is an authorized admin
+ * Check if current user has a verified administrative session
  */
 export async function GET(request: NextRequest) {
   const auth = verifyAdminRequest(request);
@@ -28,6 +33,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * Secure login endpoint with constant-time password validation & rate-limiting
+ * Emits strictly HttpOnly session cookie (no token exposure in JSON body).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -56,9 +62,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Response contains only the verified user payload, NOT the raw token
     const response = NextResponse.json({
       success: true,
-      token: result.token,
       user: result.user,
     });
 
@@ -67,7 +73,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: Math.floor(TOKEN_LIFETIME_MS / 1000), // 12 hours in seconds
       path: "/",
     });
 
@@ -82,10 +88,26 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Logout and clear session cookie
+ * Logout and clear session cookie + invalidate token
  */
-export async function DELETE() {
-  const response = NextResponse.json({ success: true, message: "Logged out." });
-  response.cookies.delete("oludax_admin_token");
+export async function DELETE(request: NextRequest) {
+  const cookie = request.cookies.get("oludax_admin_token")?.value;
+  if (cookie) {
+    revokeAdminToken(cookie);
+  }
+
+  const response = NextResponse.json({
+    success: true,
+    message: "Admin session terminated successfully.",
+  });
+
+  response.cookies.set("oludax_admin_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
+
   return response;
 }

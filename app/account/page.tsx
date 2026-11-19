@@ -46,25 +46,13 @@ function AccountContent() {
     try {
       let isStaff = false;
       if (authMode === "login") {
-        await login(email, password);
-        const lower = email.toLowerCase();
-        if (
-          lower.includes("admin") ||
-          lower.includes("superadmin") ||
-          lower.includes("manager") ||
-          lower.includes("artisan") ||
-          lower.includes("support") ||
-          password === "admin2026" ||
-          password === "admin"
-        ) {
-          isStaff = true;
-        }
+        const res = await login(email, password);
+        isStaff = res.isStaff;
       } else {
         await register(name, email, password);
       }
 
-      // If staff member, route directly to the admin portal
-      // If customer, navigate seamlessly behind the scenes to the catalogue/destination
+      // If verified staff member, route to admin console; otherwise to destination
       if (isStaff) {
         router.push("/admin");
       } else {

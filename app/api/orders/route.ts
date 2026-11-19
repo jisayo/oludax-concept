@@ -115,12 +115,25 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Check stock availability
-      if (matchedProduct.inStock === false) {
+      // Check stock availability & quantity limits
+      if (matchedProduct.inStock === false || (matchedProduct.stockCount !== undefined && matchedProduct.stockCount <= 0)) {
         return NextResponse.json(
           {
             success: false,
             error: `"${matchedProduct.name}" is currently out of stock.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (
+        matchedProduct.stockCount !== undefined &&
+        matchedProduct.stockCount < quantity
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Only ${matchedProduct.stockCount} units available for "${matchedProduct.name}". Requested: ${quantity}.`,
           },
           { status: 400 }
         );

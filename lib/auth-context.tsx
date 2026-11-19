@@ -21,11 +21,11 @@ type AuthContextType = {
   isAdmin: boolean;
   role: Role;
   hasPermission: (permission: Permission) => boolean;
-  login: (email: string, password?: string, roleOverride?: Role) => Promise<void>;
+  login: (email: string, password?: string) => Promise<{ success: boolean; isStaff: boolean; error?: string }>;
   register: (name: string, email: string, password?: string) => Promise<void>;
-  logout: () => void;
-  setRole: (role: Role) => void;
+  logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  refreshSession: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,57 +34,92 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Check for existing session
+  // Synchronize session with server HttpOnly cookie on boot
+  const refreshSession = useCallback(async () => {
     try {
-      const saved = localStorage.getItem("oludax_user");
-      if (saved) {
-        setUser(JSON.parse(saved));
+      const res = await fetch("/api/admin/auth", {
+        method: "GET",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          setUser({
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            role: data.user.role,
+          });
+          setIsLoading(false);
+          return;
+        }
       }
     } catch {}
-    setIsLoading(false);
+
+    // Fall back to saved customer profile if not a staff session
+    try {
+      const saved = localStorage.getItem("oludax_customer_user");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Security: Customers can NEVER have administrative roles
+        setUser({
+          ...parsed,
+          role: "customer",
+        });
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    refreshSession();
+  }, [refreshSession]);
+
   const login = useCallback(
-    async (email: string, password?: string, roleOverride?: Role) => {
+    async (email: string, password?: string) => {
       setIsLoading(true);
       try {
-        let assignedRole: Role = "customer";
+        // 1. First attempt authenticated staff login against server API
+        if (password) {
+          try {
+            const adminRes = await fetch("/api/admin/auth", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
 
-        if (roleOverride) {
-          assignedRole = roleOverride;
-        } else if (
-          email.toLowerCase().includes("superadmin") ||
-          password === "superadmin"
-        ) {
-          assignedRole = "super_admin";
-        } else if (
-          email.toLowerCase().includes("admin") ||
-          password === "admin2026" ||
-          password === "admin"
-        ) {
-          assignedRole = "admin";
-        } else if (email.toLowerCase().includes("manager")) {
-          assignedRole = "manager";
-        } else if (email.toLowerCase().includes("artisan")) {
-          assignedRole = "artisan";
-        } else if (email.toLowerCase().includes("support")) {
-          assignedRole = "support";
+            if (adminRes.ok) {
+              const data = await adminRes.json();
+              if (data.success && data.user) {
+                const verifiedStaffUser: User = {
+                  id: data.user.id,
+                  email: data.user.email,
+                  name: data.user.name,
+                  role: data.user.role,
+                };
+                setUser(verifiedStaffUser);
+                return { success: true, isStaff: true };
+              }
+            }
+          } catch {}
         }
 
-        const isStaff = assignedRole !== "customer";
-
-        const mockUser: User = {
-          id: isStaff ? `staff-${assignedRole}` : "user-1",
-          email,
-          name: isStaff
-            ? `${assignedRole.replace("_", " ").toUpperCase()} Officer`
-            : email.split("@")[0],
-          role: assignedRole,
+        // 2. Standard customer authentication (strictly customer role, no admin privilege)
+        const customerUser: User = {
+          id: `customer-${Date.now().toString(36)}`,
+          email: email.trim().toLowerCase(),
+          name: email.split("@")[0],
+          role: "customer",
         };
 
-        setUser(mockUser);
-        localStorage.setItem("oludax_user", JSON.stringify(mockUser));
+        setUser(customerUser);
+        localStorage.setItem("oludax_customer_user", JSON.stringify(customerUser));
+        return { success: true, isStaff: false };
       } finally {
         setIsLoading(false);
       }
@@ -96,14 +131,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (name: string, email: string, _password?: string) => {
       setIsLoading(true);
       try {
-        const mockUser: User = {
-          id: "user-" + Date.now(),
-          email,
-          name,
+        const customerUser: User = {
+          id: `customer-${Date.now().toString(36)}`,
+          email: email.trim().toLowerCase(),
+          name: name.trim(),
           role: "customer",
         };
-        setUser(mockUser);
-        localStorage.setItem("oludax_user", JSON.stringify(mockUser));
+        setUser(customerUser);
+        localStorage.setItem("oludax_customer_user", JSON.stringify(customerUser));
       } finally {
         setIsLoading(false);
       }
@@ -111,25 +146,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await fetch("/api/admin/auth", { method: "DELETE" });
+    } catch {}
     setUser(null);
+    localStorage.removeItem("oludax_customer_user");
     localStorage.removeItem("oludax_user");
-  }, []);
-
-  const setRole = useCallback((newRole: Role) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const updated: User = { ...prev, role: newRole };
-      localStorage.setItem("oludax_user", JSON.stringify(updated));
-      return updated;
-    });
+    localStorage.removeItem("oludax_admin_token");
   }, []);
 
   const updateProfile = useCallback(async (data: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return prev;
-      const updated = { ...prev, ...data };
-      localStorage.setItem("oludax_user", JSON.stringify(updated));
+      // Do not allow client updates to change server-assigned role
+      const updated: User = { ...prev, ...data, role: prev.role };
+      if (prev.role === "customer") {
+        localStorage.setItem("oludax_customer_user", JSON.stringify(updated));
+      }
       return updated;
     });
   }, []);
@@ -148,8 +182,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
-        setRole,
         updateProfile,
+        refreshSession,
       }}
     >
       {children}
