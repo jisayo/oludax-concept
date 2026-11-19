@@ -201,6 +201,21 @@ DROP POLICY IF EXISTS "Public can insert order items" ON order_items;
 DROP POLICY IF EXISTS "Public can insert contact messages" ON contact_messages;
 CREATE POLICY "Public can insert contact messages" ON contact_messages FOR INSERT WITH CHECK (true);
 
--- 8.5 Customization Uploads: Public can INSERT artwork. No public SELECT.
+-- 8.5 Customization Uploads: Managed exclusively server-side via /api/customization/upload.
+-- Direct public table access is strictly DENIED to prevent fake metadata insertion.
 DROP POLICY IF EXISTS "Public can insert customization uploads" ON customization_uploads;
-CREATE POLICY "Public can insert customization uploads" ON customization_uploads FOR INSERT WITH CHECK (true);
+
+-- ============================================================================
+-- 9. SUPABASE STORAGE BUCKET CONFIGURATION (Customizations)
+-- ============================================================================
+-- Creates 'customizations' storage bucket for customer photos, artwork, and prints.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('customizations', 'customizations', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow public read access to uploaded images via public URL
+DROP POLICY IF EXISTS "Public can view customization files" ON storage.objects;
+CREATE POLICY "Public can view customization files"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'customizations');

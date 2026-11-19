@@ -106,6 +106,10 @@ if (HAS_SUPABASE) {
   }
 }
 
+export function getSupabaseServerClient(): SupabaseClient | null {
+  return supabaseServerClient;
+}
+
 // ============================================================================
 // IN-MEMORY / LOCAL STORE FALLBACK
 // ============================================================================
