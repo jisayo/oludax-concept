@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrder, listOrders, CreateOrderInput } from "@/lib/server/db";
+import { products, extractPriceFromVariant } from "@/lib/products";
+import { verifyAdminRequest } from "@/lib/server/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -80,21 +82,69 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate subtotal from validated item entries
+    // Server-enforced price and inventory validation (Customer cannot dictate prices)
     let computedSubtotal = 0;
-    const validatedItems = items.map((item: any, idx: number) => {
-      const quantity = Math.max(1, parseInt(item.quantity || item.qty || 1, 10));
-      const price = Math.max(0, parseFloat(item.price || 0));
-      computedSubtotal += price * quantity;
+    const validatedItems = [];
 
-      return {
-        productId: item.productId || item.id || `item-${idx + 1}`,
-        name: item.name || "Bespoke Gift Item",
-        price,
+    for (const item of items) {
+      const rawQty = parseInt(item.quantity || item.qty || 1, 10);
+      if (isNaN(rawQty) || rawQty <= 0) {
+        return NextResponse.json(
+          { success: false, error: `Invalid quantity for item "${item.name || 'unnamed'}".` },
+          { status: 400 }
+        );
+      }
+      const quantity = Math.min(100, Math.max(1, rawQty));
+
+      // Match genuine product in official catalog
+      const matchedProduct =
+        products.find((p) => p.id === (item.productId || item.id)) ||
+        products.find(
+          (p) =>
+            p.name.toLowerCase().trim() ===
+            (item.name || "").toLowerCase().trim()
+        );
+
+      if (!matchedProduct) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Unrecognized product "${item.name || item.productId}". Only verified items can be ordered.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check stock availability
+      if (matchedProduct.inStock === false) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `"${matchedProduct.name}" is currently out of stock.`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Calculate authoritative server price (including design variants)
+      let verifiedUnitPrice = matchedProduct.price;
+      if (item.customization?.designPreference) {
+        verifiedUnitPrice = extractPriceFromVariant(
+          item.customization.designPreference,
+          matchedProduct.price
+        );
+      }
+
+      computedSubtotal += verifiedUnitPrice * quantity;
+
+      validatedItems.push({
+        productId: matchedProduct.id,
+        name: matchedProduct.name,
+        price: verifiedUnitPrice,
         quantity,
         customization: item.customization || undefined,
-      };
-    });
+      });
+    }
 
     // Determine delivery fee (free nationwide shipping over ₦50,000)
     const deliveryFee =
@@ -102,13 +152,13 @@ export async function POST(request: NextRequest) {
     const total = computedSubtotal + deliveryFee;
 
     const orderInput: CreateOrderInput = {
-      customerName,
-      customerEmail,
-      customerPhone,
-      deliveryAddress,
-      deliveryCity,
-      deliveryState,
-      deliveryNotes,
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim().toLowerCase(),
+      customerPhone: customerPhone.trim(),
+      deliveryAddress: deliveryAddress.trim(),
+      deliveryCity: deliveryCity.trim(),
+      deliveryState: deliveryState.trim(),
+      deliveryNotes: deliveryNotes?.trim() || undefined,
       items: validatedItems,
       subtotal: computedSubtotal,
       deliveryFee,
@@ -135,14 +185,27 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Restricted order listing: Requires staff authorization
+ */
 export async function GET(request: NextRequest) {
+  const auth = verifyAdminRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Unauthorized: Administrative privileges required to list all orders.",
+      },
+      { status: 401 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email");
-    const search = searchParams.get("search") || email || undefined;
+    const search = searchParams.get("search") || undefined;
     const limit = searchParams.has("limit")
       ? parseInt(searchParams.get("limit")!, 10)
-      : 20;
+      : 50;
 
     const orders = await listOrders({ search, limit });
 

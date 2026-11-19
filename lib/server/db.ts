@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 import {
   products as defaultProducts,
   categories as defaultCategories,
@@ -352,7 +353,8 @@ export type CreateOrderInput = {
 };
 
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
-  const orderRef = `OLU-${Math.floor(100000 + Math.random() * 900000)}`;
+  // High-entropy cryptographically secure order reference (e.g. OLU-M4X9B2-E81A2F)
+  const orderRef = `OLU-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
   const now = new Date().toISOString();
 
   const newOrder: Order = {
@@ -378,7 +380,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     updatedAt: now,
   };
 
-  // Try Supabase insert if available
+  // Try Supabase insert if available with rollback protection
   if (supabaseServerClient) {
     try {
       const { data: dbOrder, error: orderErr } = await supabaseServerClient
@@ -404,22 +406,35 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
         .select()
         .single();
 
-      if (!orderErr && dbOrder) {
+      if (orderErr) {
+        console.error("Supabase order insert error:", orderErr);
+        throw new Error(`Database order insert failed: ${orderErr.message}`);
+      }
+
+      if (dbOrder) {
         newOrder.id = dbOrder.id;
 
-        // Insert order items
+        // Insert order items atomically
         if (newOrder.items && newOrder.items.length > 0) {
-          await supabaseServerClient.from("order_items").insert(
-            newOrder.items.map((item) => ({
-              order_id: dbOrder.id,
-              order_ref: newOrder.orderRef,
-              product_id: item.productId,
-              name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              customization: item.customization || {},
-            }))
-          );
+          const { error: itemsErr } = await supabaseServerClient
+            .from("order_items")
+            .insert(
+              newOrder.items.map((item) => ({
+                order_id: dbOrder.id,
+                order_ref: newOrder.orderRef,
+                product_id: item.productId,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                customization: item.customization || {},
+              }))
+            );
+
+          if (itemsErr) {
+            console.error("Order items insert failed, rolling back parent order:", itemsErr);
+            await supabaseServerClient.from("orders").delete().eq("id", dbOrder.id);
+            throw new Error(`Failed to persist order items: ${itemsErr.message}`);
+          }
         }
       }
     } catch (err) {

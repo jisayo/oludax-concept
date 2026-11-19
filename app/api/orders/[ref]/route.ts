@@ -1,8 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrderByRef } from "@/lib/server/db";
+import { verifyAdminRequest } from "@/lib/server/admin-auth";
+
+function maskEmail(email: string): string {
+  const [user, domain] = email.split("@");
+  if (!domain) return "***";
+  if (user.length <= 2) return `${user[0]}***@${domain}`;
+  return `${user[0]}***${user[user.length - 1]}@${domain}`;
+}
+
+function maskPhone(phone: string): string {
+  const clean = phone.trim();
+  if (clean.length < 7) return "***";
+  return `${clean.slice(0, 4)} *** ${clean.slice(-4)}`;
+}
+
+function maskName(name: string): string {
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[1][0]}.`;
+}
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { ref: string } }
 ) {
   try {
@@ -22,12 +42,37 @@ export async function GET(
       );
     }
 
+    // Verify ownership via query params (email or phone) or admin session
+    const { searchParams } = new URL(request.url);
+    const providedEmail = searchParams.get("email")?.trim().toLowerCase();
+    const providedPhone = searchParams.get("phone")?.trim();
+    const isAdmin = verifyAdminRequest(request).authorized;
+
+    const isVerifiedOwner =
+      isAdmin ||
+      (providedEmail && providedEmail === order.customerEmail.toLowerCase()) ||
+      (providedPhone &&
+        providedPhone.replace(/\D/g, "") ===
+          order.customerPhone.replace(/\D/g, ""));
+
+    // If not verified, mask customer PII to prevent data harvesting
+    const sanitizedOrder = isVerifiedOwner
+      ? order
+      : {
+          ...order,
+          customerName: maskName(order.customerName),
+          customerEmail: maskEmail(order.customerEmail),
+          customerPhone: maskPhone(order.customerPhone),
+          deliveryAddress: `${order.deliveryCity}, ${order.deliveryState} (Specific street hidden for customer privacy)`,
+        };
+
     // Dynamic timeline milestones computed from order status
     const milestones = getTrackingMilestones(order);
 
     return NextResponse.json({
       success: true,
-      order,
+      verified: Boolean(isVerifiedOwner),
+      order: sanitizedOrder,
       milestones,
     });
   } catch (err: any) {

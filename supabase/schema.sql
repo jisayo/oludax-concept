@@ -173,7 +173,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 -- ============================================================================
--- 8. ROW LEVEL SECURITY (RLS) POLICIES
+-- 8. ROW LEVEL SECURITY (RLS) POLICIES (Hardened for Production)
 -- ============================================================================
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
@@ -182,21 +182,30 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customization_uploads ENABLE ROW LEVEL SECURITY;
 
--- Categories & Products: Public read access
+-- 8.1 Categories & Products: Public catalog read access (No public writes)
+DROP POLICY IF EXISTS "Public read categories" ON categories;
 CREATE POLICY "Public read categories" ON categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public read products" ON products;
 CREATE POLICY "Public read products" ON products FOR SELECT USING (true);
 
--- Orders: Public can insert new orders during checkout
+-- 8.2 Orders: Public can only INSERT during checkout.
+-- Public SELECT is DENIED to prevent customer PII exposure.
+-- Order lookups and admin management are performed securely through the server using service_role.
+DROP POLICY IF EXISTS "Public can view own order by ref" ON orders;
+DROP POLICY IF EXISTS "Public can insert orders" ON orders;
 CREATE POLICY "Public can insert orders" ON orders FOR INSERT WITH CHECK (true);
--- Customers can view their own order by reference
-CREATE POLICY "Public can view own order by ref" ON orders FOR SELECT USING (true);
 
--- Order Items: Public can insert and read
+-- 8.3 Order Items: Public can only INSERT during checkout.
+-- Public SELECT is DENIED to protect order contents and customer notes.
+DROP POLICY IF EXISTS "Public can read order items" ON order_items;
+DROP POLICY IF EXISTS "Public can insert order items" ON order_items;
 CREATE POLICY "Public can insert order items" ON order_items FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public can read order items" ON order_items FOR SELECT USING (true);
 
--- Contact Messages: Anyone can submit
+-- 8.4 Contact Messages: Public can INSERT inquiries. No public SELECT.
+DROP POLICY IF EXISTS "Public can insert contact messages" ON contact_messages;
 CREATE POLICY "Public can insert contact messages" ON contact_messages FOR INSERT WITH CHECK (true);
 
--- Customization Uploads: Anyone can upload artwork
+-- 8.5 Customization Uploads: Public can INSERT artwork. No public SELECT.
+DROP POLICY IF EXISTS "Public can insert customization uploads" ON customization_uploads;
 CREATE POLICY "Public can insert customization uploads" ON customization_uploads FOR INSERT WITH CHECK (true);
