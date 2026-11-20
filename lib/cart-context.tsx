@@ -46,7 +46,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("oludax_cart");
-      if (saved) setItems(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setItems(parsed.filter((item) => item && typeof item === "object" && item.id));
+        }
+      }
     } catch {}
     setHydrated(true);
   }, []);
@@ -54,49 +59,53 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (hydrated) {
       try {
-        localStorage.setItem("oludax_cart", JSON.stringify(items));
+        localStorage.setItem("oludax_cart", JSON.stringify(Array.isArray(items) ? items : []));
       } catch {}
     }
   }, [items, hydrated]);
 
   const addItem = useCallback((item: Omit<CartItem, "qty">, qty = 1) => {
+    if (!item || !item.id) return;
     setItems((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
       // If item has customization, always add as new line
       if (item.customization) {
         const uniqueId = `${item.id}-${Date.now()}`;
-        return [...prev, { ...item, id: uniqueId, qty }];
+        return [...safe, { ...item, id: uniqueId, qty }];
       }
-      const existing = prev.find(
-        (i) => i.id === item.id && !i.customization
+      const existing = safe.find(
+        (i) => i && i.id === item.id && !i.customization
       );
       if (existing) {
-        return prev.map((i) =>
+        return safe.map((i) =>
           i.id === item.id && !i.customization
-            ? { ...i, qty: i.qty + qty }
+            ? { ...i, qty: (Number(i.qty) || 1) + qty }
             : i
         );
       }
-      return [...prev, { ...item, qty }];
+      return [...safe, { ...item, qty }];
     });
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (!id) return;
+    setItems((prev) => (Array.isArray(prev) ? prev.filter((i) => i?.id !== id) : []));
   }, []);
 
   const updateQty = useCallback((id: string, qty: number) => {
-    if (qty < 1) return;
+    if (!id || qty < 1) return;
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, qty } : i))
+      Array.isArray(prev) ? prev.map((i) => (i?.id === id ? { ...i, qty } : i)) : []
     );
   }, []);
 
   const clearCart = useCallback(() => setItems([]), []);
 
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  const safeItems = Array.isArray(items) ? items : [];
+  const subtotal = safeItems.reduce((sum, i) => sum + (Number(i?.price) || 0) * (Number(i?.qty) || 1), 0);
   const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD || subtotal === 0 ? 0 : DELIVERY_FEE;
   const total = subtotal + deliveryFee;
-  const count = items.reduce((sum, i) => sum + i.qty, 0);
+  const count = safeItems.reduce((sum, i) => sum + (Number(i?.qty) || 1), 0);
 
   return (
     <CartContext.Provider

@@ -62,13 +62,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         // Security: Customers can NEVER have administrative roles
-        setUser({
-          ...parsed,
-          role: "customer",
-        });
-      } else {
-        setUser(null);
+        if (parsed && typeof parsed === "object") {
+          setUser({
+            id: String(parsed.id || `customer-${Date.now().toString(36)}`),
+            email: String(parsed.email || ""),
+            name: String(parsed.name || "Customer"),
+            phone: parsed.phone ? String(parsed.phone) : undefined,
+            role: "customer",
+          });
+          setIsLoading(false);
+          return;
+        }
       }
+      setUser(null);
     } catch {
       setUser(null);
     } finally {

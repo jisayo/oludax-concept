@@ -22,7 +22,7 @@ import { useWishlist } from "@/lib/wishlist-context";
 function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const destination = searchParams.get("redirect") || "/shop";
+  const destination = searchParams ? (searchParams.get("redirect") || "/shop") : "/shop";
 
   const { user, isAuthenticated, isAdmin, login, register, logout, updateProfile } =
     useAuth();
@@ -317,7 +317,7 @@ function AccountContent() {
                       <input
                         type="email"
                         disabled
-                        value={user.email}
+                        value={user?.email || ""}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs text-cloud/60 cursor-not-allowed font-mono"
                       />
                     </div>

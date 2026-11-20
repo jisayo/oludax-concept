@@ -45,8 +45,8 @@ type SavedOrder = {
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
-  const refParam = searchParams.get("ref");
-  const referenceParam = searchParams.get("reference") || searchParams.get("trxref");
+  const refParam = searchParams ? searchParams.get("ref") : null;
+  const referenceParam = searchParams ? (searchParams.get("reference") || searchParams.get("trxref")) : null;
 
   const [order, setOrder] = useState<SavedOrder | null>(null);
 

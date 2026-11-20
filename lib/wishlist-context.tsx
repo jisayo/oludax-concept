@@ -19,38 +19,55 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("oludax_wishlist");
-      if (saved) setItems(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setItems(parsed.filter((id) => typeof id === "string"));
+        }
+      }
     } catch {}
   }, []);
 
   useEffect(() => {
     try {
-      localStorage.setItem("oludax_wishlist", JSON.stringify(items));
+      localStorage.setItem("oludax_wishlist", JSON.stringify(Array.isArray(items) ? items : []));
     } catch {}
   }, [items]);
 
   const addItem = useCallback((id: string) => {
-    setItems((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    if (!id) return;
+    setItems((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
+      return safe.includes(id) ? safe : [...safe, id];
+    });
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((item) => item !== id));
+    if (!id) return;
+    setItems((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
+      return safe.filter((item) => item !== id);
+    });
   }, []);
 
   const toggleItem = useCallback((id: string) => {
-    setItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    if (!id) return;
+    setItems((prev) => {
+      const safe = Array.isArray(prev) ? prev : [];
+      return safe.includes(id) ? safe.filter((item) => item !== id) : [...safe, id];
+    });
   }, []);
 
   const isInWishlist = useCallback(
-    (id: string) => items.includes(id),
+    (id: string) => (Array.isArray(items) ? items.includes(id) : false),
     [items]
   );
 
+  const safeCount = Array.isArray(items) ? items.length : 0;
+
   return (
     <WishlistContext.Provider
-      value={{ items, addItem, removeItem, toggleItem, isInWishlist, count: items.length }}
+      value={{ items: Array.isArray(items) ? items : [], addItem, removeItem, toggleItem, isInWishlist, count: safeCount }}
     >
       {children}
     </WishlistContext.Provider>
