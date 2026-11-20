@@ -121,7 +121,8 @@ const initialOrders: AdminOrder[] = [
       },
     ],
     itemsSummary: "Personalized Ceramic Mug × 1",
-    customizationDetails: "Name: 'Sarah' | Colour: Pink | 'Happy 30th Birthday'",
+    customizationDetails:
+      "Name: 'Sarah' | Colour: Pink | 'Happy 30th Birthday'",
     subtotal: 8000,
     deliveryFee: 3500,
     amount: 11500,
@@ -232,8 +233,16 @@ const initialOrders: AdminOrder[] = [
 ];
 
 export default function AdminDashboardPage() {
-  const { user, isAuthenticated, isAdmin, role, hasPermission, logout, refreshSession, isLoading } =
-    useAuth();
+  const {
+    user,
+    isAuthenticated,
+    isAdmin,
+    role,
+    hasPermission,
+    logout,
+    refreshSession,
+    isLoading,
+  } = useAuth();
 
   // Admin Portal Sign-in Gate state
   const [adminEmail, setAdminEmail] = useState("admin@oludaxconcept.com");
@@ -242,19 +251,24 @@ export default function AdminDashboardPage() {
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
   // Dashboard Tabs & Data
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "products" | "rbac">(
-    "overview"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "orders" | "products" | "rbac"
+  >("overview");
   const [ordersList, setOrdersList] = useState<AdminOrder[]>(initialOrders);
   const [productList, setProductList] = useState<Product[]>(products);
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("All");
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Active Order for Inspection / Editing
   const [editingOrder, setEditingOrder] = useState<AdminOrder | null>(null);
-  const [cancellingOrder, setCancellingOrder] = useState<AdminOrder | null>(null);
-  const [cancelReason, setCancelReason] = useState("Customer requested cancellation via WhatsApp");
+  const [cancellingOrder, setCancellingOrder] = useState<AdminOrder | null>(
+    null,
+  );
+  const [cancelReason, setCancelReason] = useState(
+    "Customer requested cancellation via WhatsApp",
+  );
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   const getAdminHeaders = () => {
@@ -263,21 +277,27 @@ export default function AdminDashboardPage() {
     };
   };
 
-  // Fetch orders from API on load
+  // Fetch orders from API on load and upon auth change
   useEffect(() => {
+    if (!isAdmin) return;
     fetch("/api/admin/orders", { headers: getAdminHeaders() })
       .then((r) => r.json())
       .then((data) => {
-        if (data.success && data.orders && data.orders.length > 0) {
+        if (
+          data &&
+          data.success &&
+          Array.isArray(data.orders) &&
+          data.orders.length > 0
+        ) {
           setOrdersList(
-            data.orders.map((o: any) => mapApiOrderToAdminOrder(o))
+            data.orders.map((o: any) => mapApiOrderToAdminOrder(o)),
           );
         }
       })
       .catch((err) =>
-        console.warn("Admin orders fetch warning, using local state:", err)
+        console.warn("Admin orders fetch warning, using local state:", err),
       );
-  }, []);
+  }, [isAdmin]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -305,7 +325,25 @@ export default function AdminDashboardPage() {
       }
 
       await refreshSession();
-      showToast(`Authenticated as ${data.user.name}`);
+      showToast(`Authenticated as ${data.user?.name || "Administrator"}`);
+
+      // Immediately fetch live orders upon successful login
+      try {
+        const ordersRes = await fetch("/api/admin/orders", {
+          headers: getAdminHeaders(),
+        });
+        const ordersData = await ordersRes.json();
+        if (
+          ordersData &&
+          ordersData.success &&
+          Array.isArray(ordersData.orders) &&
+          ordersData.orders.length > 0
+        ) {
+          setOrdersList(
+            ordersData.orders.map((o: any) => mapApiOrderToAdminOrder(o)),
+          );
+        }
+      } catch {}
     } catch {
       setAdminAuthError("Authentication network error. Please try again.");
     } finally {
@@ -314,14 +352,21 @@ export default function AdminDashboardPage() {
   };
 
   // Fast inline status transition
-  const updateQuickOrderStatus = async (orderRef: string, newStatus: OrderStatus) => {
+  const updateQuickOrderStatus = async (
+    orderRef: string,
+    newStatus: OrderStatus,
+  ) => {
     if (!hasPermission("edit_order_status")) {
-      showToast("Access Denied: Your role lacks permission to update order status.");
+      showToast(
+        "Access Denied: Your role lacks permission to update order status.",
+      );
       return;
     }
 
     setOrdersList((prev) =>
-      prev.map((o) => (o.orderRef === orderRef ? { ...o, status: newStatus } : o))
+      prev.map((o) =>
+        o.orderRef === orderRef ? { ...o, status: newStatus } : o,
+      ),
     );
 
     try {
@@ -345,7 +390,9 @@ export default function AdminDashboardPage() {
     if (!editingOrder) return;
 
     if (!hasPermission("edit_order_details")) {
-      showToast("Access Denied: Your role lacks permission to edit order details.");
+      showToast(
+        "Access Denied: Your role lacks permission to edit order details.",
+      );
       return;
     }
 
@@ -374,14 +421,16 @@ export default function AdminDashboardPage() {
       if (data.success && data.order) {
         const updated = mapApiOrderToAdminOrder(data.order);
         setOrdersList((prev) =>
-          prev.map((o) => (o.orderRef === updated.orderRef ? updated : o))
+          prev.map((o) => (o.orderRef === updated.orderRef ? updated : o)),
         );
         showToast(`Order #${editingOrder.orderRef} saved successfully!`);
         setEditingOrder(null);
       } else {
         // Fallback update in state
         setOrdersList((prev) =>
-          prev.map((o) => (o.orderRef === editingOrder.orderRef ? editingOrder : o))
+          prev.map((o) =>
+            o.orderRef === editingOrder.orderRef ? editingOrder : o,
+          ),
         );
         showToast("Changes saved locally.");
         setEditingOrder(null);
@@ -389,7 +438,9 @@ export default function AdminDashboardPage() {
     } catch {
       showToast("Server error. Changes updated locally.");
       setOrdersList((prev) =>
-        prev.map((o) => (o.orderRef === editingOrder.orderRef ? editingOrder : o))
+        prev.map((o) =>
+          o.orderRef === editingOrder.orderRef ? editingOrder : o,
+        ),
       );
       setEditingOrder(null);
     } finally {
@@ -425,8 +476,8 @@ export default function AdminDashboardPage() {
         prev.map((o) =>
           o.orderRef === orderRef
             ? { ...o, status: "Cancelled", cancellationReason: cancelReason }
-            : o
-        )
+            : o,
+        ),
       );
 
       showToast(`Order #${orderRef} has been cancelled.`);
@@ -439,8 +490,8 @@ export default function AdminDashboardPage() {
         prev.map((o) =>
           o.orderRef === orderRef
             ? { ...o, status: "Cancelled", cancellationReason: cancelReason }
-            : o
-        )
+            : o,
+        ),
       );
       showToast(`Order #${orderRef} cancelled locally.`);
       setCancellingOrder(null);
@@ -456,7 +507,11 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    if (!confirm(`Are you sure you want to permanently delete order #${orderRef}? This cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete order #${orderRef}? This cannot be undone.`,
+      )
+    ) {
       return;
     }
 
@@ -489,21 +544,26 @@ export default function AdminDashboardPage() {
               inStock: !p.inStock,
               stockCount: p.inStock ? 0 : 25,
             }
-          : p
-      )
+          : p,
+      ),
     );
   };
 
-  // Filtered orders list
-  const filteredOrders = ordersList.filter((o) => {
+  // Filtered orders list (defensive & null-safe)
+  const filteredOrders = (ordersList || []).filter((o) => {
+    if (!o) return false;
     const matchesFilter =
       selectedStatusFilter === "All" || o.status === selectedStatusFilter;
+    const q = (searchQuery || "").toLowerCase().trim();
+    if (!q) return matchesFilter;
     const matchesSearch =
-      o.orderRef.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.itemsSummary.toLowerCase().includes(searchQuery.toLowerCase());
+      (o.orderRef || "").toLowerCase().includes(q) ||
+      (o.customerName || "").toLowerCase().includes(q) ||
+      (o.email || "").toLowerCase().includes(q) ||
+      (o.phone || "").toLowerCase().includes(q) ||
+      (o.city || "").toLowerCase().includes(q) ||
+      (o.state || "").toLowerCase().includes(q) ||
+      (o.itemsSummary || "").toLowerCase().includes(q);
     return matchesFilter && matchesSearch;
   });
 
@@ -512,7 +572,7 @@ export default function AdminDashboardPage() {
     .reduce((sum, o) => sum + o.amount, 0);
 
   const activeCustomizations = ordersList.filter(
-    (o) => o.status === "Customization in Progress"
+    (o) => o.status === "Customization in Progress",
   ).length;
 
   const currentRoleDef = ROLES[role] || ROLES.customer;
@@ -556,7 +616,9 @@ export default function AdminDashboardPage() {
                 <span>Customer Account Detected</span>
               </div>
               <p className="text-[11px] text-amber-200/80 leading-relaxed">
-                You are signed in as <strong>{user?.email}</strong>. Administrative credentials are required to manage orders, dispatches, and inventory.
+                You are signed in as <strong>{user?.email}</strong>.
+                Administrative credentials are required to manage orders,
+                dispatches, and inventory.
               </p>
             </div>
           )}
@@ -574,7 +636,10 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-            <form onSubmit={handleAdminLogin} className="space-y-4 font-mono text-xs">
+            <form
+              onSubmit={handleAdminLogin}
+              className="space-y-4 font-mono text-xs"
+            >
               <div>
                 <label className="block text-gray-300 uppercase tracking-wider text-[10px] mb-1.5 font-semibold">
                   Administrator Email *
@@ -610,7 +675,9 @@ export default function AdminDashboardPage() {
               >
                 <KeyRound className="w-4 h-4" />
                 <span>
-                  {isSubmittingAuth ? "Verifying..." : "Unlock Merchant Console"}
+                  {isSubmittingAuth
+                    ? "Verifying..."
+                    : "Unlock Merchant Console"}
                 </span>
               </button>
             </form>
@@ -653,7 +720,9 @@ export default function AdminDashboardPage() {
               <span className="font-display font-bold text-sm text-white tracking-wide">
                 OLUDAX CONCEPT
               </span>
-              <span className={`font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${currentRoleDef.badgeColor} font-semibold`}>
+              <span
+                className={`font-mono text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${currentRoleDef.badgeColor} font-semibold`}
+              >
                 {currentRoleDef.name}
               </span>
             </div>
@@ -697,7 +766,11 @@ export default function AdminDashboardPage() {
         <div className="flex gap-2 border-b border-white/10 pb-4 overflow-x-auto">
           {[
             { id: "overview", label: "Executive Overview", icon: TrendingUp },
-            { id: "orders", label: `Orders & Customization (${ordersList.length})`, icon: Package },
+            {
+              id: "orders",
+              label: `Orders & Customization (${ordersList.length})`,
+              icon: Package,
+            },
             { id: "products", label: "Catalog & Inventory", icon: Layers },
             { id: "rbac", label: "RBAC Permissions Matrix", icon: Shield },
           ].map((tab) => {
@@ -759,7 +832,8 @@ export default function AdminDashboardPage() {
                   {ordersList.length}
                 </p>
                 <span className="text-[10px] font-mono text-gray-400 mt-2 block">
-                  {ordersList.filter((o) => o.status === "Cancelled").length} cancelled
+                  {ordersList.filter((o) => o.status === "Cancelled").length}{" "}
+                  cancelled
                 </span>
               </div>
 
@@ -800,17 +874,24 @@ export default function AdminDashboardPage() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-pink">{order.id}</span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}
+                        >
                           {order.status}
                         </span>
-                        {order.status === "Cancelled" && order.cancellationReason && (
-                          <span className="text-[10px] text-rose-400 truncate max-w-[200px]">
-                            ({order.cancellationReason})
-                          </span>
-                        )}
+                        {order.status === "Cancelled" &&
+                          order.cancellationReason && (
+                            <span className="text-[10px] text-rose-400 truncate max-w-[200px]">
+                              ({order.cancellationReason})
+                            </span>
+                          )}
                       </div>
-                      <p className="text-white font-semibold">{order.customerName} • {order.city}, {order.state}</p>
-                      <p className="text-gray-400 text-[11px] mt-0.5">{order.itemsSummary}</p>
+                      <p className="text-white font-semibold">
+                        {order.customerName} • {order.city}, {order.state}
+                      </p>
+                      <p className="text-gray-400 text-[11px] mt-0.5">
+                        {order.itemsSummary}
+                      </p>
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -886,15 +967,19 @@ export default function AdminDashboardPage() {
                     {/* Top Row: Ref, Status, Pricing & Actions */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10 font-mono">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-pink">{order.id}</span>
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}>
+                        <span className="font-bold text-sm text-pink">
+                          {order.id}
+                        </span>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}
+                        >
                           {order.status}
                         </span>
                         <span className="text-[10px] text-gray-400">
                           {order.date}
                         </span>
                         <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          {order.paymentStatus.toUpperCase()}
+                          {(order.paymentStatus || "pending").toUpperCase()}
                         </span>
                       </div>
 
@@ -910,23 +995,30 @@ export default function AdminDashboardPage() {
                         </button>
 
                         {/* Fast Cancel Button */}
-                        {order.status !== "Cancelled" && order.status !== "Delivered" && (
-                          <button
-                            onClick={() => {
-                              if (!hasPermission("cancel_order")) {
-                                showToast("Access Denied: You do not have permission to cancel orders.");
-                                return;
+                        {order.status !== "Cancelled" &&
+                          order.status !== "Delivered" && (
+                            <button
+                              onClick={() => {
+                                if (!hasPermission("cancel_order")) {
+                                  showToast(
+                                    "Access Denied: You do not have permission to cancel orders.",
+                                  );
+                                  return;
+                                }
+                                setCancellingOrder(order);
+                              }}
+                              disabled={!hasPermission("cancel_order")}
+                              className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1 transition disabled:opacity-30 cursor-pointer"
+                              title={
+                                !hasPermission("cancel_order")
+                                  ? "Requires Support, Manager, or Admin role"
+                                  : "Cancel this order"
                               }
-                              setCancellingOrder(order);
-                            }}
-                            disabled={!hasPermission("cancel_order")}
-                            className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center gap-1 transition disabled:opacity-30 cursor-pointer"
-                            title={!hasPermission("cancel_order") ? "Requires Support, Manager, or Admin role" : "Cancel this order"}
-                          >
-                            <Ban className="w-3 h-3" />
-                            <span>Cancel</span>
-                          </button>
-                        )}
+                            >
+                              <Ban className="w-3 h-3" />
+                              <span>Cancel</span>
+                            </button>
+                          )}
 
                         {/* Super Admin Delete */}
                         {hasPermission("delete_order") && (
@@ -947,7 +1039,9 @@ export default function AdminDashboardPage() {
                         <span className="text-gray-400 uppercase text-[10px] block mb-1">
                           Customer / Recipient
                         </span>
-                        <p className="font-semibold text-white">{order.customerName}</p>
+                        <p className="font-semibold text-white">
+                          {order.customerName}
+                        </p>
                         <p className="text-gray-400 mt-0.5">{order.phone}</p>
                         <p className="text-gray-400">{order.email}</p>
                       </div>
@@ -956,8 +1050,12 @@ export default function AdminDashboardPage() {
                         <span className="text-gray-400 uppercase text-[10px] block mb-1">
                           Delivery Destination
                         </span>
-                        <p className="text-white font-semibold">{order.address}</p>
-                        <p className="text-gray-400 mt-0.5">{order.city}, {order.state}</p>
+                        <p className="text-white font-semibold">
+                          {order.address}
+                        </p>
+                        <p className="text-gray-400 mt-0.5">
+                          {order.city}, {order.state}
+                        </p>
                         {order.deliveryNotes && (
                           <p className="text-amber-300/80 text-[11px] mt-1 italic">
                             &quot;{order.deliveryNotes}&quot;
@@ -973,7 +1071,8 @@ export default function AdminDashboardPage() {
                           {formatPrice(order.amount)}
                         </p>
                         <p className="text-gray-400 text-[11px]">
-                          Subtotal: {formatPrice(order.subtotal)} | Delivery: {formatPrice(order.deliveryFee)}
+                          Subtotal: {formatPrice(order.subtotal)} | Delivery:{" "}
+                          {formatPrice(order.deliveryFee)}
                         </p>
                         <p className="text-gray-400 text-[11px] mt-0.5 capitalize">
                           Via: {order.paymentMethod}
@@ -986,19 +1085,24 @@ export default function AdminDashboardPage() {
                       <span className="text-gray-400 uppercase text-[10px] block">
                         Ordered Items & Bespoke Artwork Details
                       </span>
-                      {order.items.map((it, idx) => (
+                      {(order.items || []).map((it, idx) => (
                         <div
                           key={idx}
                           className="p-3 rounded-xl bg-white/5 border border-white/5 flex flex-wrap items-center justify-between gap-2"
                         >
                           <div>
-                            <span className="font-bold text-white">{it.name}</span>{" "}
-                            <span className="text-pink font-semibold">× {it.quantity}</span>
+                            <span className="font-bold text-white">
+                              {it.name}
+                            </span>{" "}
+                            <span className="text-pink font-semibold">
+                              × {it.quantity}
+                            </span>
                             {it.customization && (
                               <div className="text-[11px] text-gray-300 mt-1 space-x-2">
                                 {it.customization.customerName && (
                                   <span className="bg-pink/15 text-pink px-2 py-0.5 rounded-md border border-pink/20">
-                                    Name: &quot;{it.customization.customerName}&quot;
+                                    Name: &quot;{it.customization.customerName}
+                                    &quot;
                                   </span>
                                 )}
                                 {it.customization.selectedColor && (
@@ -1031,57 +1135,85 @@ export default function AdminDashboardPage() {
                       <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-mono flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 shrink-0" />
                         <span>
-                          <strong>Order Cancelled:</strong> {order.cancellationReason || "No reason specified"}
+                          <strong>Order Cancelled:</strong>{" "}
+                          {order.cancellationReason || "No reason specified"}
                         </span>
                       </div>
                     )}
 
                     {/* Quick Stage Progression Buttons */}
-                    {order.status !== "Cancelled" && order.status !== "Delivered" && hasPermission("edit_order_status") && (
-                      <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-[11px]">
-                        <span className="text-gray-400">Quick Advance:</span>
-                        {order.status === "Pending" && (
-                          <button
-                            onClick={() => updateQuickOrderStatus(order.orderRef, "Payment Confirmed")}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition"
-                          >
-                            → Confirm Payment
-                          </button>
-                        )}
-                        {order.status === "Payment Confirmed" && (
-                          <button
-                            onClick={() => updateQuickOrderStatus(order.orderRef, "Customization in Progress")}
-                            className="px-2.5 py-1 rounded-lg bg-pink/20 text-pink border border-pink/30 hover:bg-pink/30 transition"
-                          >
-                            → Start Customization
-                          </button>
-                        )}
-                        {order.status === "Customization in Progress" && (
-                          <button
-                            onClick={() => updateQuickOrderStatus(order.orderRef, "Ready for Dispatch")}
-                            className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 transition"
-                          >
-                            → Mark Ready for Dispatch
-                          </button>
-                        )}
-                        {order.status === "Ready for Dispatch" && (
-                          <button
-                            onClick={() => updateQuickOrderStatus(order.orderRef, "Shipped")}
-                            className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 transition"
-                          >
-                            → Dispatch with Courier
-                          </button>
-                        )}
-                        {order.status === "Shipped" && (
-                          <button
-                            onClick={() => updateQuickOrderStatus(order.orderRef, "Delivered")}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition"
-                          >
-                            → Confirm Doorstep Delivery
-                          </button>
-                        )}
-                      </div>
-                    )}
+                    {order.status !== "Cancelled" &&
+                      order.status !== "Delivered" &&
+                      hasPermission("edit_order_status") && (
+                        <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                          <span className="text-gray-400">Quick Advance:</span>
+                          {order.status === "Pending" && (
+                            <button
+                              onClick={() =>
+                                updateQuickOrderStatus(
+                                  order.orderRef,
+                                  "Payment Confirmed",
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition"
+                            >
+                              → Confirm Payment
+                            </button>
+                          )}
+                          {order.status === "Payment Confirmed" && (
+                            <button
+                              onClick={() =>
+                                updateQuickOrderStatus(
+                                  order.orderRef,
+                                  "Customization in Progress",
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-pink/20 text-pink border border-pink/30 hover:bg-pink/30 transition"
+                            >
+                              → Start Customization
+                            </button>
+                          )}
+                          {order.status === "Customization in Progress" && (
+                            <button
+                              onClick={() =>
+                                updateQuickOrderStatus(
+                                  order.orderRef,
+                                  "Ready for Dispatch",
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 transition"
+                            >
+                              → Mark Ready for Dispatch
+                            </button>
+                          )}
+                          {order.status === "Ready for Dispatch" && (
+                            <button
+                              onClick={() =>
+                                updateQuickOrderStatus(
+                                  order.orderRef,
+                                  "Shipped",
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 transition"
+                            >
+                              → Dispatch with Courier
+                            </button>
+                          )}
+                          {order.status === "Shipped" && (
+                            <button
+                              onClick={() =>
+                                updateQuickOrderStatus(
+                                  order.orderRef,
+                                  "Delivered",
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition"
+                            >
+                              → Confirm Doorstep Delivery
+                            </button>
+                          )}
+                        </div>
+                      )}
                   </div>
                 ))
               )}
@@ -1116,7 +1248,9 @@ export default function AdminDashboardPage() {
                 >
                   <div className="flex gap-3">
                     <img
-                      src={prod.primaryImage || "/images/products/sample-mug.jpg"}
+                      src={
+                        prod.primaryImage || "/images/products/sample-mug.jpg"
+                      }
                       alt={prod.name}
                       className="w-16 h-16 rounded-xl object-cover shrink-0 border border-white/10"
                     />
@@ -1134,10 +1268,16 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      prod.inStock ? "bg-emerald-500/15 text-emerald-400" : "bg-rose-500/15 text-rose-400"
-                    }`}>
-                      {prod.inStock ? `In Stock (${prod.stockCount})` : "Out of Stock"}
+                    <span
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                        prod.inStock
+                          ? "bg-emerald-500/15 text-emerald-400"
+                          : "bg-rose-500/15 text-rose-400"
+                      }`}
+                    >
+                      {prod.inStock
+                        ? `In Stock (${prod.stockCount})`
+                        : "Out of Stock"}
                     </span>
 
                     <button
@@ -1165,7 +1305,8 @@ export default function AdminDashboardPage() {
                 <span>Role-Based Access Control (RBAC) Hierarchy</span>
               </h3>
               <p className="font-mono text-xs text-gray-400 mt-1">
-                Granular operational rights assigned to personnel based on studio specialization
+                Granular operational rights assigned to personnel based on
+                studio specialization
               </p>
             </div>
 
@@ -1185,7 +1326,9 @@ export default function AdminDashboardPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${def.badgeColor}`}>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${def.badgeColor}`}
+                        >
                           {def.name}
                         </span>
                         {isCurrent && (
@@ -1220,7 +1363,9 @@ export default function AdminDashboardPage() {
                             : "bg-white/5 text-gray-400 border border-white/10"
                         }`}
                       >
-                        {isCurrent ? "Your Active Verified Role" : `${def.name} Tier`}
+                        {isCurrent
+                          ? "Your Active Verified Role"
+                          : `${def.name} Tier`}
                       </div>
                     </div>
                   );
@@ -1247,7 +1392,8 @@ export default function AdminDashboardPage() {
                     Edit Order {editingOrder.id}
                   </h3>
                   <p className="text-[11px] text-gray-400">
-                    Placed: {editingOrder.date} • Placed via {editingOrder.paymentMethod.toUpperCase()}
+                    Placed: {editingOrder.date} • Placed via{" "}
+                    {(editingOrder.paymentMethod || "paystack").toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -1278,7 +1424,11 @@ export default function AdminDashboardPage() {
                     className="w-full px-3 py-2 rounded-xl bg-[#1C141E] border border-white/15 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                   >
                     {ORDER_STATUSES.map((st) => (
-                      <option key={st} value={st} className="bg-[#1C141E] text-white">
+                      <option
+                        key={st}
+                        value={st}
+                        className="bg-[#1C141E] text-white"
+                      >
                         {st}
                       </option>
                     ))}
@@ -1306,7 +1456,10 @@ export default function AdminDashboardPage() {
                     <option value="pending" className="bg-[#1C141E] text-white">
                       Pending Authorization
                     </option>
-                    <option value="refunded" className="bg-[#1C141E] text-white">
+                    <option
+                      value="refunded"
+                      className="bg-[#1C141E] text-white"
+                    >
                       Refunded to Customer
                     </option>
                     <option value="failed" className="bg-[#1C141E] text-white">
@@ -1333,7 +1486,10 @@ export default function AdminDashboardPage() {
                       disabled={!hasPermission("edit_order_details")}
                       value={editingOrder.customerName}
                       onChange={(e) =>
-                        setEditingOrder({ ...editingOrder, customerName: e.target.value })
+                        setEditingOrder({
+                          ...editingOrder,
+                          customerName: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                     />
@@ -1349,7 +1505,10 @@ export default function AdminDashboardPage() {
                       disabled={!hasPermission("edit_order_details")}
                       value={editingOrder.phone}
                       onChange={(e) =>
-                        setEditingOrder({ ...editingOrder, phone: e.target.value })
+                        setEditingOrder({
+                          ...editingOrder,
+                          phone: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                     />
@@ -1366,7 +1525,10 @@ export default function AdminDashboardPage() {
                     disabled={!hasPermission("edit_order_details")}
                     value={editingOrder.email}
                     onChange={(e) =>
-                      setEditingOrder({ ...editingOrder, email: e.target.value })
+                      setEditingOrder({
+                        ...editingOrder,
+                        email: e.target.value,
+                      })
                     }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                   />
@@ -1389,7 +1551,10 @@ export default function AdminDashboardPage() {
                     disabled={!hasPermission("edit_order_details")}
                     value={editingOrder.address}
                     onChange={(e) =>
-                      setEditingOrder({ ...editingOrder, address: e.target.value })
+                      setEditingOrder({
+                        ...editingOrder,
+                        address: e.target.value,
+                      })
                     }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                   />
@@ -1406,7 +1571,10 @@ export default function AdminDashboardPage() {
                       disabled={!hasPermission("edit_order_details")}
                       value={editingOrder.city}
                       onChange={(e) =>
-                        setEditingOrder({ ...editingOrder, city: e.target.value })
+                        setEditingOrder({
+                          ...editingOrder,
+                          city: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                     />
@@ -1422,7 +1590,10 @@ export default function AdminDashboardPage() {
                       disabled={!hasPermission("edit_order_details")}
                       value={editingOrder.state}
                       onChange={(e) =>
-                        setEditingOrder({ ...editingOrder, state: e.target.value })
+                        setEditingOrder({
+                          ...editingOrder,
+                          state: e.target.value,
+                        })
                       }
                       className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
                     />
@@ -1438,7 +1609,10 @@ export default function AdminDashboardPage() {
                     disabled={!hasPermission("edit_order_details")}
                     value={editingOrder.deliveryNotes || ""}
                     onChange={(e) =>
-                      setEditingOrder({ ...editingOrder, deliveryNotes: e.target.value })
+                      setEditingOrder({
+                        ...editingOrder,
+                        deliveryNotes: e.target.value,
+                      })
                     }
                     placeholder="e.g. Call before delivery, gate code..."
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink disabled:opacity-50"
@@ -1452,8 +1626,11 @@ export default function AdminDashboardPage() {
                   Artisan Personalization Specs
                 </span>
 
-                {editingOrder.items.map((it, idx) => (
-                  <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                {(editingOrder.items || []).map((it, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-2"
+                  >
                     <p className="font-semibold text-white">
                       {it.name} (Qty: {it.quantity})
                     </p>
@@ -1475,7 +1652,10 @@ export default function AdminDashboardPage() {
                                 customerName: e.target.value,
                               },
                             };
-                            setEditingOrder({ ...editingOrder, items: newItems });
+                            setEditingOrder({
+                              ...editingOrder,
+                              items: newItems,
+                            });
                           }}
                           placeholder="No custom name"
                           className="w-full px-2.5 py-1.5 rounded-lg bg-[#1C141E] border border-white/10 text-white disabled:opacity-50"
@@ -1499,7 +1679,10 @@ export default function AdminDashboardPage() {
                                 message: e.target.value,
                               },
                             };
-                            setEditingOrder({ ...editingOrder, items: newItems });
+                            setEditingOrder({
+                              ...editingOrder,
+                              items: newItems,
+                            });
                           }}
                           placeholder="No personal message"
                           className="w-full px-2.5 py-1.5 rounded-lg bg-[#1C141E] border border-white/10 text-white disabled:opacity-50"
@@ -1519,7 +1702,10 @@ export default function AdminDashboardPage() {
                   rows={2}
                   value={editingOrder.adminNotes || ""}
                   onChange={(e) =>
-                    setEditingOrder({ ...editingOrder, adminNotes: e.target.value })
+                    setEditingOrder({
+                      ...editingOrder,
+                      adminNotes: e.target.value,
+                    })
                   }
                   placeholder="Private internal notes (e.g. customer verified gold monogram thread via WhatsApp call)..."
                   className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-pink"
@@ -1529,16 +1715,17 @@ export default function AdminDashboardPage() {
               {/* Modal Action Buttons */}
               <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  {editingOrder.status !== "Cancelled" && hasPermission("cancel_order") && (
-                    <button
-                      type="button"
-                      onClick={() => setCancellingOrder(editingOrder)}
-                      className="px-3.5 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 font-semibold flex items-center gap-1.5 transition cursor-pointer"
-                    >
-                      <Ban className="w-3.5 h-3.5" />
-                      <span>Cancel Order</span>
-                    </button>
-                  )}
+                  {editingOrder.status !== "Cancelled" &&
+                    hasPermission("cancel_order") && (
+                      <button
+                        type="button"
+                        onClick={() => setCancellingOrder(editingOrder)}
+                        className="px-3.5 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Ban className="w-3.5 h-3.5" />
+                        <span>Cancel Order</span>
+                      </button>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -1555,7 +1742,9 @@ export default function AdminDashboardPage() {
                     className="btn-primary py-2.5 px-6 font-semibold flex items-center gap-2 disabled:opacity-50"
                   >
                     <Save className="w-3.5 h-3.5" />
-                    <span>{isSavingOrder ? "Saving..." : "Save Order Changes"}</span>
+                    <span>
+                      {isSavingOrder ? "Saving..." : "Save Order Changes"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -1585,7 +1774,9 @@ export default function AdminDashboardPage() {
             </div>
 
             <p className="text-gray-300 leading-relaxed text-[11px]">
-              This will update the order status to <strong>Cancelled</strong>, halt artisan production queue, and log the reason in the customer tracking timeline.
+              This will update the order status to <strong>Cancelled</strong>,
+              halt artisan production queue, and log the reason in the customer
+              tracking timeline.
             </p>
 
             <div>
@@ -1633,7 +1824,9 @@ export default function AdminDashboardPage() {
                 className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold flex items-center gap-1.5 shadow-md shadow-rose-600/30 disabled:opacity-50 cursor-pointer"
               >
                 <Ban className="w-3.5 h-3.5" />
-                <span>{isSavingOrder ? "Processing..." : "Confirm Cancellation"}</span>
+                <span>
+                  {isSavingOrder ? "Processing..." : "Confirm Cancellation"}
+                </span>
               </button>
             </div>
           </div>
@@ -1648,15 +1841,24 @@ export default function AdminDashboardPage() {
 // ============================================================================
 
 function mapApiOrderToAdminOrder(o: any): AdminOrder {
-  const items: OrderItem[] = (o.items || []).map((it: any) => ({
-    productId: it.productId || it.id || "item-1",
-    name: it.name || "Bespoke Gift",
-    price: Number(it.price || 0),
-    quantity: Number(it.quantity || 1),
-    customization: it.customization || undefined,
+  if (!o) return initialOrders[0];
+
+  const rawItems = Array.isArray(o.items) ? o.items : [];
+  const items: OrderItem[] = rawItems.map((it: any) => ({
+    productId: String(it?.productId || it?.id || "item-1"),
+    name: String(it?.name || "Bespoke Gift"),
+    price: Number(it?.price || 0),
+    quantity: Number(it?.quantity || 1),
+    customization: it?.customization || undefined,
   }));
 
-  const itemsSummary = items.map((i) => `${i.name} × ${i.quantity}`).join(", ");
+  const itemsSummary =
+    items.length > 0
+      ? items.map((i) => `${i.name} × ${i.quantity}`).join(", ")
+      : typeof o.itemsSummary === "string" && o.itemsSummary.trim()
+      ? o.itemsSummary.trim()
+      : "Bespoke gift order";
+
   const customParts: string[] = [];
   items.forEach((it) => {
     if (it.customization?.customerName)
@@ -1667,32 +1869,58 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
       customParts.push(`'${it.customization.message}'`);
   });
 
+  const rawStatus = o.orderStatus || o.status || "Pending";
+  const validStatus = (ORDER_STATUSES as readonly string[]).includes(rawStatus)
+    ? (rawStatus as OrderStatus)
+    : "Pending";
+
+  const rawPaymentStatus = (o.paymentStatus || "pending").toLowerCase();
+  const validPaymentStatus: PaymentStatus = ["paid", "pending", "failed", "refunded"].includes(rawPaymentStatus)
+    ? (rawPaymentStatus as PaymentStatus)
+    : "pending";
+
+  let formattedDate = "Recently";
+  try {
+    const d = new Date(o.createdAt || o.date || Date.now());
+    if (!isNaN(d.getTime())) {
+      formattedDate = d.toLocaleDateString("en-NG", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+  } catch {
+    formattedDate = "Recently";
+  }
+
+  const orderRef = String(o.orderRef || o.id || "OLU-UNKNOWN").replace(/^#/, "");
+
   return {
-    id: `#${o.orderRef}`,
-    orderRef: o.orderRef,
-    customerName: o.customerName,
-    email: o.customerEmail,
-    phone: o.customerPhone || "+234 800 000 0000",
-    address: o.deliveryAddress,
-    city: o.deliveryCity,
-    state: o.deliveryState,
-    deliveryNotes: o.deliveryNotes,
-    cancellationReason: o.cancellationReason,
-    adminNotes: o.adminNotes,
+    id: `#${orderRef}`,
+    orderRef: orderRef,
+    customerName: String(o.customerName || "Customer"),
+    email: String(o.customerEmail || o.email || "No email"),
+    phone: String(o.customerPhone || o.phone || "+234 800 000 0000"),
+    address: String(o.deliveryAddress || o.address || "Lagos, Nigeria"),
+    city: String(o.deliveryCity || o.city || "Lagos"),
+    state: String(o.deliveryState || o.state || "Lagos"),
+    deliveryNotes: o.deliveryNotes || undefined,
+    cancellationReason: o.cancellationReason || undefined,
+    adminNotes: o.adminNotes || undefined,
     items,
     itemsSummary: itemsSummary || "Bespoke gift order",
-    customizationDetails: customParts.join(" | ") || "Standard catalog order",
-    subtotal: Number(o.subtotal || o.total),
+    customizationDetails:
+      customParts.join(" | ") ||
+      (typeof o.customizationDetails === "string"
+        ? o.customizationDetails
+        : "Standard catalog order"),
+    subtotal: Number(o.subtotal || o.total || 0),
     deliveryFee: Number(o.deliveryFee || 0),
-    amount: Number(o.total),
-    paymentMethod: o.paymentMethod || "paystack",
-    paymentStatus: o.paymentStatus || "pending",
-    status: o.orderStatus as OrderStatus,
-    date: new Date(o.createdAt || Date.now()).toLocaleDateString("en-NG", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
+    amount: Number(o.total || o.amount || 0),
+    paymentMethod: String(o.paymentMethod || "paystack"),
+    paymentStatus: validPaymentStatus,
+    status: validStatus,
+    date: formattedDate,
   };
 }
 

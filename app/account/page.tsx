@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -39,6 +39,12 @@ function AccountContent() {
   const [profileSaved, setProfileSaved] = useState(false);
   const [profileName, setProfileName] = useState(user?.name || "");
   const [profilePhone, setProfilePhone] = useState(user?.phone || "");
+
+  // Keep form state in sync when user profile finishes asynchronous load
+  useEffect(() => {
+    if (user?.name) setProfileName(user.name);
+    if (user?.phone) setProfilePhone(user.phone);
+  }, [user]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,12 +136,12 @@ function AccountContent() {
             <div className="lg:col-span-4 space-y-6">
               <div className="glass rounded-[24px] p-6 text-center border border-black/8 dark:border-[rgba(244,244,242,0.08)]">
                 <div className="w-16 h-16 rounded-full bg-accent/20 border border-accent/30 text-accent font-display font-semibold text-xl flex items-center justify-center mx-auto mb-3 shadow-inner">
-                  {user.name[0]?.toUpperCase() || "U"}
+                  {((user?.name || user?.email || "U").charAt(0)).toUpperCase()}
                 </div>
                 <h2 className="font-display font-medium text-lg text-cloud">
-                  {user.name}
+                  {user?.name || "Customer"}
                 </h2>
-                <p className="font-mono text-xs text-cloud/60">{user.email}</p>
+                <p className="font-mono text-xs text-cloud/60">{user?.email || ""}</p>
 
                 <div className="grid grid-cols-2 gap-2 mt-6 pt-6 border-t border-black/8 dark:border-[rgba(244,244,242,0.08)] font-mono">
                   <Link

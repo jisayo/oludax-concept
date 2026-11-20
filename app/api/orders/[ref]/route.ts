@@ -2,23 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { getOrderByRef } from "@/lib/server/db";
 import { verifyAdminRequest } from "@/lib/server/admin-auth";
 
-function maskEmail(email: string): string {
+function maskEmail(email?: string | null): string {
+  if (!email || typeof email !== "string" || !email.includes("@")) return "***";
   const [user, domain] = email.split("@");
   if (!domain) return "***";
   if (user.length <= 2) return `${user[0]}***@${domain}`;
   return `${user[0]}***${user[user.length - 1]}@${domain}`;
 }
 
-function maskPhone(phone: string): string {
+function maskPhone(phone?: string | null): string {
+  if (!phone || typeof phone !== "string") return "***";
   const clean = phone.trim();
   if (clean.length < 7) return "***";
   return `${clean.slice(0, 4)} *** ${clean.slice(-4)}`;
 }
 
-function maskName(name: string): string {
+function maskName(name?: string | null): string {
+  if (!name || typeof name !== "string") return "Customer";
   const parts = name.trim().split(" ");
-  if (parts.length === 1) return parts[0];
-  return `${parts[0]} ${parts[1][0]}.`;
+  if (parts.length <= 1) return parts[0] || "Customer";
+  return `${parts[0]} ${parts[1]?.[0] || ""}.`;
 }
 
 export async function GET(
