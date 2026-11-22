@@ -115,7 +115,7 @@ function CheckoutSuccessContent() {
     }
   }, [refParam, referenceParam]);
 
-  const displayRef = refParam || order?.ref || "OLU-108249";
+  const displayRef = refParam || order?.ref || "";
 
   return (
     <div className="min-h-screen bg-base text-cloud pt-20 sm:pt-24 lg:pt-28 pb-16">
@@ -137,12 +137,14 @@ function CheckoutSuccessContent() {
             We have received your order and our artisan team in Lagos has begun bespoke curation and hand-packaging.
           </p>
 
-          <div className="glass border border-black/10 dark:border-white/10 rounded-full px-5 py-2 inline-flex items-center gap-3">
-            <span className="font-mono text-xs text-cloud/50">Order Reference:</span>
-            <span className="font-mono font-bold text-accent text-sm tracking-wider">
-              #{displayRef}
-            </span>
-          </div>
+          {displayRef && (
+            <div className="glass border border-black/10 dark:border-white/10 rounded-full px-5 py-2 inline-flex items-center gap-3">
+              <span className="font-mono text-xs text-cloud/50">Order Reference:</span>
+              <span className="font-mono font-bold text-accent text-sm tracking-wider">
+                #{displayRef}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Order Details Breakdown */}
@@ -226,7 +228,7 @@ function CheckoutSuccessContent() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/track"
+            href={displayRef ? `/track?ref=${encodeURIComponent(displayRef)}` : "/track"}
             className="btn-primary py-3.5 px-8 font-mono text-xs uppercase tracking-[0.14em] flex items-center justify-center gap-2"
           >
             <Truck className="w-4 h-4" />

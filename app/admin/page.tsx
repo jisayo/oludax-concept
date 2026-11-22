@@ -94,143 +94,7 @@ type AdminOrder = {
   date: string;
 };
 
-const initialOrders: AdminOrder[] = [
-  {
-    id: "#OLU-108249",
-    orderRef: "OLU-108249",
-    customerName: "Adebayo Olawale",
-    email: "adebayo@gmail.com",
-    phone: "+234 803 123 4567",
-    address: "14 Admiralty Way, Lekki Phase 1",
-    city: "Lekki",
-    state: "Lagos",
-    deliveryNotes: "Leave at front desk with security guard",
-    adminNotes: "Client requested pink accent wrapping",
-    items: [
-      {
-        productId: "prod-1",
-        name: "Personalized Ceramic Mug",
-        price: 8000,
-        quantity: 1,
-        customization: {
-          customerName: "Sarah",
-          selectedColor: "#FF69B4",
-          message: "Happy 30th Birthday! Shine bright always.",
-          selectedDesign: "Modern Sans",
-        },
-      },
-    ],
-    itemsSummary: "Personalized Ceramic Mug × 1",
-    customizationDetails:
-      "Name: 'Sarah' | Colour: Pink | 'Happy 30th Birthday'",
-    subtotal: 8000,
-    deliveryFee: 3500,
-    amount: 11500,
-    paymentMethod: "paystack",
-    paymentStatus: "paid",
-    status: "Customization in Progress",
-    date: "Nov 17, 2026",
-  },
-  {
-    id: "#OLU-108248",
-    orderRef: "OLU-108248",
-    customerName: "Chioma Nwachukwu",
-    email: "chioma.n@yahoo.com",
-    phone: "+234 802 987 6543",
-    address: "22 Gana Street, Maitama",
-    city: "Maitama",
-    state: "Abuja (FCT)",
-    deliveryNotes: "Call when dispatch rider arrives",
-    adminNotes: "Express delivery verified",
-    items: [
-      {
-        productId: "prod-2",
-        name: "Luxury Fresh Flower Bouquet",
-        price: 20000,
-        quantity: 1,
-        customization: {
-          message: "To my queen, forever and always.",
-          selectedColor: "#FF0000",
-        },
-      },
-    ],
-    itemsSummary: "Luxury Fresh Flower Bouquet × 1",
-    customizationDetails: "Ribbon note: 'To my queen, forever and always.'",
-    subtotal: 20000,
-    deliveryFee: 3500,
-    amount: 23500,
-    paymentMethod: "paystack",
-    paymentStatus: "paid",
-    status: "Payment Confirmed",
-    date: "Nov 17, 2026",
-  },
-  {
-    id: "#OLU-108247",
-    orderRef: "OLU-108247",
-    customerName: "Funke Adeleke",
-    email: "funke.a@outlook.com",
-    phone: "+234 814 555 6677",
-    address: "7 Trans Amadi Industrial Layout",
-    city: "Port Harcourt",
-    state: "Rivers",
-    adminNotes: "Embroidery thread: metallic gold",
-    items: [
-      {
-        productId: "prod-4",
-        name: "Custom Embroidered Hoodie",
-        price: 25000,
-        quantity: 1,
-        customization: {
-          customerName: "F.A.",
-          selectedSize: "L",
-          selectedColor: "#171016",
-        },
-      },
-    ],
-    itemsSummary: "Custom Embroidered Hoodie (Size L) × 1",
-    customizationDetails: "Chest initials: 'F.A.' in Gold thread",
-    subtotal: 25000,
-    deliveryFee: 3500,
-    amount: 28500,
-    paymentMethod: "bank_transfer",
-    paymentStatus: "paid",
-    status: "Ready for Dispatch",
-    date: "Nov 16, 2026",
-  },
-  {
-    id: "#OLU-108246",
-    orderRef: "OLU-108246",
-    customerName: "Babajide Sanwo",
-    email: "jide@lagosgov.ng",
-    phone: "+234 809 111 2233",
-    address: "Alausa Secretariat, Ikeja",
-    city: "Ikeja",
-    state: "Lagos",
-    deliveryNotes: "Deliver directly to administrative office 3",
-    adminNotes: "Corporate bulk order discount applied",
-    items: [
-      {
-        productId: "prod-5",
-        name: "Executive Corporate Gift Set",
-        price: 35000,
-        quantity: 5,
-        customization: {
-          customerName: "State Executives",
-          message: "With compliments of the Governor's Office",
-        },
-      },
-    ],
-    itemsSummary: "Executive Corporate Gift Set × 5",
-    customizationDetails: "Engraved corporate logo + executive names",
-    subtotal: 175000,
-    deliveryFee: 0,
-    amount: 175000,
-    paymentMethod: "paystack",
-    paymentStatus: "paid",
-    status: "Delivered",
-    date: "Nov 15, 2026",
-  },
-];
+const initialOrders: AdminOrder[] = [];
 
 export default function AdminDashboardPage() {
   const {
@@ -808,7 +672,9 @@ export default function AdminDashboardPage() {
                   {formatPrice(totalSales)}
                 </p>
                 <span className="text-[10px] font-mono text-emerald-400 mt-2 block">
-                  ↑ 18.4% vs last cycle
+                  {ordersList.length > 0
+                    ? "Calculated from completed orders"
+                    : "Awaiting first settlement"}
                 </span>
               </div>
 
@@ -866,48 +732,57 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="divide-y divide-white/5">
-                {ordersList.slice(0, 4).map((order) => (
-                  <div
-                    key={order.orderRef}
-                    className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono text-xs"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-pink">{order.id}</span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}
-                        >
-                          {order.status}
-                        </span>
-                        {order.status === "Cancelled" &&
-                          order.cancellationReason && (
-                            <span className="text-[10px] text-rose-400 truncate max-w-[200px]">
-                              ({order.cancellationReason})
-                            </span>
-                          )}
-                      </div>
-                      <p className="text-white font-semibold">
-                        {order.customerName} • {order.city}, {order.state}
-                      </p>
-                      <p className="text-gray-400 text-[11px] mt-0.5">
-                        {order.itemsSummary}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-sm text-white">
-                        {formatPrice(order.amount)}
-                      </span>
-                      <button
-                        onClick={() => setEditingOrder({ ...order })}
-                        className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-pink text-xs font-semibold flex items-center gap-1 transition"
-                      >
-                        <Edit3 className="w-3 h-3" />
-                        <span>Manage</span>
-                      </button>
-                    </div>
+                {ordersList.length === 0 ? (
+                  <div className="py-10 text-center font-mono text-xs text-gray-500">
+                    No active orders in production queue. Live customer orders
+                    will appear here automatically.
                   </div>
-                ))}
+                ) : (
+                  ordersList.slice(0, 4).map((order) => (
+                    <div
+                      key={order.orderRef}
+                      className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono text-xs"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-bold text-pink">
+                            {order.id}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeClasses(order.status)}`}
+                          >
+                            {order.status}
+                          </span>
+                          {order.status === "Cancelled" &&
+                            order.cancellationReason && (
+                              <span className="text-[10px] text-rose-400 truncate max-w-[200px]">
+                                ({order.cancellationReason})
+                              </span>
+                            )}
+                        </div>
+                        <p className="text-white font-semibold">
+                          {order.customerName} • {order.city}, {order.state}
+                        </p>
+                        <p className="text-gray-400 text-[11px] mt-0.5">
+                          {order.itemsSummary}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-sm text-white">
+                          {formatPrice(order.amount)}
+                        </span>
+                        <button
+                          onClick={() => setEditingOrder({ ...order })}
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-pink text-xs font-semibold flex items-center gap-1 transition"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Manage</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -1841,7 +1716,32 @@ export default function AdminDashboardPage() {
 // ============================================================================
 
 function mapApiOrderToAdminOrder(o: any): AdminOrder {
-  if (!o) return initialOrders[0];
+  if (!o) {
+    return {
+      id: "#OLU-000000",
+      orderRef: "OLU-000000",
+      customerName: "Customer",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      items: [],
+      itemsSummary: "No items",
+      customizationDetails: "None",
+      subtotal: 0,
+      deliveryFee: 0,
+      amount: 0,
+      paymentMethod: "paystack",
+      paymentStatus: "pending",
+      status: "Pending",
+      date: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+    };
+  }
 
   const rawItems = Array.isArray(o.items) ? o.items : [];
   const items: OrderItem[] = rawItems.map((it: any) => ({
@@ -1856,8 +1756,8 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
     items.length > 0
       ? items.map((i) => `${i.name} × ${i.quantity}`).join(", ")
       : typeof o.itemsSummary === "string" && o.itemsSummary.trim()
-      ? o.itemsSummary.trim()
-      : "Bespoke gift order";
+        ? o.itemsSummary.trim()
+        : "Bespoke gift order";
 
   const customParts: string[] = [];
   items.forEach((it) => {
@@ -1875,7 +1775,12 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
     : "Pending";
 
   const rawPaymentStatus = (o.paymentStatus || "pending").toLowerCase();
-  const validPaymentStatus: PaymentStatus = ["paid", "pending", "failed", "refunded"].includes(rawPaymentStatus)
+  const validPaymentStatus: PaymentStatus = [
+    "paid",
+    "pending",
+    "failed",
+    "refunded",
+  ].includes(rawPaymentStatus)
     ? (rawPaymentStatus as PaymentStatus)
     : "pending";
 
@@ -1893,7 +1798,10 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
     formattedDate = "Recently";
   }
 
-  const orderRef = String(o.orderRef || o.id || "OLU-UNKNOWN").replace(/^#/, "");
+  const orderRef = String(o.orderRef || o.id || "OLU-UNKNOWN").replace(
+    /^#/,
+    "",
+  );
 
   return {
     id: `#${orderRef}`,

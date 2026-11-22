@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Truck,
@@ -38,9 +39,12 @@ type OrderData = {
   }>;
 };
 
-export default function TrackOrderPage() {
-  const [orderQuery, setOrderQuery] = useState("OLU-108249");
-  const [searchedOrder, setSearchedOrder] = useState<string | null>("OLU-108249");
+function TrackContent() {
+  const searchParams = useSearchParams();
+  const initialRef = (typeof searchParams?.get === "function" ? searchParams.get("ref") : "") || "";
+
+  const [orderQuery, setOrderQuery] = useState(initialRef);
+  const [searchedOrder, setSearchedOrder] = useState<string | null>(initialRef || null);
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [milestones, setMilestones] = useState<TrackingMilestone[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,7 +125,7 @@ export default function TrackOrderPage() {
                   type="text"
                   value={orderQuery}
                   onChange={(e) => setOrderQuery(e.target.value)}
-                  placeholder="Enter order reference (e.g. OLU-108249)"
+                  placeholder="Enter order reference (e.g. OLU-XXXXXX)"
                   className="w-full pl-11 pr-4 py-3 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs sm:text-sm font-mono text-cloud focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
@@ -140,6 +144,19 @@ export default function TrackOrderPage() {
             <div className="glass rounded-[20px] p-5 border border-rose-500/20 text-rose-500 flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-xs sm:text-sm font-mono">{errorMessage}</p>
+            </div>
+          )}
+
+          {/* Initial Guidance Card when no search performed yet */}
+          {!orderData && !errorMessage && !isLoading && (
+            <div className="glass rounded-[24px] p-8 sm:p-12 text-center border border-black/8 dark:border-[rgba(244,244,242,0.08)] space-y-3">
+              <Package className="w-12 h-12 text-cloud/20 mx-auto" />
+              <h3 className="font-display font-medium text-lg text-cloud">
+                Track Your Custom Keepsake
+              </h3>
+              <p className="text-xs sm:text-sm text-cloud/50 max-w-md mx-auto leading-relaxed">
+                Enter your bespoke order reference number (e.g. OLU-XXXXXX) from your confirmation receipt, SMS, or WhatsApp notification above to view live production milestones.
+              </p>
             </div>
           )}
 
@@ -182,48 +199,35 @@ export default function TrackOrderPage() {
                 </div>
               </div>
 
-              {/* Stepper Timeline */}
-              <div className="relative pl-8 sm:pl-10 space-y-8">
-                {milestones.map((step, idx) => {
-                  const isCompleted = step.isCompleted;
-                  const isCurrent = step.isCurrent;
-
+              {/* Timeline Steps */}
+              <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-3 sm:before:left-4 before:top-3 before:bottom-3 before:w-0.5 before:bg-black/10 dark:before:bg-white/10">
+                {milestones.map((step) => {
                   return (
-                    <div key={step.title} className="relative">
-                      {/* Vertical Connector Line */}
-                      {idx < milestones.length - 1 && (
-                        <div
-                          className={`absolute -left-[23px] sm:-left-[27px] top-6 w-0.5 h-full ${
-                            isCompleted ? "bg-emerald-500" : "bg-black/10 dark:bg-white/10"
-                          }`}
-                        />
-                      )}
-
-                      {/* Step Indicator */}
+                    <div key={step.key} className="relative flex items-start gap-4">
+                      {/* Status Icon Indicator */}
                       <div
-                        className={`absolute -left-8 sm:-left-10 top-0.5 w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs font-semibold transition-all ${
-                          isCompleted
-                            ? "bg-emerald-500 text-white"
-                            : isCurrent
-                            ? "bg-accent text-white ring-4 ring-accent/20 animate-pulse"
-                            : "bg-black/10 dark:bg-white/10 text-cloud/40"
+                        className={`absolute -left-6 sm:-left-8 top-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                          step.isCompleted
+                            ? "bg-accent text-white"
+                            : step.isCurrent
+                            ? "bg-accent/20 text-accent border border-accent ring-4 ring-accent/15"
+                            : "bg-black/10 dark:bg-white/10 text-cloud/30"
                         }`}
                       >
-                        {isCompleted ? (
+                        {step.isCompleted ? (
                           <CheckCircle2 className="w-3.5 h-3.5" />
+                        ) : step.isCurrent ? (
+                          <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
                         ) : (
-                          <span>{idx + 1}</span>
+                          <Clock className="w-3 h-3" />
                         )}
                       </div>
 
-                      {/* Step Content */}
-                      <div>
-                        <div className="flex flex-wrap items-baseline justify-between gap-1 mb-1">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
                           <h3
-                            className={`font-medium text-xs sm:text-sm ${
-                              isCurrent
-                                ? "text-accent font-semibold"
-                                : isCompleted
+                            className={`font-mono text-sm font-semibold ${
+                              step.isCompleted || step.isCurrent
                                 ? "text-cloud"
                                 : "text-cloud/40"
                             }`}
@@ -265,5 +269,19 @@ export default function TrackOrderPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TrackOrderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-base pt-28 text-center text-cloud font-mono text-xs">
+          Loading tracking...
+        </div>
+      }
+    >
+      <TrackContent />
+    </Suspense>
   );
 }

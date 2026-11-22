@@ -139,7 +139,7 @@ export async function verifyPaystackPayment(
       currency: "NGN",
       customer: {
         id: 1,
-        email: "customer@oludaxconcept.com",
+        email: "client@oludaxconcept.com",
         customer_code: "CUS_mock123",
       },
     },

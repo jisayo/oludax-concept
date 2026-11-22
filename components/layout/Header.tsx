@@ -33,12 +33,12 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Hide header on admin pages
-  if (pathname.startsWith("/admin")) return null;
-
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  // Hide header on admin pages after all hooks have run
+  if (pathname?.startsWith("/admin")) return null;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

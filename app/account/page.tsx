@@ -22,7 +22,10 @@ import { useWishlist } from "@/lib/wishlist-context";
 function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const destination = searchParams ? (searchParams.get("redirect") || "/shop") : "/shop";
+  const destination =
+    typeof searchParams?.get === "function"
+      ? searchParams.get("redirect") || "/shop"
+      : "/shop";
 
   const { user, isAuthenticated, isAdmin, login, register, logout, updateProfile } =
     useAuth();
@@ -208,44 +211,22 @@ function AccountContent() {
                     </Link>
                   </div>
 
-                  <div className="space-y-4">
-                    {/* Demo Order Card */}
-                    <div className="glass rounded-2xl p-5 border border-black/8 dark:border-[rgba(244,244,242,0.08)] space-y-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-black/8 dark:border-[rgba(244,244,242,0.08)]">
-                        <div>
-                          <span className="font-mono font-bold text-sm text-accent">
-                            #OLU-108249
-                          </span>
-                          <span className="font-mono text-[11px] text-cloud/60 block">
-                            Nov 17, 2026 · 1 item
-                          </span>
-                        </div>
-                        <span className="glass rounded-full px-3 py-1 font-mono text-[10px] text-accent border border-accent/25 flex items-center gap-1 font-semibold">
-                          <Sparkles className="w-3 h-3" /> Customization in Progress
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <div>
-                          <p className="font-semibold text-cloud">
-                            Personalized Ceramic Mug × 1
-                          </p>
-                          <p className="text-[11px] text-cloud/60">
-                            Custom: &quot;Sarah&quot; · Colour: Pink
-                          </p>
-                        </div>
-                        <span className="font-bold text-cloud">₦11,500</span>
-                      </div>
-
-                      <div className="pt-2 flex justify-end">
-                        <Link
-                          href="/track?ref=OLU-108249"
-                          className="font-mono text-xs text-accent hover:underline flex items-center gap-1 font-semibold"
-                        >
-                          <span>Track Milestone Status</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
+                  <div className="py-12 text-center space-y-3">
+                    <Package className="w-10 h-10 text-cloud/20 mx-auto" />
+                    <p className="font-mono text-xs text-cloud/60">
+                      No orders placed yet.
+                    </p>
+                    <p className="text-xs text-cloud/40 max-w-sm mx-auto">
+                      When you place an order, your milestone tracking, customization proofs, and delivery details will appear here.
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        href="/shop"
+                        className="btn-primary inline-flex items-center gap-1.5 py-2 px-5 font-mono text-xs"
+                      >
+                        <span>Explore Bespoke Catalogue</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -257,29 +238,14 @@ function AccountContent() {
                     Saved Delivery Addresses
                   </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="glass rounded-2xl p-4 border border-accent/30 relative">
-                      <span className="absolute top-3 right-3 font-mono text-[9px] uppercase tracking-wider bg-accent/15 text-accent px-2 py-0.5 rounded-full font-semibold">
-                        Default
-                      </span>
-                      <h4 className="font-semibold text-xs font-mono text-cloud mb-1">
-                        Primary Residence
-                      </h4>
-                      <p className="text-xs text-cloud/70 leading-relaxed font-mono">
-                        14 Admiralty Way, Lekki Phase 1<br />
-                        Lagos, Nigeria
-                      </p>
-                      <p className="text-xs text-cloud/60 font-mono mt-2">
-                        +234 (0) 803 123 4567
-                      </p>
-                    </div>
-
-                    <div className="glass rounded-2xl p-4 border border-dashed border-black/15 dark:border-white/15 flex flex-col items-center justify-center text-center p-6 cursor-pointer hover:border-accent/40 transition-colors">
-                      <MapPin className="w-6 h-6 text-cloud/40 mb-2" />
-                      <span className="font-mono text-xs text-accent font-semibold">
-                        + Add New Delivery Address
-                      </span>
-                    </div>
+                  <div className="py-12 text-center space-y-3">
+                    <MapPin className="w-10 h-10 text-cloud/20 mx-auto" />
+                    <p className="font-mono text-xs text-cloud/60">
+                      No saved delivery destinations yet.
+                    </p>
+                    <p className="text-xs text-cloud/40 max-w-sm mx-auto">
+                      Addresses used during checkout will be automatically saved here for one-click reordering.
+                    </p>
                   </div>
                 </div>
               )}
@@ -446,26 +412,7 @@ function AccountContent() {
               </button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-black/8 dark:border-[rgba(244,244,242,0.08)] text-center">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={async () => {
-                  setEmail("customer@oludaxconcept.com");
-                  setPassword("password123");
-                  setIsSubmitting(true);
-                  try {
-                    await login("customer@oludaxconcept.com", "password123");
-                    router.push(destination);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-                className="font-mono text-xs text-accent hover:brightness-110 font-semibold inline-flex items-center gap-1 cursor-pointer"
-              >
-                <span>Quick Demo Sign In →</span>
-              </button>
-            </div>
+
           </div>
         )}
       </div>
