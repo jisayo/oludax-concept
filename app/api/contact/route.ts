@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: "Thank you! Our concierge team has received your inquiry.",
+        message: "Thank you! Our team has received your inquiry.",
         data: saved,
       },
       { status: 201 }

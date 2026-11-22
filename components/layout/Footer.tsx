@@ -95,7 +95,7 @@ export default function Footer() {
                   href="/about"
                   className="text-sm text-cloud/60 transition hover:text-cloud"
                 >
-                  About Our Studio
+                  About Us
                 </Link>
               </li>
               <li>
@@ -103,7 +103,7 @@ export default function Footer() {
                   href="/contact"
                   className="text-sm text-cloud/60 transition hover:text-cloud"
                 >
-                  Contact Concierge
+                  Contact Us
                 </Link>
               </li>
             </ul>

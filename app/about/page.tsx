@@ -9,7 +9,7 @@ import {
 export const metadata = {
   title: "About Us | OLUDAX CONCEPT",
   description:
-    "Learn about OLUDAX CONCEPT, our approach to thoughtful gifting, artisanal personalization, and our commitment to making every celebration memorable.",
+    "Learn about OLUDAX CONCEPT — Your Number One Gift Plug. We customise gifts, frames, merchandise branding, and celebration packages in Ile-Ife, Akure, and nationwide.",
 };
 
 export default function AboutPage() {
@@ -194,20 +194,20 @@ export default function AboutPage() {
             <div className="glass rounded-2xl p-6 space-y-3 border border-black/8 dark:border-[rgba(244,244,242,0.08)]">
               <span className="font-mono text-xs text-accent font-semibold">02</span>
               <h3 className="font-display text-lg font-medium text-cloud">
-                Artisan Customization
+                Gift Customization
               </h3>
               <p className="text-xs leading-relaxed text-cloud/50">
-                From precision engraving and heat-pressed mugs to custom ribbon tags and greeting card typography, your words take center stage.
+                From personalized mugs and custom frames to printed stationery and celebration souvenirs, your photos and messages take center stage.
               </p>
             </div>
 
             <div className="glass rounded-2xl p-6 space-y-3 border border-black/8 dark:border-[rgba(244,244,242,0.08)]">
               <span className="font-mono text-xs text-accent font-semibold">03</span>
               <h3 className="font-display text-lg font-medium text-cloud">
-                Pristine Presentation
+                Careful Presentation
               </h3>
               <p className="text-xs leading-relaxed text-cloud/50">
-                Every order is enclosed in luxury packaging with satin ribbons, wax seals, and protective cushioning ready for instant presentation.
+                Every order is prepared with care, quality packaging, and attention to detail, ready to gift directly to someone special.
               </p>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function AboutPage() {
             Ready to Celebrate Someone Special?
           </h2>
           <p className="text-xs sm:text-sm text-cloud/50 max-w-md mx-auto">
-            Explore our curated gift catalogue or reach out to our concierge desk for custom branding and gift packages.
+            Explore our gift catalogue or reach out directly to us on WhatsApp for custom branding and celebration packages.
           </p>
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link href="/shop" className="btn-primary py-3 px-8 font-mono text-xs uppercase tracking-wider">
@@ -227,7 +227,7 @@ export default function AboutPage() {
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
             <Link href="/contact" className="btn-outline py-3 px-8 font-mono text-xs uppercase tracking-wider">
-              <span>Contact Concierge</span>
+              <span>Contact Us</span>
             </Link>
           </div>
         </div>

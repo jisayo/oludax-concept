@@ -116,7 +116,7 @@ function TrackContent() {
                 Track Your Gift Package
               </h1>
               <p className="text-cloud/50 text-xs sm:text-sm mt-1 max-w-xl">
-                Enter your order reference number to view artisan personalization status and courier transit milestones.
+                Enter your order reference number to view customization status and courier transit milestones.
               </p>
             </div>
           </div>

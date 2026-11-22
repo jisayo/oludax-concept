@@ -72,7 +72,7 @@ export const ROLES: Record<Role, RoleDefinition> = {
     ],
   },
   support: {
-    name: "Concierge / Support",
+    name: "Customer Support",
     description: "Customer service: editing delivery destinations, phone numbers & order cancellations",
     badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     permissions: [

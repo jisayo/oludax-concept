@@ -1,18 +1,17 @@
-# OLUDAX CONCEPT — Bespoke Luxury Gifting Studio
+# OLUDAX CONCEPT — Customized Gifts & Branding Store
 
-A full-stack, enterprise-grade e-commerce web platform for **OLUDAX CONCEPT** — Nigeria's premier bespoke gifting studio and personalized luxury lifestyle brand.
+A full-stack, enterprise-grade e-commerce web platform for **OLUDAX CONCEPT** — Your Number One Gift Plug. Customised frames, corporate merchandise branding, quality printing, and celebration packages in Ile-Ife, Akure, and nationwide.
 
-Built with **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, **Supabase PostgreSQL**, and **Paystack Payments**, featuring an editorial Obsidian & Off-White design system, WCAG AAA accessibility, role-based access control (RBAC), and dual-mode resilient persistence.
+Built with **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, **Supabase PostgreSQL**, and **Paystack Payments**, featuring high-contrast themes, WCAG AAA accessibility, role-based access control (RBAC), and dual-mode resilient persistence.
 
 ---
 
 ## Highlights & Capabilities
 
-- **Curated Editorial Aesthetic**: Obsidian (`#0F0F11`), Off-White (`#FAF8F5`), and Burnished Gold (`#C8A97E`) styling inspired by high-fashion ateliers.
-- **High-Contrast Dark & Light Modes**: Elevated contrast ratios across both modes meeting WCAG AAA compliance standards.
-- **Bespoke Personalization Studio**: Live preview of custom text engraving, monogramming, and high-resolution artwork uploads.
-- **Role-Based Access Control (RBAC)**: 6 granular roles (`super_admin`, `admin`, `manager`, `artisan`, `support`, `customer`) with strict permission checks and a staff administration suite.
-- **Seamless Checkout & Nigerian Naira (`₦`) Native**: Full Paystack integration (Inline Pop & Server-to-Server HMAC SHA-512 Webhooks) with standard shipping rules (₦3,500 standard, free shipping over ₦50,000).
+- **Curated Gift Aesthetics**: Modern Dark & Light modes with refined contrast meeting WCAG AAA compliance standards.
+- **Gift Customization & WhatsApp Orders**: Direct ordering on store with instant WhatsApp order synchronization (`+234 814 441 2006`).
+- **Role-Based Access Control (RBAC)**: Granular roles (`super_admin`, `admin`, `manager`, `support`, `customer`) with strict server-side permission checks and an admin dashboard.
+- **Seamless Checkout & Nigerian Naira (`₦`) Native**: Full Paystack integration (Cards, Bank Transfer, USSD) with standard shipping rules (Osun, Ondo, Lagos, and nationwide).
 - **Dual-Mode Resilient Database**: Direct Supabase PostgreSQL connectivity with automatic failover to an in-memory transactional store for effortless zero-config local testing.
 - **Live Order Tracking**: Dynamic 4-stage tracking timeline (`Received` → `In Production` → `Dispatched` → `Delivered`) via `#OLU-XXXXXX` references.
 
@@ -22,21 +21,21 @@ Built with **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, **Supaba
 
 | Route | Description |
 | :--- | :--- |
-| `/` | Editorial landing page with hero showcase, featured collections, bestsellers, artisan process, testimonials, and newsletter |
-| `/shop` | Full catalog with real-time text search, category filters, sorting, stock badges, and quick-add stepper |
-| `/categories` | Visual collection index showcasing Bespoke Boxes, Monogrammed Leather, Executive Pens, Barware, and more |
-| `/product/[id]` | Product detail view with gallery, live customization studio, stock indicator, related products, and reviews |
-| `/customize` | Dedicated custom commission studio for bespoke engravings, special materials, and file uploads |
+| `/` | Landing page with hero showcase, featured collections, bestsellers, brand story, and WhatsApp order CTA |
+| `/shop` | Full gift catalog with real-time text search, category filters, sorting, stock badges, and quick-add |
+| `/categories` | Visual collection index showcasing Custom Frames, Branded Merchandise, Drinkware, Stationery, and Souvenirs |
+| `/product/[id]` | Product detail view with gallery, variant & size selector, stock indicator, related products, and direct WhatsApp order button |
+| `/price-list` | Complete verified price list across all frames, mugs, apparel, stationery, and celebration items |
 | `/wishlist` | Saved items drawer with direct add-to-cart migration |
-| `/cart` | Dynamic cart drawer and page with promo codes (`OLUDAX10`, `LUXURY5`) and free shipping threshold tracker |
+| `/cart` | Dynamic cart drawer and page with promo codes and free shipping tracker |
 | `/checkout` | Comprehensive checkout with Nigerian states/cities, shipping calculation, and Paystack payment gateway |
 | `/checkout/success` | Order confirmation receipt with tracking reference, order breakdown, and print capability |
 | `/track` | Public order lookup and tracking timeline with real-time status visualization |
-| `/account` | Customer account portal with auth (Sign In / Register / Live Role Switcher), order history, and addresses |
+| `/account` | Customer account portal with auth (Sign In / Register), order history, and addresses |
 | `/admin` | Secure staff dashboard with KPI cards, order filter/search, status transitions, modal editor, and cancellation manager |
-| `/about` | Brand heritage, artisan craftsmanship story, and mission |
-| `/contact` | Concierge inquiries form with backend message capture and studio details |
-| `/faq` | Frequently asked questions regarding shipping, personalization, corporate gifting, and care |
+| `/about` | Brand heritage, CEO story (Precious Oluwatofunmi), and the 3 pillars (Frame, Brand, Print) |
+| `/contact` | Customer inquiries form with backend message capture and studio details |
+| `/faq` | Frequently asked questions regarding shipping, customization, and payments |
 
 ---
 
@@ -54,7 +53,7 @@ Built with **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, **Supaba
 | `/api/paystack/verify` | `GET` | Payment verification callback |
 | `/api/paystack/webhook` | `POST` | HMAC SHA-512 webhook handler for asynchronous payment confirmations |
 | `/api/customization/upload` | `POST` | Artwork and monogram image file upload handler |
-| `/api/contact` | `POST` | Concierge inquiry message submission |
+| `/api/contact` | `POST` | Customer inquiry message submission |
 
 ---
 
@@ -101,8 +100,8 @@ The platform stores data in PostgreSQL via Supabase, with automatic schema defin
    - Admin audit fields: `cancellation_reason`, `admin_notes`, and `customization_details`.
 
 2. **Catalog Seed**: [`supabase/seed.sql`](supabase/seed.sql)
-   - Pre-populates 10 luxury categories (Executive Gifts, Bespoke Hampers, Monogrammed Leather, Keepsakes, etc.).
-   - Pre-populates 12 artisanal products with rich descriptions, pricing, dimensions, and high-resolution photography.
+   - Pre-populates store categories (Frames, Mugs, Apparel, Stationery, Keepsakes, etc.).
+   - Pre-populates catalog products with authentic WhatsApp catalog descriptions, pricing, options, and photography.
 
 ---
 

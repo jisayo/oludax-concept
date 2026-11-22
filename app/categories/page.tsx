@@ -95,14 +95,14 @@ export default function CategoriesPage() {
               Looking for customized gifts or corporate packages?
             </h3>
             <p className="text-cloud/50 text-xs sm:text-sm">
-              Explore our comprehensive catalogue or chat directly with our concierge team for custom branding and special orders.
+              Explore our comprehensive catalogue or chat directly with us on WhatsApp for custom branding and special orders.
             </p>
           </div>
           <Link
             href="/contact"
             className="btn-primary px-8 py-3.5 font-mono text-xs uppercase tracking-[0.14em] shrink-0"
           >
-            <span>Contact Concierge</span>
+            <span>Contact Us</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>

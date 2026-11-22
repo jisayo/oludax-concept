@@ -196,14 +196,14 @@ export default function FAQPage() {
             Still Have Questions?
           </h3>
           <p className="text-xs text-cloud/50 max-w-sm mx-auto leading-relaxed">
-            Our artisan concierge is available on WhatsApp and email to assist with special gift combinations or express orders.
+            Our support team is available on WhatsApp and email to assist with special gift combinations or express orders.
           </p>
           <div className="pt-2">
             <Link
               href="/contact"
               className="btn-primary text-xs py-3 px-8 font-mono uppercase tracking-wider inline-flex items-center gap-2"
             >
-              <span>Contact Concierge</span>
+              <span>Contact Us</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

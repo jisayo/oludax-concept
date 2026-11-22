@@ -63,7 +63,7 @@ export default function ContactPage() {
               Home
             </Link>
             <ChevronRight className="w-3 h-3 text-cloud/30" />
-            <span className="text-accent font-semibold">Contact Concierge</span>
+            <span className="text-accent font-semibold">Contact Us</span>
           </nav>
 
           <div className="max-w-2xl">
@@ -71,7 +71,7 @@ export default function ContactPage() {
               We&apos;re Here to Help
             </h1>
             <p className="text-cloud/50 text-xs sm:text-sm mt-1 leading-relaxed">
-              Have a question about a customized gift, delivery timeline, or corporate bulk gifting? Reach out to our concierge team.
+              Have a question about a customized gift, delivery timeline, or corporate branding order? Reach out to our team.
             </p>
           </div>
         </div>
@@ -223,7 +223,7 @@ export default function ContactPage() {
                 Send Us a Message
               </h2>
               <p className="text-xs text-cloud/50 mb-6">
-                Fill in the form below and an artisan concierge will reply promptly.
+                Fill in the form below and our team will reply promptly.
               </p>
 
               {submitted ? (

@@ -636,9 +636,9 @@ export default function Home() {
             </div>
             <div>
               <p className="font-mono text-xs uppercase tracking-wider font-semibold text-cloud">
-                WhatsApp Concierge
+                WhatsApp Support
               </p>
-              <p className="text-xs text-cloud/50">Direct artisan support</p>
+              <p className="text-xs text-cloud/50">Direct order assistance</p>
             </div>
           </div>
         </div>

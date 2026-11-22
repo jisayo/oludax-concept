@@ -1107,7 +1107,7 @@ export default function AdminDashboardPage() {
                   Catalogue & Stock Control
                 </h3>
                 <p className="font-mono text-xs text-gray-400">
-                  Instant stock adjustments for artisan gifting materials
+                  Instant stock adjustments for gift items & materials
                 </p>
               </div>
               <span className="font-mono text-xs text-pink bg-pink/15 px-3 py-1 rounded-full border border-pink/25">
@@ -1571,7 +1571,7 @@ export default function AdminDashboardPage() {
               {/* Internal Staff Notes */}
               <div>
                 <label className="block text-gray-400 uppercase text-[10px] mb-1 font-semibold">
-                  Internal Staff / Concierge Notes
+                  Internal Staff Notes
                 </label>
                 <textarea
                   rows={2}
@@ -1650,7 +1650,7 @@ export default function AdminDashboardPage() {
 
             <p className="text-gray-300 leading-relaxed text-[11px]">
               This will update the order status to <strong>Cancelled</strong>,
-              halt artisan production queue, and log the reason in the customer
+              halt production queue, and log the reason in the customer
               tracking timeline.
             </p>
 
@@ -1669,8 +1669,8 @@ export default function AdminDashboardPage() {
                 <option value="Customer requested cancellation via Email/Phone">
                   Customer requested cancellation via Email/Phone
                 </option>
-                <option value="Artisan materials or customized stock unavailable">
-                  Artisan materials or customized stock unavailable
+                <option value="Production materials or customized stock unavailable">
+                  Production materials or customized stock unavailable
                 </option>
                 <option value="Incomplete or unverified destination address in Nigeria">
                   Incomplete or unverified destination address in Nigeria
