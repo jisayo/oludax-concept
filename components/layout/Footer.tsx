@@ -65,14 +65,6 @@ export default function Footer() {
                   Curated Gift Boxes
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/customize"
-                  className="text-sm text-accent transition hover:brightness-110 font-medium"
-                >
-                  Customize Studio ✨
-                </Link>
-              </li>
             </ul>
           </div>
 

@@ -109,7 +109,7 @@ export default function AdminDashboardPage() {
   } = useAuth();
 
   // Admin Portal Sign-in Gate state
-  const [adminEmail, setAdminEmail] = useState("admin@oludaxconcept.com");
+  const [adminEmail, setAdminEmail] = useState("preciousoludare23@gmail.com");
   const [adminPassword, setAdminPassword] = useState("");
   const [adminAuthError, setAdminAuthError] = useState<string | null>(null);
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
@@ -513,7 +513,7 @@ export default function AdminDashboardPage() {
                   required
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
-                  placeholder="admin@oludaxconcept.com"
+                  placeholder="preciousoludare23@gmail.com"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-pink"
                 />
               </div>

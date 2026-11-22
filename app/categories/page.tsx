@@ -92,17 +92,17 @@ export default function CategoriesPage() {
               <span>Bespoke Personalization</span>
             </div>
             <h3 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-cloud">
-              Looking for something custom crafted?
+              Looking for a bespoke creation or corporate gift?
             </h3>
             <p className="text-cloud/50 text-xs sm:text-sm">
-              Use our dedicated Customization Studio to design bespoke items with your names, custom colors, sizing, and personalized messages.
+              Explore our comprehensive catalogue or chat directly with our concierge team for custom branding and special orders.
             </p>
           </div>
           <Link
-            href="/customize"
+            href="/contact"
             className="btn-primary px-8 py-3.5 font-mono text-xs uppercase tracking-[0.14em] shrink-0"
           >
-            <span>Open Studio</span>
+            <span>Contact Concierge</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>

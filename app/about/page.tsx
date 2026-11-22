@@ -219,15 +219,15 @@ export default function AboutPage() {
             Ready to Celebrate Someone Special?
           </h2>
           <p className="text-xs sm:text-sm text-cloud/50 max-w-md mx-auto">
-            Explore our curated gift catalogue or step into the Customization Studio to design your one-of-a-kind creation.
+            Explore our curated gift catalogue or reach out to our concierge desk for bespoke branding and custom packages.
           </p>
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link href="/shop" className="btn-primary py-3 px-8 font-mono text-xs uppercase tracking-wider">
               <span>Browse Catalog</span>
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
-            <Link href="/customize" className="btn-outline py-3 px-8 font-mono text-xs uppercase tracking-wider">
-              <span>Customize a Gift</span>
+            <Link href="/contact" className="btn-outline py-3 px-8 font-mono text-xs uppercase tracking-wider">
+              <span>Contact Concierge</span>
             </Link>
           </div>
         </div>

@@ -53,7 +53,6 @@ export default function Header() {
     { name: "Catalog", href: "/shop" },
     { name: "Price List", href: "/price-list" },
     { name: "Categories", href: "/categories" },
-    { name: "Customize", href: "/customize" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];

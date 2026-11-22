@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   ShoppingBag,
-  Sparkles,
+  User,
   Tag,
   MessageCircle,
 } from "lucide-react";
@@ -28,7 +28,7 @@ export default function BottomNav() {
     { href: "/", label: "Home", icon: Home },
     { href: "/shop", label: "Catalog", icon: ShoppingBag },
     { href: "/price-list", label: "Price List", icon: Tag },
-    { href: "/customize", label: "Bespoke", icon: Sparkles },
+    { href: "/account", label: "Account", icon: User },
     { href: "/cart", label: "Bag", icon: ShoppingBag, badge: cartCount },
   ];
 

@@ -195,7 +195,7 @@ export async function authenticateAdminUser(
     }
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@oludaxconcept.com";
+  const adminEmail = process.env.ADMIN_EMAIL || "preciousoludare23@gmail.com";
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   // Prevent login if no password is configured in environment
