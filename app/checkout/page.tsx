@@ -15,9 +15,10 @@ import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/products";
 
 const NIGERIAN_STATES = [
+  "Osun",
+  "Ondo",
   "Lagos",
   "Abuja (FCT)",
-  "Rivers",
   "Oyo",
   "Ogun",
   "Kano",
@@ -45,8 +46,6 @@ const NIGERIAN_STATES = [
   "Kwara",
   "Nasarawa",
   "Niger",
-  "Ondo",
-  "Osun",
   "Plateau",
   "Sokoto",
   "Taraba",
@@ -63,8 +62,8 @@ export default function CheckoutPage() {
     phone: "",
     email: "",
     address: "",
-    city: "",
-    state: "Lagos",
+    city: "Ile-Ife",
+    state: "Osun",
     deliveryNotes: "",
   });
 
@@ -347,7 +346,7 @@ export default function CheckoutPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, address: e.target.value })
                   }
-                  placeholder="e.g. 15 Admiralty Way, Lekki Phase 1"
+                  placeholder="e.g. Road 1, OAU Campus / Mayfair / Ede Road, Ile-Ife"
                   className={`w-full px-3.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border text-xs text-cloud focus:outline-none focus:ring-1 focus:ring-accent ${
                     formErrors.address
                       ? "border-red-500"
@@ -391,7 +390,7 @@ export default function CheckoutPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, city: e.target.value })
                     }
-                    placeholder="e.g. Ikeja, Lekki, or Garki"
+                    placeholder="e.g. Mayfair, Campus, Ede Road, or Alagbaka"
                     className={`w-full px-3.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border text-xs text-cloud focus:outline-none focus:ring-1 focus:ring-accent ${
                       formErrors.city
                         ? "border-red-500"

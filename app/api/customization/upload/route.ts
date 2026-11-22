@@ -5,6 +5,11 @@ import {
   getSupabaseServerClient,
   getOrderByRef,
 } from "@/lib/server/db";
+import {
+  getClientIp,
+  uploadRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/server/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +76,12 @@ function detectFileTypeFromBuffer(buffer: Buffer): AllowedType | null {
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    const rl = uploadRateLimiter.check(clientIp);
+    if (!rl.success) {
+      return rateLimitExceededResponse(rl.resetMs);
+    }
+
     const contentType = request.headers.get("content-type") || "";
 
     if (!contentType.includes("multipart/form-data")) {

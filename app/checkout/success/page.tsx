@@ -134,7 +134,7 @@ function CheckoutSuccessContent() {
             Thank You for Your Order!
           </h1>
           <p className="text-cloud/50 text-xs sm:text-sm max-w-md mx-auto mb-6">
-            We have received your order and our artisan team in Lagos has begun bespoke curation and hand-packaging.
+            We have received your order and our artisan team in Ile-Ife has begun bespoke curation and hand-packaging.
           </p>
 
           {displayRef && (

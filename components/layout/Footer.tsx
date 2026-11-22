@@ -23,7 +23,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-2 text-xs font-mono text-cloud/60 pt-1">
               <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span>Est. 2022 • Lagos, Nigeria</span>
+              <span>Est. 2022 • Ile-Ife, Nigeria</span>
             </div>
           </div>
 
@@ -157,7 +157,7 @@ export default function Footer() {
               </li>
               <li>
                 <span className="text-xs text-cloud/40 block pt-1">
-                  Lagos, Nigeria • Nationwide Dispatch
+                  Ile-Ife, Osun State • Dispatches to Akure & Nationwide
                 </span>
               </li>
             </ul>

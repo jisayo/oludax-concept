@@ -33,7 +33,10 @@ export const metadata: Metadata = {
     "gift boxes",
     "celebration packages",
     "Nigeria",
-    "Lagos",
+    "Ile-Ife",
+    "Akure",
+    "Osun",
+    "Ondo",
     "OLUDAX",
   ],
   openGraph: {

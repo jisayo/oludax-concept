@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrderByRef } from "@/lib/server/db";
 import { verifyAdminRequest } from "@/lib/server/admin-auth";
+import {
+  getClientIp,
+  trackingRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/server/rate-limit";
 
 function maskEmail(email?: string | null): string {
   if (!email || typeof email !== "string" || !email.includes("@")) return "***";
@@ -29,6 +34,12 @@ export async function GET(
   { params }: { params: { ref: string } }
 ) {
   try {
+    const clientIp = getClientIp(request);
+    const rl = trackingRateLimiter.check(clientIp);
+    if (!rl.success) {
+      return rateLimitExceededResponse(rl.resetMs);
+    }
+
     const { ref } = params;
     if (!ref) {
       return NextResponse.json(

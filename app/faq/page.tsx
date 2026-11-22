@@ -53,7 +53,7 @@ const faqData: FAQCategory[] = [
       {
         question: "Do you deliver across all states in Nigeria?",
         answer:
-          "Yes! We deliver across all 36 states and the Federal Capital Territory (Abuja). Orders within Lagos typically arrive within 1-2 business days, while deliveries to other states take 2-4 business days depending on transit routes.",
+          "Yes! We deliver across Ile-Ife, Akure, and all 36 states and the Federal Capital Territory (Abuja). Orders within Ile-Ife & Akure typically arrive within 1-2 business days, while deliveries to other states take 2-4 business days depending on transit routes.",
       },
       {
         question: "How does Free Delivery work?",

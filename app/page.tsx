@@ -135,14 +135,14 @@ export default function Home() {
                   </span>
                 </div>
                 <p className="text-xs text-cloud/70 leading-relaxed">
-                  Lagos-based bespoke gifting & branding studio. Custom frames, personalized corporate souvenirs, luxury print stationery, and celebration packages.
+                  Ile-Ife & Akure bespoke gifting & branding studio. Custom frames, personalized corporate souvenirs, luxury print stationery, and celebration packages.
                 </p>
                 <div className="flex items-center justify-between pt-2 text-[11px] font-mono text-cloud/60">
                   <span className="flex items-center gap-1 text-emerald-500 font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     Accepting Orders
                   </span>
-                  <span>📍 Lagos, Nigeria</span>
+                  <span>📍 Ile-Ife, Osun State</span>
                 </div>
               </div>
             </div>
@@ -488,7 +488,7 @@ export default function Home() {
               3. Swift Nationwide Dispatch
             </h3>
             <p className="text-sm leading-relaxed text-cloud/70">
-              Crafted in Lagos, beautifully packaged with love, and dispatched safely across all 36 Nigerian states.
+              Crafted in Ile-Ife, beautifully packaged with love, and dispatched safely across Osun, Ondo, and all Nigerian states.
             </p>
           </div>
         </div>
@@ -583,7 +583,7 @@ export default function Home() {
                 &ldquo;Testimonials from happy clients 💖✨ More than enough proof to trust our brand. From custom frames to thoughtful gift boxes, our clients always leave with smiles.&rdquo;
               </p>
               <div className="pt-2 flex items-center justify-between font-mono text-[11px] text-cloud/50">
-                <span>📍 Lagos, Nigeria</span>
+                <span>📍 Ile-Ife & Akure, Nigeria</span>
                 <span className="text-emerald-500 font-medium">WhatsApp Verified</span>
               </div>
             </div>
@@ -602,7 +602,7 @@ export default function Home() {
               <p className="font-mono text-xs uppercase tracking-wider font-semibold text-cloud">
                 Swift Delivery
               </p>
-              <p className="text-xs text-cloud/50">Across Lagos & Nationwide</p>
+              <p className="text-xs text-cloud/50">Across Ile-Ife, Akure & Nationwide</p>
             </div>
           </div>
 

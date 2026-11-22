@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { initializePaystackPayment } from "@/lib/server/paystack";
 import { getOrderByRef } from "@/lib/server/db";
+import {
+  getClientIp,
+  paymentRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/server/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    const rl = paymentRateLimiter.check(clientIp);
+    if (!rl.success) {
+      return rateLimitExceededResponse(rl.resetMs);
+    }
+
     const body = await request.json();
     const { orderRef, email, amount, callbackUrl } = body;
 

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createOrder, listOrders, CreateOrderInput } from "@/lib/server/db";
 import { products, extractPriceFromVariant } from "@/lib/products";
 import { verifyAdminRequest } from "@/lib/server/admin-auth";
+import {
+  getClientIp,
+  orderCreationRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/server/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +15,12 @@ const STANDARD_DELIVERY_FEE = 3500; // ₦3,500 standard delivery
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    const rl = orderCreationRateLimiter.check(clientIp);
+    if (!rl.success) {
+      return rateLimitExceededResponse(rl.resetMs);
+    }
+
     const body = await request.json();
 
     const {

@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveContactMessage } from "@/lib/server/db";
+import {
+  getClientIp,
+  contactRateLimiter,
+  rateLimitExceededResponse,
+} from "@/lib/server/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    const rl = contactRateLimiter.check(clientIp);
+    if (!rl.success) {
+      return rateLimitExceededResponse(rl.resetMs);
+    }
+
     const body = await request.json();
     const { name, email, phone, subject, message } = body;
 

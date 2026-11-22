@@ -686,7 +686,7 @@ export default function ProductDetailPage({
                 <div className="text-xs text-cloud/70 leading-relaxed space-y-2">
                   <p>{product.deliveryInfo || "Dispatched via verified courier partners nationwide."}</p>
                   <p className="font-mono text-[11px] text-cloud/40">
-                    Lagos: 1-2 business days • Rest of Nigeria: 2-4 business days.
+                    Ile-Ife & Akure: 1-2 business days • Rest of Nigeria: 2-4 business days.
                   </p>
                 </div>
               )}

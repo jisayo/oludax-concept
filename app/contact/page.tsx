@@ -174,7 +174,7 @@ export default function ContactPage() {
                         CEO: <span className="font-mono">@Oluwatitofunmi9</span>
                       </p>
                       <p className="text-cloud/60 text-[11px] pt-1">
-                        Lagos, Nigeria (Dispatches Nationwide)
+                        Ile-Ife, Osun State (Dispatches to Akure & Nationwide)
                       </p>
                     </div>
                   </div>
