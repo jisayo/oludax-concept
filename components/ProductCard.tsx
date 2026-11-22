@@ -114,7 +114,7 @@ export default function ProductCard({ product }: { product: Product }) {
             )}
             {product.customizable && (
               <span className="glass rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-accent font-semibold shadow-sm flex items-center gap-1 border border-accent/20">
-                <Sparkles className="w-2.5 h-2.5" /> <span className="hidden sm:inline">Bespoke</span>
+                <Sparkles className="w-2.5 h-2.5" /> <span className="hidden sm:inline">Custom</span>
               </span>
             )}
           </div>
@@ -144,7 +144,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="text-xs leading-relaxed text-cloud/75 line-clamp-2">
             {product.shortDescription ||
               product.description ||
-              "Bespoke personalized gift crafted with love and care for memorable moments."}
+              "Customized gift crafted with love and care for memorable moments."}
           </p>
         </div>
 

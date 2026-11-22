@@ -107,7 +107,7 @@ export default function PriceListPage() {
             </h1>
 
             <p className="text-cloud/60 text-xs sm:text-sm leading-relaxed">
-              Explore the verified pricing for all bespoke frames, personalized mugs, custom apparel, executive stationery, carrier nylons, and milestone prints. Every item can be ordered directly online or via WhatsApp.
+              Explore the verified pricing for all customized frames, personalized mugs, custom apparel, executive stationery, carrier nylons, and milestone prints. Every item can be ordered directly online or via WhatsApp.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">

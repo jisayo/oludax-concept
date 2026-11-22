@@ -89,10 +89,10 @@ export default function CategoriesPage() {
           <div className="max-w-xl text-center md:text-left space-y-2">
             <div className="inline-flex items-center gap-1.5 bg-accent/15 text-accent px-3 py-1 rounded-full font-mono text-[10px] uppercase tracking-wider border border-accent/25">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Bespoke Personalization</span>
+              <span>Gift Customization</span>
             </div>
             <h3 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-cloud">
-              Looking for a bespoke creation or corporate gift?
+              Looking for customized gifts or corporate packages?
             </h3>
             <p className="text-cloud/50 text-xs sm:text-sm">
               Explore our comprehensive catalogue or chat directly with our concierge team for custom branding and special orders.

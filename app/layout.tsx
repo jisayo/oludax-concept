@@ -21,17 +21,18 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "OLUDAX CONCEPT — Bespoke Gifting & Personalization Studio",
+    default: "OLUDAX CONCEPT — Customized Gifts & Branding Store",
     template: "%s | OLUDAX CONCEPT",
   },
   description:
-    "Thoughtfully curated gifts, custom-engraved treasures, and personalized creations for every special moment across Nigeria.",
+    "Your Number One Gift Plug. Customized frames, merchandise branding, personalized gifts, and celebration souvenirs in Ile-Ife, Akure, and nationwide.",
   keywords: [
     "gifts",
     "personalized gifts",
-    "custom gifts",
-    "gift boxes",
-    "celebration packages",
+    "customized gifts",
+    "gift customization",
+    "custom frames",
+    "merchandise branding",
     "Nigeria",
     "Ile-Ife",
     "Akure",
@@ -40,9 +41,9 @@ export const metadata: Metadata = {
     "OLUDAX",
   ],
   openGraph: {
-    title: "OLUDAX CONCEPT — Bespoke Gifting & Personalization Studio",
+    title: "OLUDAX CONCEPT — Customized Gifts & Branding Store",
     description:
-      "Thoughtfully curated gifts, custom-engraved treasures, and personalized creations for every special moment across Nigeria.",
+      "Your Number One Gift Plug. Customized frames, merchandise branding, personalized gifts, and celebration souvenirs in Ile-Ife, Akure, and nationwide.",
     type: "website",
     locale: "en_NG",
     siteName: "OLUDAX CONCEPT",

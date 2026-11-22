@@ -159,7 +159,7 @@ function ShopContent() {
               <p className="text-cloud/50 text-xs sm:text-sm mt-1 max-w-xl">
                 {activeCategory
                   ? activeCategory.description
-                  : "Discover thoughtful bespoke gifts, personalized ceramic keepsakes, and celebration packages."}
+                  : "Discover thoughtful customized gifts, personalized ceramic keepsakes, and celebration packages."}
               </p>
             </div>
             <div className="glass flex items-center gap-2 rounded-full px-4 py-2 border border-black/8 dark:border-[rgba(244,244,242,0.08)] self-start md:self-auto font-mono text-xs text-cloud/80">

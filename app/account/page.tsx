@@ -224,7 +224,7 @@ function AccountContent() {
                         href="/shop"
                         className="btn-primary inline-flex items-center gap-1.5 py-2 px-5 font-mono text-xs"
                       >
-                        <span>Explore Bespoke Catalogue</span>
+                        <span>Explore Gift Catalogue</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
@@ -347,7 +347,7 @@ function AccountContent() {
               <p className="text-xs text-cloud/70 mt-1">
                 {authMode === "login"
                   ? "Access your saved addresses, orders, and personalized wishlist."
-                  : "Enjoy bespoke recommendations and live tracking."}
+                  : "Enjoy personalized recommendations and live tracking."}
               </p>
             </div>
 

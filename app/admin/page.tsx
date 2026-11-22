@@ -591,7 +591,7 @@ export default function AdminDashboardPage() {
               </span>
             </div>
             <span className="text-[0.65rem] text-gray-400 font-mono block">
-              Merchant Management & Bespoke Studio Hub
+              Merchant Management & Store Fulfillment Hub
             </span>
           </div>
         </div>
@@ -958,7 +958,7 @@ export default function AdminDashboardPage() {
                     {/* Customization & Item Highlights */}
                     <div className="space-y-2 text-xs font-mono">
                       <span className="text-gray-400 uppercase text-[10px] block">
-                        Ordered Items & Bespoke Artwork Details
+                        Ordered Items & Custom Details
                       </span>
                       {(order.items || []).map((it, idx) => (
                         <div
@@ -1495,7 +1495,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Bespoke Customization Specs (Editable by Artisan & Admin) */}
+              {/* Gift Customization Specs */}
               <div className="space-y-3">
                 <span className="font-bold text-white text-xs uppercase tracking-wider block border-b border-white/10 pb-1">
                   Gift Notes & Inscription Specs
@@ -1746,7 +1746,7 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
   const rawItems = Array.isArray(o.items) ? o.items : [];
   const items: OrderItem[] = rawItems.map((it: any) => ({
     productId: String(it?.productId || it?.id || "item-1"),
-    name: String(it?.name || "Bespoke Gift"),
+    name: String(it?.name || "Custom Gift"),
     price: Number(it?.price || 0),
     quantity: Number(it?.quantity || 1),
     customization: it?.customization || undefined,
@@ -1757,7 +1757,7 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
       ? items.map((i) => `${i.name} × ${i.quantity}`).join(", ")
       : typeof o.itemsSummary === "string" && o.itemsSummary.trim()
         ? o.itemsSummary.trim()
-        : "Bespoke gift order";
+        : "Custom gift order";
 
   const customParts: string[] = [];
   items.forEach((it) => {
@@ -1816,7 +1816,7 @@ function mapApiOrderToAdminOrder(o: any): AdminOrder {
     cancellationReason: o.cancellationReason || undefined,
     adminNotes: o.adminNotes || undefined,
     items,
-    itemsSummary: itemsSummary || "Bespoke gift order",
+    itemsSummary: itemsSummary || "Custom gift order",
     customizationDetails:
       customParts.join(" | ") ||
       (typeof o.customizationDetails === "string"

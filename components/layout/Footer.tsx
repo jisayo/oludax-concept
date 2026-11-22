@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-cloud/50 max-w-xs">
-              Your Number One Gift Plug. Turning special moments into beautiful keepsakes through bespoke frames, merchandise branding, and luxury prints.
+              Your Number One Gift Plug. Turning special moments into beautiful keepsakes through customized frames, merchandise branding, and quality prints.
             </p>
             <div className="flex items-center gap-2 text-xs font-mono text-cloud/60 pt-1">
               <Sparkles className="w-3.5 h-3.5 text-accent" />

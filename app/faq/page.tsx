@@ -90,7 +90,7 @@ const faqData: FAQCategory[] = [
       {
         question: "What is your return policy for personalized gifts?",
         answer:
-          "Because customized items are bespoke creations crafted with your unique name or photo, they cannot be restocked or refunded once produced. However, if there is a spelling mistake caused by our team or if an item arrives damaged in transit, we will immediately produce and dispatch a replacement at zero cost to you.",
+          "Because customized items are personalized with your unique name, message, or photo, they cannot be restocked or refunded once produced. However, if there is a spelling mistake caused by our team or if an item arrives damaged in transit, we will immediately produce and dispatch a replacement at zero cost to you.",
       },
       {
         question: "What should I do if an item arrives damaged?",

@@ -59,7 +59,7 @@ export default function CartPage() {
                 Your Shopping Bag
               </h1>
               <p className="text-cloud/50 text-xs sm:text-sm mt-1">
-                Review your bespoke creations, custom specifications, and delivery summary.
+                Review your customized gifts, personal specifications, and delivery summary.
               </p>
             </div>
             <span className="glass rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wider text-cloud/70 self-start md:self-auto border border-black/8 dark:border-[rgba(244,244,242,0.08)]">
@@ -143,7 +143,7 @@ export default function CartPage() {
                       {item.customization && (
                         <div className="mt-3 glass rounded-xl p-3 border border-black/8 dark:border-[rgba(244,244,242,0.08)] space-y-1 font-mono text-xs">
                           <span className="text-[10px] uppercase tracking-wider text-accent flex items-center gap-1 font-semibold">
-                            <Sparkles className="w-3 h-3" /> Bespoke Personalization
+                            <Sparkles className="w-3 h-3" /> Custom Gift Details
                           </span>
                           {item.customization.customerName && (
                             <p className="text-cloud/80">

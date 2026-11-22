@@ -1,7 +1,7 @@
 /**
  * OLUDAX CONCEPT - Official Product Catalog & Customization System
  *
- * Official verified price list & catalog for OLUDAX CONCEPT (Nigerian Bespoke Gifting & Branding Studio).
+ * Official verified price list & catalog for OLUDAX CONCEPT (Nigerian Gift Customization & Branding Store).
  * Currency: Nigerian Naira (₦ / NGN).
  */
 
@@ -289,7 +289,7 @@ export const categories: Category[] = [
     id: "cat-gift-boxes",
     name: "Curated Gift Hampers",
     slug: "gift-boxes",
-    description: "Bespoke gift boxes filled with curated personalized items for celebrations",
+    description: "Curated gift boxes filled with personalized items for celebrations",
     productCount: 6,
     image: "/images/products/giftbox-luxury.png",
     icon: "🎁",

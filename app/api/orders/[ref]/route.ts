@@ -137,11 +137,11 @@ function getTrackingMilestones(order: any) {
     },
     {
       key: "processing",
-      title: "Artisanal Production & Customization",
+      title: "Production & Customization",
       desc:
         status === "Customization in Progress"
-          ? "Our artisans are currently engraving, printing, and assembling your bespoke pieces."
-          : "Personalization queue scheduled.",
+          ? "Our team is currently printing, engraving, and packaging your custom gift items."
+          : "Customization queue scheduled.",
       time: status !== "Pending" ? "In Studio" : "Pending",
       isCompleted: [
         "Processing",

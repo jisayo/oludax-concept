@@ -71,7 +71,7 @@ export default function ContactPage() {
               We&apos;re Here to Help
             </h1>
             <p className="text-cloud/50 text-xs sm:text-sm mt-1 leading-relaxed">
-              Have a question about a bespoke design, delivery timeline, or corporate bulk gifting? Reach out to our concierge team.
+              Have a question about a customized gift, delivery timeline, or corporate bulk gifting? Reach out to our concierge team.
             </p>
           </div>
         </div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
               <div className="glass rounded-2xl p-4 text-xs border border-emerald-500/30">
                 <span className="font-medium text-emerald-500 flex items-center gap-1.5 mb-1">
                   <MessageCircle className="w-4 h-4" />
-                  Need an urgent bespoke commission?
+                  Need an urgent customized gift?
                 </span>
                 <p className="text-cloud/60 text-[11px] leading-relaxed mb-3">
                   Message Precious directly on WhatsApp for expedited production of frames, custom mugs, or event souvenirs.

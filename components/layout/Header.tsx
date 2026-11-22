@@ -103,7 +103,7 @@ export default function Header() {
           >
             <Search className="h-4 w-4 shrink-0 text-cloud/70" />
             <label htmlFor="nav-search" className="sr-only">
-              Search bespoke gifts
+              Search customized gifts
             </label>
             <input
               id="nav-search"

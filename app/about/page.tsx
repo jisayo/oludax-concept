@@ -96,7 +96,7 @@ export default function AboutPage() {
               &ldquo;Your Number One Gift Plug&rdquo;
             </p>
             <p className="text-xs text-cloud/50 mt-3 max-w-xs leading-relaxed">
-              Bespoke Frames • Merchandise Branding • Luxury Printing • Souvenirs
+              Customised Frames • Merchandise Branding • Quality Printing • Souvenirs
             </p>
           </div>
         </section>
@@ -173,7 +173,7 @@ export default function AboutPage() {
               Our Craft
             </span>
             <h2 className="font-display text-2xl sm:text-3xl font-medium text-cloud tracking-tight">
-              Our Approach to Bespoke Personalization
+              Our Approach to Gift Customization
             </h2>
             <p className="text-xs sm:text-sm text-cloud/50">
               Every celebration is unique, and we treat every customized order as a personalized work of art.
@@ -197,7 +197,7 @@ export default function AboutPage() {
                 Artisan Customization
               </h3>
               <p className="text-xs leading-relaxed text-cloud/50">
-                From precision engraving and heat-pressed mugs to bespoke ribbon tags and greeting card typography, your words take center stage.
+                From precision engraving and heat-pressed mugs to custom ribbon tags and greeting card typography, your words take center stage.
               </p>
             </div>
 
@@ -219,7 +219,7 @@ export default function AboutPage() {
             Ready to Celebrate Someone Special?
           </h2>
           <p className="text-xs sm:text-sm text-cloud/50 max-w-md mx-auto">
-            Explore our curated gift catalogue or reach out to our concierge desk for bespoke branding and custom packages.
+            Explore our curated gift catalogue or reach out to our concierge desk for custom branding and gift packages.
           </p>
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link href="/shop" className="btn-primary py-3 px-8 font-mono text-xs uppercase tracking-wider">

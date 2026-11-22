@@ -336,7 +336,7 @@ export default function ProductDetailPage({
                 <div className="flex items-center justify-between pb-3 border-b border-black/8 dark:border-[rgba(244,244,242,0.08)]">
                   <h3 className="font-display font-medium text-sm text-cloud flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-accent" />
-                    <span>Bespoke Customization Studio</span>
+                    <span>Custom Gift Options</span>
                   </h3>
                   <span className="font-mono text-[10px] uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded-full">
                     Complimentary

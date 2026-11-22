@@ -135,7 +135,7 @@ export default function Home() {
                   </span>
                 </div>
                 <p className="text-xs text-cloud/70 leading-relaxed">
-                  Ile-Ife & Akure bespoke gifting & branding studio. Custom frames, personalized corporate souvenirs, luxury print stationery, and celebration packages.
+                  Ile-Ife & Akure customized gifting & branding store. Custom frames, personalized corporate souvenirs, quality print stationery, and celebration packages.
                 </p>
                 <div className="flex items-center justify-between pt-2 text-[11px] font-mono text-cloud/60">
                   <span className="flex items-center gap-1 text-emerald-500 font-medium">
@@ -392,7 +392,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                    Bespoke Invitations & Programmes
+                    Custom Invitations & Event Programmes
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent" />

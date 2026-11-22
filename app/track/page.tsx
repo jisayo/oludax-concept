@@ -155,7 +155,7 @@ function TrackContent() {
                 Track Your Custom Keepsake
               </h3>
               <p className="text-xs sm:text-sm text-cloud/50 max-w-md mx-auto leading-relaxed">
-                Enter your bespoke order reference number (e.g. OLU-XXXXXX) from your confirmation receipt, SMS, or WhatsApp notification above to view live production milestones.
+                Enter your order reference number (e.g. OLU-XXXXXX) from your confirmation receipt, SMS, or WhatsApp notification above to view live production milestones.
               </p>
             </div>
           )}
