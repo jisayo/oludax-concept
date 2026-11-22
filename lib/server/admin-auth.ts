@@ -192,8 +192,7 @@ export async function authenticateAdminUser(
   }
 
   const adminEmail = process.env.ADMIN_EMAIL || "preciousoludare23@gmail.com";
-  const adminPassword =
-    process.env.ADMIN_PASSWORD || "czA0XBwuiIJdfzJV!2026#Oludax";
+  const adminPassword = process.env.ADMIN_PASSWORD || "P@$$W0Rd";
 
   let role: Role | null = null;
   let name = "";
