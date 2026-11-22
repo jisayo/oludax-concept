@@ -435,8 +435,8 @@ export default function AdminDashboardPage() {
     .filter((o) => o.status !== "Cancelled")
     .reduce((sum, o) => sum + o.amount, 0);
 
-  const activeCustomizations = ordersList.filter(
-    (o) => o.status === "Customization in Progress",
+  const activeProcessing = ordersList.filter(
+    (o) => o.status === "Processing" || o.status === "Payment Confirmed",
   ).length;
 
   const currentRoleDef = ROLES[role] || ROLES.customer;
@@ -632,7 +632,7 @@ export default function AdminDashboardPage() {
             { id: "overview", label: "Executive Overview", icon: TrendingUp },
             {
               id: "orders",
-              label: `Orders & Customization (${ordersList.length})`,
+              label: `Orders & Fulfillment (${ordersList.length})`,
               icon: Package,
             },
             { id: "products", label: "Catalog & Inventory", icon: Layers },
@@ -680,13 +680,13 @@ export default function AdminDashboardPage() {
 
               <div className="glass rounded-[20px] p-5 border border-white/10">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400">
-                  Active Customizations
+                  Active Processing
                 </span>
                 <p className="font-display text-2xl sm:text-3xl font-bold text-pink mt-1">
-                  {activeCustomizations}
+                  {activeProcessing}
                 </p>
                 <span className="text-[10px] font-mono text-gray-400 mt-2 block">
-                  Artisan proofing & packaging
+                  Curation & packaging queue
                 </span>
               </div>
 
@@ -1498,7 +1498,7 @@ export default function AdminDashboardPage() {
               {/* Bespoke Customization Specs (Editable by Artisan & Admin) */}
               <div className="space-y-3">
                 <span className="font-bold text-white text-xs uppercase tracking-wider block border-b border-white/10 pb-1">
-                  Artisan Personalization Specs
+                  Gift Notes & Inscription Specs
                 </span>
 
                 {(editingOrder.items || []).map((it, idx) => (
@@ -1516,7 +1516,7 @@ export default function AdminDashboardPage() {
                         </label>
                         <input
                           type="text"
-                          disabled={!hasPermission("edit_customization")}
+                          disabled={!hasPermission("edit_order_details")}
                           value={it.customization?.customerName || ""}
                           onChange={(e) => {
                             const newItems = [...editingOrder.items];
@@ -1543,7 +1543,7 @@ export default function AdminDashboardPage() {
                         </label>
                         <input
                           type="text"
-                          disabled={!hasPermission("edit_customization")}
+                          disabled={!hasPermission("edit_order_details")}
                           value={it.customization?.message || ""}
                           onChange={(e) => {
                             const newItems = [...editingOrder.items];
@@ -1865,8 +1865,6 @@ function formatPermissionName(p: Permission): string {
       return "Cancel orders & record reasons";
     case "delete_order":
       return "Permanently purge records";
-    case "edit_customization":
-      return "Edit artwork, text & engraved names";
     case "manage_inventory":
       return "Update catalog stock quantities";
     case "view_financials":

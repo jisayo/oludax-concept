@@ -6,7 +6,6 @@ export type Role =
   | "super_admin"
   | "admin"
   | "manager"
-  | "artisan"
   | "support"
   | "customer";
 
@@ -17,7 +16,6 @@ export type Permission =
   | "edit_order_details"
   | "cancel_order"
   | "delete_order"
-  | "edit_customization"
   | "manage_inventory"
   | "view_financials"
   | "manage_staff";
@@ -41,7 +39,6 @@ export const ROLES: Record<Role, RoleDefinition> = {
       "edit_order_details",
       "cancel_order",
       "delete_order",
-      "edit_customization",
       "manage_inventory",
       "view_financials",
       "manage_staff",
@@ -57,7 +54,6 @@ export const ROLES: Record<Role, RoleDefinition> = {
       "edit_order_status",
       "edit_order_details",
       "cancel_order",
-      "edit_customization",
       "manage_inventory",
       "view_financials",
     ],
@@ -72,19 +68,7 @@ export const ROLES: Record<Role, RoleDefinition> = {
       "edit_order_status",
       "edit_order_details",
       "cancel_order",
-      "edit_customization",
       "manage_inventory",
-    ],
-  },
-  artisan: {
-    name: "Bespoke Artisan Lead",
-    description: "Production studio: engraving, embroidery, ribbon packaging & milestone transitions",
-    badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    permissions: [
-      "view_admin_panel",
-      "view_orders",
-      "edit_order_status",
-      "edit_customization",
     ],
   },
   support: {

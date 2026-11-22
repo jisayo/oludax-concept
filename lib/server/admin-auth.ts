@@ -234,20 +234,7 @@ export async function authenticateAdminUser(
     role = "manager";
     name = "Operations Manager";
   }
-  // 3. Bespoke Artisan Lead
-  else if (
-    process.env.ARTISAN_EMAIL &&
-    process.env.ARTISAN_PASSWORD &&
-    safeCompare(
-      email.toLowerCase().trim(),
-      process.env.ARTISAN_EMAIL.toLowerCase().trim()
-    ) &&
-    safeCompare(password, process.env.ARTISAN_PASSWORD)
-  ) {
-    role = "artisan";
-    name = "Bespoke Artisan Lead";
-  }
-  // 4. Support Officer
+  // 3. Support Officer
   else if (
     process.env.SUPPORT_EMAIL &&
     process.env.SUPPORT_PASSWORD &&
