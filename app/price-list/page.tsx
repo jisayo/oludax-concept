@@ -223,7 +223,7 @@ export default function PriceListPage() {
                       href={`/product/${prod.id}`}
                       className="btn-primary flex-1 py-2 text-xs font-mono uppercase tracking-wider text-center"
                     >
-                      Personalize
+                      Order Item
                     </Link>
                     <a
                       href={`https://wa.me/message/Y4CATULMNOZHK1?text=Hello%20Oludax%20Concept,%20I%20would%20like%20to%20order%20${encodeURIComponent(prod.name)}`}

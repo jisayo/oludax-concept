@@ -40,9 +40,19 @@ const sortOptions: { value: SortOption; label: string }[] = [
 
 function ShopContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams ? (searchParams.get("category") || "") : "";
-  const initialSort = searchParams ? ((searchParams.get("sort") as SortOption) || "featured") : "featured";
-  const initialQuery = searchParams ? (searchParams.get("q") || "") : "";
+  let initialCategory = "";
+  let initialSort: SortOption = "featured";
+  let initialQuery = "";
+
+  try {
+    if (searchParams && typeof searchParams.get === "function") {
+      initialCategory = searchParams.get("category") || "";
+      initialSort = ((searchParams.get("sort") as SortOption) || "featured");
+      initialQuery = searchParams.get("q") || "";
+    }
+  } catch {
+    // Graceful fallback for unexpected param parsing
+  }
 
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);

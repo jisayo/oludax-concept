@@ -13,13 +13,10 @@ import {
   ChevronRight,
   Minus,
   Plus,
-  Upload,
   Check,
   Sparkles,
   Info,
   MessageCircle,
-  Camera,
-  X,
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
@@ -60,16 +57,9 @@ export default function ProductDetailPage({
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedDesign, setSelectedDesign] = useState<string>(
     options?.designs?.[0] || ""
   );
-  const [selectedSize, setSelectedSize] = useState<string>("");
-  const [selectedPhoneModel, setSelectedPhoneModel] = useState<string>("");
-  const [customerName, setCustomerName] = useState("");
-  const [personalMessage, setPersonalMessage] = useState("");
-  const [specialInstructions, setSpecialInstructions] = useState("");
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [addedSuccess, setAddedSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<"description" | "specs" | "delivery">(
     "description"
@@ -111,16 +101,6 @@ export default function ProductDetailPage({
       ? Math.round((1 - activePrice / product.compareAtPrice) * 100)
       : 0;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setUploadedImage(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleAddToCart = () => {
     addItem(
       {
@@ -128,23 +108,9 @@ export default function ProductDetailPage({
         name: product.name,
         price: activePrice,
         image: product.primaryImage,
-        color: selectedColor || undefined,
-        size: selectedSize || undefined,
-        customization: product.customizable
+        customization: selectedDesign
           ? {
-              customerName: customerName.trim() || undefined,
-              message: personalMessage.trim() || undefined,
-              color: selectedColor || undefined,
-              designPreference: selectedDesign || undefined,
-              imageUrl: uploadedImage || undefined,
-              specialInstructions:
-                [
-                  specialInstructions.trim(),
-                  selectedPhoneModel ? `Phone model: ${selectedPhoneModel}` : "",
-                  selectedSize ? `Size: ${selectedSize}` : "",
-                ]
-                  .filter(Boolean)
-                  .join(" | ") || undefined,
+              designPreference: selectedDesign,
             }
           : undefined,
       },
@@ -157,14 +123,9 @@ export default function ProductDetailPage({
 
   const whatsappOrderUrl = `https://wa.me/2348144412006?text=${encodeURIComponent(
     `Hello Oludax Concept! 🎁\nI want to order: *${product.name}*\n` +
-      (selectedDesign ? `• Option: ${selectedDesign}\n` : "") +
-      (customerName ? `• Custom Name: ${customerName}\n` : "") +
-      (personalMessage ? `• Message: ${personalMessage}\n` : "") +
-      (selectedColor ? `• Color: ${selectedColor}\n` : "") +
-      (selectedPhoneModel ? `• Phone: ${selectedPhoneModel}\n` : "") +
-      (selectedSize ? `• Size: ${selectedSize}\n` : "") +
+      (selectedDesign ? `• Option / Size: ${selectedDesign}\n` : "") +
       `• Quantity: ${quantity}\n` +
-      `• Total: ${formatPrice(activePrice * quantity)}\n\nPlease confirm availability and payment details!`
+      `• Total: ${formatPrice(activePrice * quantity)}\n\nPlease let me know what details or photos you need to customise this for me!`
   )}`;
 
   return (
@@ -234,31 +195,7 @@ export default function ProductDetailPage({
                 </span>
               </div>
 
-              {/* LIVE PERSONALIZATION MOCKUP OVERLAY */}
-              {(customerName || uploadedImage) && (
-                <div className="absolute inset-x-6 bottom-8 pointer-events-none flex flex-col items-center justify-center text-center">
-                  <div className="glass px-4 py-2.5 rounded-2xl shadow-2xl border border-accent/50 backdrop-blur-md bg-black/70 max-w-[90%]">
-                    {uploadedImage && (
-                      <div className="w-12 h-12 rounded-xl overflow-hidden mx-auto mb-1.5 border border-accent/60 shadow">
-                        <img src={uploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    {customerName && (
-                      <p className="font-display italic text-lg sm:text-xl text-accent font-semibold tracking-wide drop-shadow-md">
-                        {customerName}
-                      </p>
-                    )}
-                    {personalMessage && (
-                      <p className="text-[10px] text-cloud/70 line-clamp-1 italic mt-0.5">
-                        &ldquo;{personalMessage}&rdquo;
-                      </p>
-                    )}
-                  </div>
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-accent bg-black/60 px-2.5 py-0.5 rounded-full mt-2 border border-accent/25">
-                    ✨ Live Personalization Mockup
-                  </span>
-                </div>
-              )}
+
 
               {/* Wishlist Button */}
               <button
@@ -330,201 +267,57 @@ export default function ProductDetailPage({
               </p>
             </div>
 
-            {/* CUSTOMIZATION OPTIONS */}
-            {product.customizable && options && (
-              <div className="glass rounded-[20px] p-5 sm:p-6 border border-accent/25 space-y-5">
+            {/* VARIANT / SIZE SELECTOR */}
+            {options?.designs && options.designs.length > 0 && (
+              <div className="glass rounded-[20px] p-5 sm:p-6 border border-accent/25 space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-black/8 dark:border-[rgba(244,244,242,0.08)]">
                   <h3 className="font-display font-medium text-sm text-cloud flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-accent" />
-                    <span>Custom Gift Options</span>
+                    <span>Select Size / Option</span>
                   </h3>
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded-full">
-                    Complimentary
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded-full font-semibold">
+                    Catalog Variant
                   </span>
                 </div>
 
-                {/* 1. VARIANT / SIZE / OPTION SELECTOR (with dynamic prices) */}
-                {options.designs && options.designs.length > 0 && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-2">
-                      Select Variant / Size / Option
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {options.designs.map((design) => {
-                        const isSelected = selectedDesign === design;
-                        const varPrice = extractPriceFromVariant(design, product.price);
-                        return (
-                          <button
-                            key={design}
-                            type="button"
-                            onClick={() => setSelectedDesign(design)}
-                            className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
-                              isSelected
-                                ? "border-accent bg-accent/15 ring-1 ring-accent"
-                                : "border-black/10 dark:border-white/10 hover:border-accent/40 bg-black/5 dark:bg-white/5"
-                            }`}
-                          >
-                            <div className="space-y-0.5 pr-2">
-                              <span className="font-mono text-xs text-cloud font-medium block">
-                                {design.replace(/\s*\(₦[\d,]+\)/, "").replace(/\s*-\s*₦[\d,]+/, "")}
-                              </span>
-                              <span className="font-mono text-[11px] text-accent font-semibold">
-                                {formatPrice(varPrice)}
-                              </span>
-                            </div>
-                            {isSelected && <Check className="w-4 h-4 text-accent shrink-0" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. RECIPIENT NAME FIELD */}
-                {options.allowName && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1">
-                      {options.namePrompt || "Personalized Name"}
-                    </label>
-                    <input
-                      type="text"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Adebayo, Sarah, or Victor Sam"
-                      maxLength={options.nameMaxLength || 25}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs text-cloud focus:outline-none focus:ring-1 focus:ring-accent"
-                    />
-                  </div>
-                )}
-
-                {/* 3. PHOTO / LOGO UPLOAD */}
-                {options.allowImage && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1">
-                      {options.imagePrompt || "Upload Photo Memory or Brand Logo"}
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <label className="flex-1 border-2 border-dashed border-accent/30 hover:border-accent rounded-2xl p-4 text-center cursor-pointer transition bg-accent/5 hover:bg-accent/10">
-                        <Upload className="w-5 h-5 text-accent mx-auto mb-1" />
-                        <span className="font-mono text-xs text-cloud font-medium block">
-                          {uploadedImage ? "Change Uploaded Photo" : "Click to Upload Photo / Logo"}
-                        </span>
-                        <span className="font-mono text-[10px] text-cloud/40 block mt-0.5">
-                          PNG, JPG, or WEBP (Max 10MB)
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </label>
-                      {uploadedImage && (
-                        <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-accent shrink-0 group">
-                          <img src={uploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => setUploadedImage(null)}
-                            className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition"
-                            title="Remove image"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {options.designs.map((design) => {
+                    const isSelected = selectedDesign === design;
+                    const varPrice = extractPriceFromVariant(design, product.price);
+                    return (
+                      <button
+                        key={design}
+                        type="button"
+                        onClick={() => setSelectedDesign(design)}
+                        className={`p-3 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-accent bg-accent/15 ring-1 ring-accent"
+                            : "border-black/10 dark:border-white/10 hover:border-accent/40 bg-black/5 dark:bg-white/5"
+                        }`}
+                      >
+                        <div className="space-y-0.5 pr-2">
+                          <span className="font-mono text-xs text-cloud font-medium block">
+                            {design.replace(/\s*\(₦[\d,]+\)/, "").replace(/\s*-\s*₦[\d,]+/, "")}
+                          </span>
+                          <span className="font-mono text-[11px] text-accent font-semibold">
+                            {formatPrice(varPrice)}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. GREETING MESSAGE */}
-                {options.allowMessage && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1">
-                      {options.messagePrompt || "Greeting / Sentimental Message"}
-                    </label>
-                    <textarea
-                      value={personalMessage}
-                      onChange={(e) => setPersonalMessage(e.target.value)}
-                      placeholder="Write your sweet message or quote..."
-                      maxLength={options.messageMaxLength || 150}
-                      rows={2}
-                      className="w-full px-3.5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs text-cloud focus:outline-none focus:ring-1 focus:ring-accent resize-none"
-                    />
-                  </div>
-                )}
-
-                {/* 5. COLOUR SELECTION */}
-                {options.allowColor && options.colors && options.colors.length > 0 && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1.5">
-                      Select Colour
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {options.colors.map((c) => (
-                        <button
-                          key={c}
-                          type="button"
-                          onClick={() => setSelectedColor(c)}
-                          style={{ backgroundColor: c }}
-                          className={`w-7 h-7 rounded-full border transition-all cursor-pointer ${
-                            selectedColor === c
-                              ? "ring-2 ring-accent scale-110"
-                              : "border-black/20 hover:scale-105"
-                          }`}
-                          title={c}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 6. CLOTHING SIZES */}
-                {options.clothingSizes && options.clothingSizes.length > 0 && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1.5">
-                      Select Size
-                    </label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {options.clothingSizes.map((sz) => (
-                        <button
-                          key={sz}
-                          type="button"
-                          onClick={() => setSelectedSize(sz)}
-                          className={`w-9 h-9 rounded-xl font-mono text-xs font-semibold transition cursor-pointer ${
-                            selectedSize === sz
-                              ? "bg-accent text-white"
-                              : "glass text-cloud/70 hover:text-cloud"
-                          }`}
-                        >
-                          {sz}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 7. PHONE MODELS */}
-                {options.phoneModels && options.phoneModels.length > 0 && (
-                  <div>
-                    <label className="font-mono text-[10px] uppercase tracking-[0.14em] text-cloud/60 block mb-1">
-                      Exact Phone Model
-                    </label>
-                    <select
-                      value={selectedPhoneModel}
-                      onChange={(e) => setSelectedPhoneModel(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs text-cloud focus:outline-none focus:ring-1 focus:ring-accent"
-                    >
-                      <option value="" className="bg-panel text-cloud">-- Select Phone Variant --</option>
-                      {options.phoneModels.map((m) => (
-                        <option key={m} value={m} className="bg-panel text-cloud">
-                          {m}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                        {isSelected && <Check className="w-4 h-4 text-accent shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
+
+            {/* Customization Note */}
+            <div className="glass rounded-xl p-3.5 border border-black/8 dark:border-[rgba(244,244,242,0.08)] flex items-start gap-2.5 text-xs text-cloud/70">
+              <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <span>
+                Want custom names, photos, or branding? Send your specifications directly to us on WhatsApp after ordering or click <strong className="text-cloud font-medium">&ldquo;Order via WhatsApp&rdquo;</strong> below.
+              </span>
+            </div>
 
             {/* ACTION BAR: STEPPER + ADD TO CART + WHATSAPP ORDER */}
             <div className="space-y-3">

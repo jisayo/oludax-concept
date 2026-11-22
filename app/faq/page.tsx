@@ -30,14 +30,14 @@ const faqData: FAQCategory[] = [
     icon: Sparkles,
     items: [
       {
-        question: "How do I personalize a product?",
+        question: "How do I add custom details to my gift order?",
         answer:
-          "You can personalize an item directly from its product page or via our Customization Studio. Enter the recipient's name, craft your personal message, pick your preferred colour schemes, choose clothing sizes or phone models, and even upload reference artwork. We confirm all spelling before production begins.",
+          "Simply choose your preferred item and size on our store, then click 'Order via WhatsApp' or complete your checkout online. You can send your photos, names, celebrant messages, or branding instructions directly to us on WhatsApp (+234 814 441 2006). We preview and confirm all details with you before printing or production begins.",
       },
       {
         question: "Can I review the design before it is produced?",
         answer:
-          "Yes. Our artisan team inspects all customization requests. For complex orders, corporate logos, or custom photo prints, we can send a digital mock-up preview via WhatsApp or email for your confirmation.",
+          "Yes. Our production team inspects all custom specifications. For custom frames, corporate branding, or celebrant photo items, we share a digital preview via WhatsApp for your approval before final production.",
       },
       {
         question: "Can I place a bulk corporate order?",
@@ -88,9 +88,9 @@ const faqData: FAQCategory[] = [
     icon: RotateCcw,
     items: [
       {
-        question: "What is your return policy for personalized gifts?",
+        question: "What is your return policy for customized gifts?",
         answer:
-          "Because customized items are personalized with your unique name, message, or photo, they cannot be restocked or refunded once produced. However, if there is a spelling mistake caused by our team or if an item arrives damaged in transit, we will immediately produce and dispatch a replacement at zero cost to you.",
+          "Because customized gifts are individually produced with your specific name, picture, or message, they cannot be returned or refunded once made. However, if there is a mistake caused by our team or if an item arrives damaged in transit, we will immediately produce and dispatch a replacement at zero cost to you.",
       },
       {
         question: "What should I do if an item arrives damaged?",

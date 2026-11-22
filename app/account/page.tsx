@@ -22,10 +22,14 @@ import { useWishlist } from "@/lib/wishlist-context";
 function AccountContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const destination =
-    typeof searchParams?.get === "function"
-      ? searchParams.get("redirect") || "/shop"
-      : "/shop";
+  let destination = "/shop";
+  try {
+    if (searchParams && typeof searchParams.get === "function") {
+      destination = searchParams.get("redirect") || "/shop";
+    }
+  } catch {
+    destination = "/shop";
+  }
 
   const { user, isAuthenticated, isAdmin, login, register, logout, updateProfile } =
     useAuth();
@@ -162,8 +166,8 @@ function AccountContent() {
                     className="p-3 glass rounded-xl hover:border-accent/40 transition-colors"
                   >
                     <Package className="w-4 h-4 text-accent mx-auto mb-1" />
-                    <span className="text-xs font-semibold text-cloud block">1</span>
-                    <span className="text-[10px] text-cloud/60">Active Order</span>
+                    <span className="text-xs font-semibold text-cloud block">0</span>
+                    <span className="text-[10px] text-cloud/60">Orders</span>
                   </Link>
                 </div>
               </div>

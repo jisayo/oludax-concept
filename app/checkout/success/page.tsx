@@ -45,8 +45,17 @@ type SavedOrder = {
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
-  const refParam = searchParams ? searchParams.get("ref") : null;
-  const referenceParam = searchParams ? (searchParams.get("reference") || searchParams.get("trxref")) : null;
+  let refParam: string | null = null;
+  let referenceParam: string | null = null;
+
+  try {
+    if (searchParams && typeof searchParams.get === "function") {
+      refParam = searchParams.get("ref");
+      referenceParam = searchParams.get("reference") || searchParams.get("trxref");
+    }
+  } catch {
+    // Graceful fallback
+  }
 
   const [order, setOrder] = useState<SavedOrder | null>(null);
 

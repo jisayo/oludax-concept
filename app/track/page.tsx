@@ -41,7 +41,14 @@ type OrderData = {
 
 function TrackContent() {
   const searchParams = useSearchParams();
-  const initialRef = (typeof searchParams?.get === "function" ? searchParams.get("ref") : "") || "";
+  let initialRef = "";
+  try {
+    if (searchParams && typeof searchParams.get === "function") {
+      initialRef = searchParams.get("ref") || "";
+    }
+  } catch {
+    // Graceful fallback
+  }
 
   const [orderQuery, setOrderQuery] = useState(initialRef);
   const [searchedOrder, setSearchedOrder] = useState<string | null>(initialRef || null);
