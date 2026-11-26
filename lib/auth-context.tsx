@@ -22,7 +22,7 @@ type AuthContextType = {
   role: Role;
   hasPermission: (permission: Permission) => boolean;
   login: (email: string, password?: string) => Promise<{ success: boolean; isStaff: boolean; error?: string }>;
-  register: (name: string, email: string, password?: string) => Promise<void>;
+  register: (name: string, email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -61,11 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem("oludax_customer_user");
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Security: Customers can NEVER have administrative roles
+        // Security: Customers can NEVER have administrative roles or reserved admin email
         if (parsed && typeof parsed === "object") {
+          const cachedEmail = String(parsed.email || "").trim().toLowerCase();
+          if (cachedEmail === "preciousoludare23@gmail.com") {
+            localStorage.removeItem("oludax_customer_user");
+            setUser(null);
+            setIsLoading(false);
+            return;
+          }
           setUser({
             id: String(parsed.id || `customer-${Date.now().toString(36)}`),
-            email: String(parsed.email || ""),
+            email: cachedEmail,
             name: String(parsed.name || "Customer"),
             phone: parsed.phone ? String(parsed.phone) : undefined,
             role: "customer",
@@ -91,29 +98,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       try {
         // 1. First attempt authenticated staff login against server API
-        if (password) {
-          try {
-            const adminRes = await fetch("/api/admin/auth", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, password }),
-            });
+        try {
+          const adminRes = await fetch("/api/admin/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password: password || "" }),
+          });
 
-            if (adminRes.ok) {
-              const data = await adminRes.json();
-              if (data.success && data.user) {
-                const verifiedStaffUser: User = {
-                  id: data.user.id,
-                  email: data.user.email,
-                  name: data.user.name,
-                  role: data.user.role,
-                };
-                setUser(verifiedStaffUser);
-                return { success: true, isStaff: true };
-              }
-            }
-          } catch {}
-        }
+          const data = await adminRes.json().catch(() => null);
+
+          if (adminRes.ok && data?.success && data?.user) {
+            localStorage.removeItem("oludax_customer_user");
+            const verifiedStaffUser: User = {
+              id: data.user.id,
+              email: data.user.email,
+              name: data.user.name,
+              role: data.user.role,
+            };
+            setUser(verifiedStaffUser);
+            return { success: true, isStaff: true };
+          }
+
+          // Staff/admin emails must NEVER fall back to customer login
+          if (data?.isStaffEmail) {
+            return {
+              success: false,
+              isStaff: false,
+              error: data.error || "Invalid administrative credentials.",
+            };
+          }
+        } catch {}
 
         // 2. Standard customer authentication (strictly customer role, no admin privilege)
         const customerUser: User = {
@@ -137,6 +151,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (name: string, email: string, _password?: string) => {
       setIsLoading(true);
       try {
+        try {
+          const checkRes = await fetch("/api/admin/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, checkOnly: true }),
+          });
+          const checkData = await checkRes.json().catch(() => null);
+          if (checkData?.isStaffEmail) {
+            return {
+              success: false,
+              error: "This email is reserved for staff/admin login only.",
+            };
+          }
+        } catch {}
+
         const customerUser: User = {
           id: `customer-${Date.now().toString(36)}`,
           email: email.trim().toLowerCase(),
@@ -145,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         setUser(customerUser);
         localStorage.setItem("oludax_customer_user", JSON.stringify(customerUser));
+        return { success: true };
       } finally {
         setIsLoading(false);
       }

@@ -166,6 +166,24 @@ export function verifyAdminRequest(request: NextRequest): {
   };
 }
 
+export function isReservedStaffEmail(email: string): boolean {
+  const cleanEmail = email.toLowerCase().trim();
+  if (!cleanEmail) return false;
+
+  const adminEmail = (process.env.ADMIN_EMAIL || "preciousoludare23@gmail.com")
+    .toLowerCase()
+    .trim();
+  const managerEmail = process.env.MANAGER_EMAIL?.toLowerCase().trim();
+  const supportEmail = process.env.SUPPORT_EMAIL?.toLowerCase().trim();
+
+  return (
+    safeCompare(cleanEmail, adminEmail) ||
+    safeCompare(cleanEmail, "preciousoludare23@gmail.com") ||
+    (managerEmail ? safeCompare(cleanEmail, managerEmail) : false) ||
+    (supportEmail ? safeCompare(cleanEmail, supportEmail) : false)
+  );
+}
+
 /**
  * Validate administrator login credentials with brute-force protection
  * Strict: No hardcoded default passwords allowed in code.
@@ -174,7 +192,15 @@ export async function authenticateAdminUser(
   clientIp: string,
   email: string,
   password: string
-): Promise<{ success: boolean; token?: string; user?: any; error?: string }> {
+): Promise<{
+  success: boolean;
+  token?: string;
+  user?: any;
+  error?: string;
+  isStaffEmail?: boolean;
+}> {
+  const staffEmailMatch = isReservedStaffEmail(email);
+
   // Rate-limiting check
   const now = Date.now();
   const attempt = loginAttempts.get(clientIp);
@@ -184,6 +210,7 @@ export async function authenticateAdminUser(
       const minutes = Math.ceil(remainingMs / 60000);
       return {
         success: false,
+        isStaffEmail: staffEmailMatch,
         error: `Too many failed attempts. Try again in ${minutes} minutes.`,
       };
     } else {
@@ -262,6 +289,7 @@ export async function authenticateAdminUser(
 
     return {
       success: false,
+      isStaffEmail: staffEmailMatch,
       error: "Invalid administrative credentials.",
     };
   }

@@ -39,6 +39,7 @@ function AccountContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"orders" | "addresses" | "profile">(
     "orders"
@@ -53,16 +54,32 @@ function AccountContent() {
     if (user?.phone) setProfilePhone(user.phone);
   }, [user]);
 
+  // Redirect authenticated staff/admin away from customer account view
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      router.replace("/admin");
+    }
+  }, [isAuthenticated, isAdmin, router]);
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setAuthError(null);
     try {
       let isStaff = false;
       if (authMode === "login") {
         const res = await login(email, password);
+        if (!res.success) {
+          setAuthError(res.error || "Unable to sign in. Please check your credentials.");
+          return;
+        }
         isStaff = res.isStaff;
       } else {
-        await register(name, email, password);
+        const res = await register(name, email, password);
+        if (!res.success) {
+          setAuthError(res.error || "Unable to create account with this email.");
+          return;
+        }
       }
 
       // If verified staff member, route to admin console; otherwise to destination
@@ -322,7 +339,10 @@ function AccountContent() {
             <div className="flex rounded-2xl bg-black/5 dark:bg-white/5 p-1 mb-8 border border-black/5 dark:border-white/5">
               <button
                 type="button"
-                onClick={() => setAuthMode("login")}
+                onClick={() => {
+                  setAuthMode("login");
+                  setAuthError(null);
+                }}
                 className={`flex-1 py-2 font-mono text-xs uppercase tracking-wider rounded-xl transition ${
                   authMode === "login"
                     ? "bg-accent text-white font-semibold"
@@ -333,7 +353,10 @@ function AccountContent() {
               </button>
               <button
                 type="button"
-                onClick={() => setAuthMode("register")}
+                onClick={() => {
+                  setAuthMode("register");
+                  setAuthError(null);
+                }}
                 className={`flex-1 py-2 font-mono text-xs uppercase tracking-wider rounded-xl transition ${
                   authMode === "register"
                     ? "bg-accent text-white font-semibold"
@@ -354,6 +377,12 @@ function AccountContent() {
                   : "Enjoy personalized recommendations and live tracking."}
               </p>
             </div>
+
+            {authError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-500 text-xs font-mono text-center">
+                {authError}
+              </div>
+            )}
 
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               {authMode === "register" && (

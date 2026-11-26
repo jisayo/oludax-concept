@@ -3,6 +3,7 @@ import {
   authenticateAdminUser,
   verifyAdminRequest,
   revokeAdminToken,
+  isReservedStaffEmail,
   TOKEN_LIFETIME_MS,
 } from "@/lib/server/admin-auth";
 
@@ -38,11 +39,21 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, checkOnly } = body;
+
+    if (checkOnly && typeof email === "string") {
+      return NextResponse.json({
+        isStaffEmail: isReservedStaffEmail(email),
+      });
+    }
 
     if (!email || !password) {
       return NextResponse.json(
-        { success: false, error: "Email and passkey are required." },
+        {
+          success: false,
+          isStaffEmail: typeof email === "string" ? isReservedStaffEmail(email) : false,
+          error: "Email and passkey are required.",
+        },
         { status: 400 }
       );
     }
@@ -57,7 +68,11 @@ export async function POST(request: NextRequest) {
 
     if (!result.success || !result.token) {
       return NextResponse.json(
-        { success: false, error: result.error || "Invalid credentials." },
+        {
+          success: false,
+          isStaffEmail: result.isStaffEmail ?? false,
+          error: result.error || "Invalid credentials.",
+        },
         { status: 401 }
       );
     }
