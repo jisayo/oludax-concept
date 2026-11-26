@@ -12,6 +12,7 @@ export type User = {
   phone?: string;
   avatar?: string;
   role: Role;
+  permissions?: Permission[];
 };
 
 type AuthContextType = {
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: data.user.email,
             name: data.user.name,
             role: data.user.role,
+            permissions: Array.isArray(data.user.permissions) ? data.user.permissions : undefined,
           });
           setIsLoading(false);
           return;
@@ -114,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               email: data.user.email,
               name: data.user.name,
               role: data.user.role,
+              permissions: Array.isArray(data.user.permissions) ? data.user.permissions : undefined,
             };
             setUser(verifiedStaffUser);
             return { success: true, isStaff: true };
@@ -214,7 +217,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isAdmin: canAccessAdmin(userRole),
         role: userRole,
-        hasPermission: (perm: Permission) => hasPermission(userRole, perm),
+        hasPermission: (perm: Permission) =>
+          Array.isArray(user?.permissions)
+            ? user!.permissions.includes(perm)
+            : hasPermission(userRole, perm),
         login,
         register,
         logout,

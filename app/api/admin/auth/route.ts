@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       email: auth.user.email,
       name: auth.user.name,
       role: auth.user.role,
+      permissions: auth.user.permissions,
     },
   });
 }

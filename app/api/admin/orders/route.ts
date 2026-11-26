@@ -8,8 +8,8 @@ import {
   OrderStatus,
   PaymentStatus,
 } from "@/lib/server/db";
-import { verifyAdminRequest } from "@/lib/server/admin-auth";
-import { hasPermission } from "@/lib/rbac";
+import { verifyAdminRequest, hasEffectivePermission } from "@/lib/server/admin-auth";
+import { logAudit } from "@/lib/server/admin-store";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Enforce role-based permission
-  if (!hasPermission(auth.user.role, "view_orders")) {
+  if (!hasEffectivePermission(auth.user, "view_orders")) {
     return NextResponse.json(
       { success: false, error: "Forbidden: Insufficient permissions to view orders." },
       { status: 403 }
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
 
     // Role-based authorization for order cancellation
     if (action === "cancel") {
-      if (!hasPermission(auth.user.role, "cancel_order")) {
+      if (!hasEffectivePermission(auth.user, "cancel_order")) {
         return NextResponse.json(
           {
             success: false,
@@ -123,6 +123,15 @@ export async function PATCH(request: NextRequest) {
           { status: 404 }
         );
       }
+
+      logAudit({
+        actorEmail: auth.user.email,
+        actorRole: auth.user.role,
+        action: "ORDER_CANCELLED",
+        target: orderRef,
+        details: reason,
+      });
+
       return NextResponse.json({
         success: true,
         message: `Order #${orderRef} has been cancelled successfully.`,
@@ -132,7 +141,7 @@ export async function PATCH(request: NextRequest) {
 
     // Role-based authorization for status changes
     if (orderStatus) {
-      if (!hasPermission(auth.user.role, "edit_order_status")) {
+      if (!hasEffectivePermission(auth.user, "edit_order_status")) {
         return NextResponse.json(
           {
             success: false,
@@ -165,7 +174,7 @@ export async function PATCH(request: NextRequest) {
       adminNotes
     );
 
-    if (isModifyingDetails && !hasPermission(auth.user.role, "edit_order_details")) {
+    if (isModifyingDetails && !hasEffectivePermission(auth.user, "edit_order_details")) {
       return NextResponse.json(
         {
           success: false,
@@ -198,6 +207,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    logAudit({
+      actorEmail: auth.user.email,
+      actorRole: auth.user.role,
+      action: "ORDER_UPDATED",
+      target: orderRef,
+      details: `Updated order ${orderRef} (status: ${updated.orderStatus}, payment: ${updated.paymentStatus}).`,
+    });
+
     return NextResponse.json({
       success: true,
       message: `Order #${orderRef} updated successfully.`,
@@ -222,7 +239,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   // Strictly enforce delete_order permission (super_admin only)
-  if (!hasPermission(auth.user.role, "delete_order")) {
+  if (!hasEffectivePermission(auth.user, "delete_order")) {
     return NextResponse.json(
       {
         success: false,
@@ -250,6 +267,14 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    logAudit({
+      actorEmail: auth.user.email,
+      actorRole: auth.user.role,
+      action: "ORDER_DELETED",
+      target: orderRef,
+      details: `Permanently deleted order #${orderRef}.`,
+    });
 
     return NextResponse.json({
       success: true,

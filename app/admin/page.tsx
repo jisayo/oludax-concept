@@ -34,8 +34,11 @@ import {
   CreditCard,
   FileText,
   UserCheck,
+  Settings,
+  Activity,
+  UserPlus,
 } from "lucide-react";
-import { products, formatPrice, Product } from "@/lib/products";
+import { products, categories as defaultCategories, formatPrice, Product } from "@/lib/products";
 import { useAuth, Role } from "@/lib/auth-context";
 import { ROLES, Permission } from "@/lib/rbac";
 
@@ -116,14 +119,99 @@ export default function AdminDashboardPage() {
 
   // Dashboard Tabs & Data
   const [activeTab, setActiveTab] = useState<
-    "overview" | "orders" | "products" | "rbac"
+    "overview" | "orders" | "products" | "customers" | "staff" | "audit"
   >("overview");
   const [ordersList, setOrdersList] = useState<AdminOrder[]>(initialOrders);
   const [productList, setProductList] = useState<Product[]>(products);
+  const [productSearch, setProductSearch] = useState("");
   const [selectedStatusFilter, setSelectedStatusFilter] =
     useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Product Add / Edit Modal state
+  const [editingProductModal, setEditingProductModal] = useState<{
+    mode: "create" | "edit";
+    id?: string;
+    name: string;
+    price: string;
+    compareAtPrice: string;
+    category: string;
+    description: string;
+    primaryImage: string;
+    stockCount: string;
+    inStock: boolean;
+    featured: boolean;
+    designsText: string;
+  } | null>(null);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+
+  // Customers Directory state
+  const [customersList, setCustomersList] = useState<
+    Array<{
+      email: string;
+      name: string;
+      phone: string;
+      city: string;
+      state: string;
+      orderCount: number;
+      totalSpent: number;
+      lastOrderDate: string;
+      suspended: boolean;
+    }>
+  >([]);
+  const [customerSearch, setCustomerSearch] = useState("");
+
+  // Staff & Custom Permissions state
+  const [staffList, setStaffList] = useState<
+    Array<{
+      id: string;
+      email: string;
+      name: string;
+      role: Exclude<Role, "customer">;
+      active: boolean;
+      isProtectedOwner?: boolean;
+      customGrant: Permission[];
+      customRevoke: Permission[];
+    }>
+  >([]);
+  const [newStaffModal, setNewStaffModal] = useState<{
+    name: string;
+    email: string;
+    password: string;
+    role: "admin" | "manager" | "support";
+  } | null>(null);
+  const [editingStaffPerms, setEditingStaffPerms] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    role: Exclude<Role, "customer">;
+    customGrant: Permission[];
+    customRevoke: Permission[];
+  } | null>(null);
+  const [isSavingStaff, setIsSavingStaff] = useState(false);
+
+  // Audit Log & System Settings state
+  const [auditLogsList, setAuditLogsList] = useState<
+    Array<{
+      id: string;
+      timestamp: string;
+      actorEmail: string;
+      actorRole: Role;
+      action: string;
+      target: string;
+      details: string;
+    }>
+  >([]);
+  const [systemSettings, setSystemSettings] = useState({
+    storeName: "OLUDAX CONCEPT",
+    whatsappNumber: "2348144412006",
+    dispatchHub: "Ile-Ife, Osun State (Dispatches to Akure & Nationwide)",
+    freeDeliveryThreshold: 50000,
+    standardShippingFee: 3500,
+    acceptingOrders: true,
+  });
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   // Active Order for Inspection / Editing
   const [editingOrder, setEditingOrder] = useState<AdminOrder | null>(null);
@@ -141,27 +229,64 @@ export default function AdminDashboardPage() {
     };
   };
 
-  // Fetch orders from API on load and upon auth change
-  useEffect(() => {
-    if (!isAdmin) return;
+  const loadAdminResources = () => {
     fetch("/api/admin/orders", { headers: getAdminHeaders() })
       .then((r) => r.json())
       .then((data) => {
-        if (
-          data &&
-          data.success &&
-          Array.isArray(data.orders) &&
-          data.orders.length > 0
-        ) {
-          setOrdersList(
-            data.orders.map((o: any) => mapApiOrderToAdminOrder(o)),
-          );
+        if (data?.success && Array.isArray(data.orders)) {
+          setOrdersList(data.orders.map((o: any) => mapApiOrderToAdminOrder(o)));
         }
       })
-      .catch((err) =>
-        console.warn("Admin orders fetch warning, using local state:", err),
-      );
-  }, [isAdmin]);
+      .catch(() => {});
+
+    fetch("/api/admin/products", { headers: getAdminHeaders() })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products)) {
+          setProductList(data.products);
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/admin/customers", { headers: getAdminHeaders() })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.customers)) {
+          setCustomersList(data.customers);
+        }
+      })
+      .catch(() => {});
+
+    if (role === "super_admin" || role === "admin") {
+      fetch("/api/admin/staff", { headers: getAdminHeaders() })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.success && Array.isArray(data.staff)) {
+            setStaffList(data.staff);
+          }
+        })
+        .catch(() => {});
+    }
+
+    if (role === "super_admin") {
+      fetch("/api/admin/audit", { headers: getAdminHeaders() })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.success) {
+            if (Array.isArray(data.logs)) setAuditLogsList(data.logs);
+            if (data.settings) setSystemSettings(data.settings);
+          }
+        })
+        .catch(() => {});
+    }
+  };
+
+  // Fetch admin resources on load and upon auth/role change
+  useEffect(() => {
+    if (!isAdmin) return;
+    loadAdminResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin, role]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -393,24 +518,295 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Stock toggle for products
-  const toggleProductStock = (productId: string) => {
+  // Persistent Stock toggle for products
+  const toggleProductStock = async (prod: Product) => {
     if (!hasPermission("manage_inventory")) {
       showToast("Access Denied: Inventory management permission required.");
       return;
     }
 
-    setProductList((prev) =>
-      prev.map((p) =>
-        p.id === productId
-          ? {
-              ...p,
-              inStock: !p.inStock,
-              stockCount: p.inStock ? 0 : 25,
-            }
-          : p,
-      ),
-    );
+    const nextInStock = !prod.inStock;
+    const nextCount = nextInStock ? Math.max(prod.stockCount || 0, 25) : 0;
+
+    try {
+      const res = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({
+          id: prod.id,
+          inStock: nextInStock,
+          stockCount: nextCount,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to update stock.");
+        return;
+      }
+      setProductList((prev) =>
+        prev.map((p) => (p.id === prod.id ? data.product : p)),
+      );
+      showToast(`${prod.name} marked ${nextInStock ? "In Stock" : "Out of Stock"}.`);
+      if (role === "super_admin") loadAdminResources();
+    } catch {
+      showToast("Network error updating product stock.");
+    }
+  };
+
+  // Create or Update product (goods)
+  const handleSaveProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProductModal) return;
+    setIsSavingProduct(true);
+
+    const designs = editingProductModal.designsText
+      .split(/\n|,/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    try {
+      const isCreate = editingProductModal.mode === "create";
+      const res = await fetch("/api/admin/products", {
+        method: isCreate ? "POST" : "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({
+          id: editingProductModal.id,
+          name: editingProductModal.name,
+          price: Number(editingProductModal.price),
+          compareAtPrice: editingProductModal.compareAtPrice
+            ? Number(editingProductModal.compareAtPrice)
+            : undefined,
+          category: editingProductModal.category,
+          description: editingProductModal.description,
+          primaryImage: editingProductModal.primaryImage,
+          stockCount: Number(editingProductModal.stockCount || 0),
+          inStock: editingProductModal.inStock,
+          featured: editingProductModal.featured,
+          designs,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to save product.");
+        return;
+      }
+
+      if (isCreate) {
+        setProductList((prev) => [data.product, ...prev]);
+        showToast(`Added "${data.product.name}" to catalog.`);
+      } else {
+        setProductList((prev) =>
+          prev.map((p) => (p.id === data.product.id ? data.product : p)),
+        );
+        showToast(`Updated "${data.product.name}".`);
+      }
+      setEditingProductModal(null);
+      if (role === "super_admin") loadAdminResources();
+    } catch {
+      showToast("Network error saving product.");
+    } finally {
+      setIsSavingProduct(false);
+    }
+  };
+
+  // Delete product (goods)
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!hasPermission("manage_inventory")) {
+      showToast("Access Denied: Inventory permission required.");
+      return;
+    }
+    if (!confirm(`Delete "${name}" permanently from the store catalog?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/products?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: getAdminHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to delete product.");
+        return;
+      }
+      setProductList((prev) => prev.filter((p) => p.id !== id));
+      showToast(`Deleted "${name}".`);
+      if (role === "super_admin") loadAdminResources();
+    } catch {
+      showToast("Network error deleting product.");
+    }
+  };
+
+  // Staff CRUD handlers (Super Admin only)
+  const handleCreateStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStaffModal) return;
+    setIsSavingStaff(true);
+    try {
+      const res = await fetch("/api/admin/staff", {
+        method: "POST",
+        headers: getAdminHeaders(),
+        body: JSON.stringify(newStaffModal),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to create staff account.");
+        return;
+      }
+      setStaffList((prev) => [...prev, data.staff]);
+      setNewStaffModal(null);
+      showToast(`Staff account created for ${data.staff.email}.`);
+      loadAdminResources();
+    } catch {
+      showToast("Network error creating staff account.");
+    } finally {
+      setIsSavingStaff(false);
+    }
+  };
+
+  const handleUpdateStaffRole = async (
+    id: string,
+    newRole: "admin" | "manager" | "support",
+  ) => {
+    try {
+      const res = await fetch("/api/admin/staff", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ id, role: newRole }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to update role.");
+        return;
+      }
+      setStaffList((prev) => prev.map((s) => (s.id === id ? data.staff : s)));
+      showToast(`Updated role to ${ROLES[newRole].name}.`);
+      loadAdminResources();
+    } catch {
+      showToast("Network error updating staff role.");
+    }
+  };
+
+  const handleToggleStaffActive = async (id: string, active: boolean) => {
+    try {
+      const res = await fetch("/api/admin/staff", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ id, active }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to update staff status.");
+        return;
+      }
+      setStaffList((prev) => prev.map((s) => (s.id === id ? data.staff : s)));
+      showToast(active ? "Staff account reactivated." : "Staff account suspended.");
+      loadAdminResources();
+    } catch {
+      showToast("Network error updating staff status.");
+    }
+  };
+
+  const handleSaveStaffPermissions = async () => {
+    if (!editingStaffPerms) return;
+    setIsSavingStaff(true);
+    try {
+      const res = await fetch("/api/admin/staff", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({
+          id: editingStaffPerms.id,
+          customGrant: editingStaffPerms.customGrant,
+          customRevoke: editingStaffPerms.customRevoke,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to update custom permissions.");
+        return;
+      }
+      setStaffList((prev) =>
+        prev.map((s) => (s.id === editingStaffPerms.id ? data.staff : s)),
+      );
+      setEditingStaffPerms(null);
+      showToast("Custom permissions updated.");
+      loadAdminResources();
+    } catch {
+      showToast("Network error saving permissions.");
+    } finally {
+      setIsSavingStaff(false);
+    }
+  };
+
+  const handleDeleteStaff = async (id: string, email: string) => {
+    if (!confirm(`Permanently delete staff account ${email}?`)) return;
+    try {
+      const res = await fetch(`/api/admin/staff?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: getAdminHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to delete staff.");
+        return;
+      }
+      setStaffList((prev) => prev.filter((s) => s.id !== id));
+      showToast(`Deleted staff account ${email}.`);
+      loadAdminResources();
+    } catch {
+      showToast("Network error deleting staff.");
+    }
+  };
+
+  const handleToggleCustomerSuspended = async (
+    email: string,
+    suspended: boolean,
+  ) => {
+    try {
+      const res = await fetch("/api/admin/customers", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ email, suspended }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to update customer.");
+        return;
+      }
+      setCustomersList((prev) =>
+        prev.map((c) => (c.email === email ? { ...c, suspended } : c)),
+      );
+      showToast(
+        suspended
+          ? `Suspended customer ${email}.`
+          : `Reactivated customer ${email}.`,
+      );
+      if (role === "super_admin") loadAdminResources();
+    } catch {
+      showToast("Network error updating customer.");
+    }
+  };
+
+  const handleSaveSystemSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingSettings(true);
+    try {
+      const res = await fetch("/api/admin/audit", {
+        method: "PATCH",
+        headers: getAdminHeaders(),
+        body: JSON.stringify(systemSettings),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || "Failed to save settings.");
+        return;
+      }
+      setSystemSettings(data.settings);
+      showToast("System settings saved.");
+      loadAdminResources();
+    } catch {
+      showToast("Network error saving settings.");
+    } finally {
+      setIsSavingSettings(false);
+    }
   };
 
   // Filtered orders list (defensive & null-safe)
@@ -629,32 +1025,57 @@ export default function AdminDashboardPage() {
         {/* Navigation Tabs */}
         <div className="flex gap-2 border-b border-white/10 pb-4 overflow-x-auto">
           {[
-            { id: "overview", label: "Executive Overview", icon: TrendingUp },
+            { id: "overview", label: "Overview", icon: TrendingUp, show: true },
             {
               id: "orders",
-              label: `Orders & Fulfillment (${ordersList.length})`,
+              label: `Orders (${ordersList.length})`,
               icon: Package,
+              show: hasPermission("view_orders"),
             },
-            { id: "products", label: "Catalog & Inventory", icon: Layers },
-            { id: "rbac", label: "RBAC Permissions Matrix", icon: Shield },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  isSelected
-                    ? "bg-pink text-white shadow-md shadow-pink/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+            {
+              id: "products",
+              label: `Goods & Inventory (${productList.length})`,
+              icon: Layers,
+              show: true,
+            },
+            {
+              id: "customers",
+              label: `Customers (${customersList.length})`,
+              icon: Users,
+              show: hasPermission("view_orders"),
+            },
+            {
+              id: "staff",
+              label: "Staff & RBAC",
+              icon: Shield,
+              show: role === "super_admin" || role === "admin",
+            },
+            {
+              id: "audit",
+              label: "Audit & Settings",
+              icon: Activity,
+              show: role === "super_admin",
+            },
+          ]
+            .filter((t) => t.show)
+            .map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    isSelected
+                      ? "bg-pink text-white shadow-md shadow-pink/20"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
         </div>
 
         {/* ====================================================================
@@ -1097,154 +1518,626 @@ export default function AdminDashboardPage() {
         )}
 
         {/* ====================================================================
-            TAB 3: CATALOG & INVENTORY MANAGEMENT
+            TAB 3: CATALOG & INVENTORY MANAGEMENT (ADD / EDIT / DELETE GOODS)
         ==================================================================== */}
         {activeTab === "products" && (
           <div className="glass rounded-[24px] p-6 border border-white/10 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
               <div>
                 <h3 className="font-display text-lg font-bold text-white">
-                  Catalogue & Stock Control
+                  Goods, Catalogue & Stock Control
                 </h3>
                 <p className="font-mono text-xs text-gray-400">
-                  Instant stock adjustments for gift items & materials
+                  Add new goods, edit prices/details, toggle stock, or remove items
                 </p>
               </div>
-              <span className="font-mono text-xs text-pink bg-pink/15 px-3 py-1 rounded-full border border-pink/25">
-                {productList.length} active products
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    placeholder="Filter goods..."
+                    className="pl-8 pr-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-pink"
+                  />
+                </div>
+                {hasPermission("manage_inventory") && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingProductModal({
+                        mode: "create",
+                        name: "",
+                        price: "",
+                        compareAtPrice: "",
+                        category: defaultCategories[0]?.name || "Custom Frames",
+                        description: "",
+                        primaryImage: "/images/products/custom-mug.png",
+                        stockCount: "25",
+                        inStock: true,
+                        featured: false,
+                        designsText: "",
+                      })
+                    }
+                    className="px-4 py-2 rounded-xl bg-pink hover:brightness-110 text-white font-mono text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-pink/20 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Good</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {productList.map((prod) => (
-                <div
-                  key={prod.id}
-                  className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between space-y-3 font-mono text-xs"
-                >
-                  <div className="flex gap-3">
-                    <img
-                      src={
-                        prod.primaryImage || "/images/products/sample-mug.jpg"
-                      }
-                      alt={prod.name}
-                      className="w-16 h-16 rounded-xl object-cover shrink-0 border border-white/10"
-                    />
-                    <div>
-                      <h4 className="font-bold text-white truncate max-w-[180px]">
-                        {prod.name}
-                      </h4>
-                      <p className="text-pink font-semibold mt-0.5">
-                        {formatPrice(prod.price)}
-                      </p>
-                      <span className="text-[10px] text-gray-400">
-                        Category: {prod.category}
-                      </span>
+              {productList
+                .filter((p) => {
+                  const q = productSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    p.name.toLowerCase().includes(q) ||
+                    (p.category || "").toLowerCase().includes(q)
+                  );
+                })
+                .map((prod) => (
+                  <div
+                    key={prod.id}
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between space-y-3 font-mono text-xs"
+                  >
+                    <div className="flex gap-3">
+                      <img
+                        src={
+                          prod.primaryImage || "/images/products/sample-mug.jpg"
+                        }
+                        alt={prod.name}
+                        className="w-16 h-16 rounded-xl object-cover shrink-0 border border-white/10"
+                      />
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-white truncate">
+                          {prod.name}
+                        </h4>
+                        <p className="text-pink font-semibold mt-0.5">
+                          {formatPrice(prod.price)}
+                        </p>
+                        <span className="text-[10px] text-gray-400 block truncate">
+                          {prod.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => toggleProductStock(prod)}
+                        disabled={!hasPermission("manage_inventory")}
+                        className={`text-[10px] font-semibold px-2.5 py-1 rounded-full transition cursor-pointer disabled:opacity-40 ${
+                          prod.inStock
+                            ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+                            : "bg-rose-500/15 text-rose-400 hover:bg-rose-500/25"
+                        }`}
+                        title="Click to toggle stock status"
+                      >
+                        {prod.inStock
+                          ? `In Stock (${prod.stockCount})`
+                          : "Out of Stock"}
+                      </button>
+
+                      {hasPermission("manage_inventory") && (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditingProductModal({
+                                mode: "edit",
+                                id: prod.id,
+                                name: prod.name,
+                                price: String(prod.price),
+                                compareAtPrice: prod.compareAtPrice
+                                  ? String(prod.compareAtPrice)
+                                  : "",
+                                category: prod.category || defaultCategories[0]?.name || "Custom Frames",
+                                description: prod.description || "",
+                                primaryImage: prod.primaryImage || "",
+                                stockCount: String(prod.stockCount || 0),
+                                inStock: Boolean(prod.inStock),
+                                featured: Boolean(prod.featured),
+                                designsText: (
+                                  prod.customizationOptions?.designs || []
+                                ).join("\n"),
+                              })
+                            }
+                            className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] flex items-center gap-1 transition cursor-pointer"
+                          >
+                            <Edit3 className="w-3 h-3" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteProduct(prod.id, prod.name)
+                            }
+                            className="px-2 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 text-[11px] flex items-center transition cursor-pointer"
+                            title="Delete product"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                    <span
-                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                        prod.inStock
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-rose-500/15 text-rose-400"
-                      }`}
-                    >
-                      {prod.inStock
-                        ? `In Stock (${prod.stockCount})`
-                        : "Out of Stock"}
-                    </span>
-
-                    <button
-                      onClick={() => toggleProductStock(prod.id)}
-                      disabled={!hasPermission("manage_inventory")}
-                      className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] transition disabled:opacity-30 cursor-pointer"
-                    >
-                      {prod.inStock ? "Set Out of Stock" : "Restock (+25)"}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         )}
 
         {/* ====================================================================
-            TAB 4: RBAC PERMISSIONS MATRIX
+            TAB 4: CUSTOMERS DIRECTORY
         ==================================================================== */}
-        {activeTab === "rbac" && (
+        {activeTab === "customers" && (
           <div className="glass rounded-[24px] p-6 border border-white/10 space-y-6">
-            <div className="pb-4 border-b border-white/10">
-              <h3 className="font-display text-lg font-bold text-white flex items-center gap-2">
-                <Shield className="w-5 h-5 text-pink" />
-                <span>Role-Based Access Control (RBAC) Hierarchy</span>
-              </h3>
-              <p className="font-mono text-xs text-gray-400 mt-1">
-                Granular operational rights assigned to personnel based on
-                studio specialization
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div>
+                <h3 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-pink" />
+                  <span>Customer Accounts & Order History</span>
+                </h3>
+                <p className="font-mono text-xs text-gray-400 mt-1">
+                  Aggregated shopper directory from placed orders
+                </p>
+              </div>
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input
+                  type="text"
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  placeholder="Search customer name, email, city..."
+                  className="w-full pl-8 pr-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-pink"
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
-              {(Object.keys(ROLES) as Role[])
-                .filter((r) => r !== "customer")
-                .map((r) => {
-                  const def = ROLES[r];
-                  const isCurrent = role === r;
+            {customersList.length === 0 ? (
+              <div className="py-12 text-center font-mono text-xs text-gray-500">
+                No customer orders recorded yet. Customers will appear here automatically after placing an order.
+              </div>
+            ) : (
+              <div className="divide-y divide-white/5 font-mono text-xs">
+                {customersList
+                  .filter((c) => {
+                    const q = customerSearch.toLowerCase().trim();
+                    if (!q) return true;
+                    return (
+                      c.name.toLowerCase().includes(q) ||
+                      c.email.toLowerCase().includes(q) ||
+                      c.phone.toLowerCase().includes(q) ||
+                      c.city.toLowerCase().includes(q)
+                    );
+                  })
+                  .map((c) => (
+                    <div
+                      key={c.email}
+                      className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white">{c.name}</span>
+                          {c.suspended && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                              Suspended
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-400 text-[11px]">
+                          {c.email} • {c.phone} • {c.city}, {c.state}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <span className="text-white font-bold block">
+                            {formatPrice(c.totalSpent)}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {c.orderCount} order{c.orderCount === 1 ? "" : "s"}
+                          </span>
+                        </div>
+                        {(role === "super_admin" || role === "admin") && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleToggleCustomerSuspended(c.email, !c.suspended)
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition cursor-pointer ${
+                              c.suspended
+                                ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25"
+                                : "bg-rose-500/15 text-rose-400 border-rose-500/30 hover:bg-rose-500/25"
+                            }`}
+                          >
+                            {c.suspended ? "Reactivate" : "Suspend"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 5: STAFF ACCOUNTS, CUSTOM PERMISSIONS & RBAC MATRIX
+        ==================================================================== */}
+        {activeTab === "staff" && (
+          <div className="space-y-6">
+            {/* Live Staff Directory */}
+            <div className="glass rounded-[24px] p-6 border border-white/10 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                <div>
+                  <h3 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-pink" />
+                    <span>Staff Accounts & Custom Permissions</span>
+                  </h3>
+                  <p className="font-mono text-xs text-gray-400 mt-1">
+                    {role === "super_admin"
+                      ? "Create, promote, suspend, delete staff and grant or revoke individual permissions."
+                      : "Read-only staff overview. Only the Super Admin can modify roles or permissions."}
+                  </p>
+                </div>
+                {role === "super_admin" && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setNewStaffModal({
+                        name: "",
+                        email: "",
+                        password: "",
+                        role: "manager",
+                      })
+                    }
+                    className="px-4 py-2 rounded-xl bg-pink hover:brightness-110 text-white font-mono text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-pink/20 cursor-pointer self-start"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>Add Staff Account</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="divide-y divide-white/5 font-mono text-xs">
+                {staffList.map((member) => {
+                  const roleDef = ROLES[member.role] || ROLES.support;
                   return (
                     <div
-                      key={r}
-                      className={`p-5 rounded-2xl border transition space-y-3 ${
-                        isCurrent
-                          ? "bg-pink/10 border-pink/50 shadow-lg shadow-pink/10"
-                          : "bg-white/5 border-white/10"
-                      }`}
+                      key={member.id}
+                      className="py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
                     >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${def.badgeColor}`}
-                        >
-                          {def.name}
-                        </span>
-                        {isCurrent && (
-                          <span className="text-[10px] font-bold text-pink animate-pulse">
-                            ● Active Role
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-white">
+                            {member.name}
                           </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${roleDef.badgeColor}`}
+                          >
+                            {roleDef.name}
+                          </span>
+                          {member.isProtectedOwner && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              Protected Owner
+                            </span>
+                          )}
+                          {!member.active && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                              Suspended
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-400 text-[11px]">{member.email}</p>
+                        {(member.customGrant.length > 0 ||
+                          member.customRevoke.length > 0) && (
+                          <p className="text-[10px] text-amber-300">
+                            {member.customGrant.length > 0 &&
+                              `+Granted: ${member.customGrant.join(", ")} `}
+                            {member.customRevoke.length > 0 &&
+                              `-Revoked: ${member.customRevoke.join(", ")}`}
+                          </p>
                         )}
                       </div>
 
-                      <p className="text-gray-300 text-[11px] leading-relaxed">
-                        {def.description}
-                      </p>
+                      {role === "super_admin" && !member.isProtectedOwner && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <select
+                            value={member.role}
+                            onChange={(e) =>
+                              handleUpdateStaffRole(
+                                member.id,
+                                e.target.value as "admin" | "manager" | "support",
+                              )
+                            }
+                            className="px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white text-[11px] cursor-pointer"
+                          >
+                            <option value="admin" className="bg-[#121216]">
+                              Store Administrator
+                            </option>
+                            <option value="manager" className="bg-[#121216]">
+                              Operations Manager
+                            </option>
+                            <option value="support" className="bg-[#121216]">
+                              Customer Support
+                            </option>
+                          </select>
 
-                      <div className="pt-2 border-t border-white/10 space-y-1.5">
-                        <span className="text-gray-400 uppercase text-[9px] block">
-                          Granted Powers ({def.permissions.length}):
-                        </span>
-                        <ul className="space-y-1 text-[10px] text-gray-300">
-                          {def.permissions.map((p) => (
-                            <li key={p} className="flex items-center gap-1.5">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                              <span>{formatPermissionName(p)}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditingStaffPerms({
+                                id: member.id,
+                                name: member.name,
+                                email: member.email,
+                                role: member.role,
+                                customGrant: [...member.customGrant],
+                                customRevoke: [...member.customRevoke],
+                              })
+                            }
+                            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold cursor-pointer"
+                          >
+                            Custom Permissions
+                          </button>
 
-                      <div
-                        className={`w-full py-2 rounded-xl text-xs font-semibold text-center transition mt-2 ${
-                          isCurrent
-                            ? "bg-pink text-white shadow-sm"
-                            : "bg-white/5 text-gray-400 border border-white/10"
-                        }`}
-                      >
-                        {isCurrent
-                          ? "Your Active Verified Role"
-                          : `${def.name} Tier`}
-                      </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleToggleStaffActive(member.id, !member.active)
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border cursor-pointer ${
+                              member.active
+                                ? "bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25"
+                                : "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25"
+                            }`}
+                          >
+                            {member.active ? "Suspend" : "Activate"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteStaff(member.id, member.email)
+                            }
+                            className="p-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 cursor-pointer"
+                            title="Delete staff account"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* RBAC Hierarchy Reference */}
+            <div className="glass rounded-[24px] p-6 border border-white/10 space-y-6">
+              <div className="pb-4 border-b border-white/10">
+                <h3 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-pink" />
+                  <span>Role-Based Access Control (RBAC) Hierarchy</span>
+                </h3>
+                <p className="font-mono text-xs text-gray-400 mt-1">
+                  Default authority tiers across the store
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+                {(Object.keys(ROLES) as Role[])
+                  .filter((r) => r !== "customer")
+                  .map((r) => {
+                    const def = ROLES[r];
+                    const isCurrent = role === r;
+                    return (
+                      <div
+                        key={r}
+                        className={`p-5 rounded-2xl border transition space-y-3 ${
+                          isCurrent
+                            ? "bg-pink/10 border-pink/50 shadow-lg shadow-pink/10"
+                            : "bg-white/5 border-white/10"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${def.badgeColor}`}
+                          >
+                            {def.name}
+                          </span>
+                          {isCurrent && (
+                            <span className="text-[10px] font-bold text-pink animate-pulse">
+                              ● Active Role
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-gray-300 text-[11px] leading-relaxed">
+                          {def.description}
+                        </p>
+
+                        <div className="pt-2 border-t border-white/10 space-y-1.5">
+                          <span className="text-gray-400 uppercase text-[9px] block">
+                            Granted Powers ({def.permissions.length}):
+                          </span>
+                          <ul className="space-y-1 text-[10px] text-gray-300">
+                            {def.permissions.map((p) => (
+                              <li key={p} className="flex items-center gap-1.5">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                                <span>{formatPermissionName(p)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 6: AUDIT LOGS & SYSTEM SETTINGS (SUPER ADMIN ONLY)
+        ==================================================================== */}
+        {activeTab === "audit" && role === "super_admin" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* System Settings */}
+            <div className="lg:col-span-5 glass rounded-[24px] p-6 border border-white/10 space-y-5 h-fit">
+              <div className="pb-3 border-b border-white/10 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-pink" />
+                <h3 className="font-display text-lg font-bold text-white">
+                  System Settings
+                </h3>
+              </div>
+
+              <form onSubmit={handleSaveSystemSettings} className="space-y-4 font-mono text-xs">
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Store Name
+                  </label>
+                  <input
+                    type="text"
+                    value={systemSettings.storeName}
+                    onChange={(e) =>
+                      setSystemSettings({ ...systemSettings, storeName: e.target.value })
+                    }
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    WhatsApp Order Number
+                  </label>
+                  <input
+                    type="text"
+                    value={systemSettings.whatsappNumber}
+                    onChange={(e) =>
+                      setSystemSettings({
+                        ...systemSettings,
+                        whatsappNumber: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Primary Dispatch Hub
+                  </label>
+                  <input
+                    type="text"
+                    value={systemSettings.dispatchHub}
+                    onChange={(e) =>
+                      setSystemSettings({
+                        ...systemSettings,
+                        dispatchHub: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                      Free Shipping (₦)
+                    </label>
+                    <input
+                      type="number"
+                      value={systemSettings.freeDeliveryThreshold}
+                      onChange={(e) =>
+                        setSystemSettings({
+                          ...systemSettings,
+                          freeDeliveryThreshold: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                      Standard Fee (₦)
+                    </label>
+                    <input
+                      type="number"
+                      value={systemSettings.standardShippingFee}
+                      onChange={(e) =>
+                        setSystemSettings({
+                          ...systemSettings,
+                          standardShippingFee: Number(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
+                    />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2.5 pt-1 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={systemSettings.acceptingOrders}
+                    onChange={(e) =>
+                      setSystemSettings({
+                        ...systemSettings,
+                        acceptingOrders: e.target.checked,
+                      })
+                    }
+                    className="rounded accent-pink"
+                  />
+                  <span className="text-gray-300">Store is accepting new orders</span>
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={isSavingSettings}
+                  className="w-full py-2.5 rounded-xl bg-pink hover:brightness-110 text-white font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{isSavingSettings ? "Saving..." : "Save Settings"}</span>
+                </button>
+              </form>
+            </div>
+
+            {/* Security Audit Log */}
+            <div className="lg:col-span-7 glass rounded-[24px] p-6 border border-white/10 space-y-4">
+              <div className="pb-3 border-b border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-pink" />
+                  <h3 className="font-display text-lg font-bold text-white">
+                    Security & Activity Audit Log
+                  </h3>
+                </div>
+                <span className="font-mono text-[10px] text-gray-400">
+                  {auditLogsList.length} recorded events
+                </span>
+              </div>
+
+              {auditLogsList.length === 0 ? (
+                <div className="py-12 text-center font-mono text-xs text-gray-500">
+                  No sensitive actions logged yet in this session.
+                </div>
+              ) : (
+                <div className="divide-y divide-white/5 max-h-[520px] overflow-y-auto pr-1 font-mono text-xs">
+                  {auditLogsList.map((log) => (
+                    <div key={log.id} className="py-3 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-pink/15 text-pink text-[10px] font-semibold border border-pink/25">
+                          {log.action}
+                        </span>
+                        <span className="text-[10px] text-gray-500">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-gray-200 text-[11px]">{log.details}</p>
+                      <p className="text-[10px] text-gray-500">
+                        Actor: {log.actorEmail} ({log.actorRole}) • Target: {log.target}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1702,6 +2595,454 @@ export default function AdminDashboardPage() {
                 <span>
                   {isSavingOrder ? "Processing..." : "Confirm Cancellation"}
                 </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL 3: ADD / EDIT PRODUCT (GOODS)
+      ==================================================================== */}
+      {editingProductModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="glass bg-[#121216] max-w-xl w-full rounded-[28px] border border-white/15 p-6 sm:p-8 space-y-5 shadow-2xl my-8 max-h-[90vh] overflow-y-auto font-mono text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="font-display text-lg font-bold text-white">
+                {editingProductModal.mode === "create"
+                  ? "Add New Good to Catalog"
+                  : `Edit "${editingProductModal.name}"`}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingProductModal(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProduct} className="space-y-4">
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Product / Good Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editingProductModal.name}
+                  onChange={(e) =>
+                    setEditingProductModal({
+                      ...editingProductModal,
+                      name: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. Borderless Photo Frame (A4)"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Price (₦) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={editingProductModal.price}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        price: e.target.value,
+                      })
+                    }
+                    placeholder="9000"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Compare-At Price (₦)
+                  </label>
+                  <input
+                    type="number"
+                    value={editingProductModal.compareAtPrice}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        compareAtPrice: e.target.value,
+                      })
+                    }
+                    placeholder="Optional"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Category *
+                  </label>
+                  <select
+                    value={editingProductModal.category}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        category: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#1C141E] border border-white/10 text-white"
+                  >
+                    {defaultCategories.map((c) => (
+                      <option key={c.id} value={c.name} className="bg-[#121216]">
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                    Stock Count
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editingProductModal.stockCount}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        stockCount: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Image Path or URL
+                </label>
+                <input
+                  type="text"
+                  value={editingProductModal.primaryImage}
+                  onChange={(e) =>
+                    setEditingProductModal({
+                      ...editingProductModal,
+                      primaryImage: e.target.value,
+                    })
+                  }
+                  placeholder="/images/products/custom-mug.png"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  value={editingProductModal.description}
+                  onChange={(e) =>
+                    setEditingProductModal({
+                      ...editingProductModal,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Variants / Sizes (one per line, optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={editingProductModal.designsText}
+                  onChange={(e) =>
+                    setEditingProductModal({
+                      ...editingProductModal,
+                      designsText: e.target.value,
+                    })
+                  }
+                  placeholder={"A4 (₦9,000)\nA3 (₦12,000)"}
+                  className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white resize-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingProductModal.inStock}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        inStock: e.target.checked,
+                      })
+                    }
+                    className="accent-pink"
+                  />
+                  <span className="text-gray-300">In Stock</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingProductModal.featured}
+                    onChange={(e) =>
+                      setEditingProductModal({
+                        ...editingProductModal,
+                        featured: e.target.checked,
+                      })
+                    }
+                    className="accent-pink"
+                  />
+                  <span className="text-gray-300">Featured</span>
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditingProductModal(null)}
+                  className="px-4 py-2 rounded-xl bg-white/10 text-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingProduct}
+                  className="px-5 py-2 rounded-xl bg-pink text-white font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>
+                    {isSavingProduct
+                      ? "Saving..."
+                      : editingProductModal.mode === "create"
+                      ? "Create Good"
+                      : "Save Changes"}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL 4: ADD STAFF ACCOUNT (SUPER ADMIN)
+      ==================================================================== */}
+      {newStaffModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass bg-[#121216] max-w-md w-full rounded-[24px] border border-white/15 p-6 space-y-5 font-mono text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="font-display text-lg font-bold text-white">
+                Add Staff Account
+              </h3>
+              <button
+                type="button"
+                onClick={() => setNewStaffModal(null)}
+                className="w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateStaff} className="space-y-4">
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newStaffModal.name}
+                  onChange={(e) =>
+                    setNewStaffModal({ ...newStaffModal, name: e.target.value })
+                  }
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Staff Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newStaffModal.email}
+                  onChange={(e) =>
+                    setNewStaffModal({ ...newStaffModal, email: e.target.value })
+                  }
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Password (min 6 chars) *
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={newStaffModal.password}
+                  onChange={(e) =>
+                    setNewStaffModal({
+                      ...newStaffModal,
+                      password: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 uppercase text-[10px] mb-1">
+                  Role *
+                </label>
+                <select
+                  value={newStaffModal.role}
+                  onChange={(e) =>
+                    setNewStaffModal({
+                      ...newStaffModal,
+                      role: e.target.value as "admin" | "manager" | "support",
+                    })
+                  }
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#1C141E] border border-white/10 text-white"
+                >
+                  <option value="admin" className="bg-[#121216]">
+                    Store Administrator
+                  </option>
+                  <option value="manager" className="bg-[#121216]">
+                    Operations Manager
+                  </option>
+                  <option value="support" className="bg-[#121216]">
+                    Customer Support
+                  </option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setNewStaffModal(null)}
+                  className="px-4 py-2 rounded-xl bg-white/10 text-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingStaff}
+                  className="px-5 py-2 rounded-xl bg-pink text-white font-semibold cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingStaff ? "Creating..." : "Create Staff"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL 5: CUSTOM PERMISSIONS OVERRIDES (SUPER ADMIN)
+      ==================================================================== */}
+      {editingStaffPerms && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass bg-[#121216] max-w-lg w-full rounded-[24px] border border-white/15 p-6 space-y-5 font-mono text-xs">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div>
+                <h3 className="font-display text-lg font-bold text-white">
+                  Custom Permissions — {editingStaffPerms.name}
+                </h3>
+                <p className="text-[11px] text-gray-400">
+                  Base Role: {ROLES[editingStaffPerms.role]?.name}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingStaffPerms(null)}
+                className="w-8 h-8 rounded-full bg-white/10 text-gray-300 flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+              {(
+                [
+                  "view_orders",
+                  "edit_order_status",
+                  "edit_order_details",
+                  "cancel_order",
+                  "delete_order",
+                  "manage_inventory",
+                  "view_financials",
+                ] as Permission[]
+              ).map((perm) => {
+                const inBase =
+                  ROLES[editingStaffPerms.role]?.permissions.includes(perm) ||
+                  false;
+                const isGranted = editingStaffPerms.customGrant.includes(perm);
+                const isRevoked = editingStaffPerms.customRevoke.includes(perm);
+                const effective = (inBase || isGranted) && !isRevoked;
+
+                return (
+                  <label
+                    key={perm}
+                    className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer"
+                  >
+                    <div>
+                      <span className="text-white font-semibold block">
+                        {formatPermissionName(perm)}
+                      </span>
+                      <span className="text-[10px] text-gray-400">
+                        {inBase ? "Included in base role" : "Not in base role"}
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={effective}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        let nextGrant = editingStaffPerms.customGrant.filter(
+                          (p) => p !== perm,
+                        );
+                        let nextRevoke = editingStaffPerms.customRevoke.filter(
+                          (p) => p !== perm,
+                        );
+                        if (checked && !inBase) nextGrant.push(perm);
+                        if (!checked && inBase) nextRevoke.push(perm);
+                        setEditingStaffPerms({
+                          ...editingStaffPerms,
+                          customGrant: nextGrant,
+                          customRevoke: nextRevoke,
+                        });
+                      }}
+                      className="accent-pink w-4 h-4"
+                    />
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setEditingStaffPerms(null)}
+                className="px-4 py-2 rounded-xl bg-white/10 text-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveStaffPermissions}
+                disabled={isSavingStaff}
+                className="px-5 py-2 rounded-xl bg-pink text-white font-semibold cursor-pointer disabled:opacity-50"
+              >
+                {isSavingStaff ? "Saving..." : "Save Permissions"}
               </button>
             </div>
           </div>

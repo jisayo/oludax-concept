@@ -114,7 +114,8 @@ export function getSupabaseServerClient(): SupabaseClient | null {
 // IN-MEMORY / LOCAL STORE FALLBACK
 // ============================================================================
 
-// Live orders repository (initialized empty - orders populate from live checkout)
+// Live orders & products repositories (orders start empty; products seed from catalog)
+const inMemoryProducts: Product[] = defaultProducts.map((p) => ({ ...p }));
 const inMemoryOrders: Order[] = [];
 
 const inMemoryMessages: ContactMessage[] = [];
@@ -158,7 +159,7 @@ export async function getProducts(filters?: {
   }
 
   // Local fallback filtering
-  let result = [...defaultProducts];
+  let result = [...inMemoryProducts];
   if (filters?.category) {
     result = result.filter(
       (p) =>
@@ -209,10 +210,219 @@ export async function getProductByIdOrSlug(idOrSlug: string): Promise<Product | 
     } catch {}
   }
 
-  const found = defaultProducts.find(
+  const found = inMemoryProducts.find(
     (p) => p.id === idOrSlug || p.slug === idOrSlug
   );
   return found || null;
+}
+
+export type CreateProductInput = {
+  name: string;
+  price: number;
+  compareAtPrice?: number;
+  primaryImage?: string;
+  description?: string;
+  shortDescription?: string;
+  category: string;
+  categorySlug?: string;
+  inStock?: boolean;
+  stockCount?: number;
+  customizable?: boolean;
+  featured?: boolean;
+  designs?: string[];
+};
+
+export async function createProduct(input: CreateProductInput): Promise<Product> {
+  const slugBase = input.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  const uniqueSuffix = Date.now().toString(36).slice(-4);
+  const id = `prod-${slugBase || "item"}-${uniqueSuffix}`;
+  const slug = `${slugBase || "item"}-${uniqueSuffix}`;
+
+  const matchedCategory = defaultCategories.find(
+    (c) =>
+      c.slug === input.categorySlug ||
+      c.name.toLowerCase() === input.category.toLowerCase()
+  );
+
+  const newProduct: Product = {
+    id,
+    name: input.name.trim(),
+    slug,
+    price: Number(input.price),
+    compareAtPrice: input.compareAtPrice ? Number(input.compareAtPrice) : undefined,
+    primaryImage: input.primaryImage?.trim() || "/images/products/custom-mug.png",
+    images: [input.primaryImage?.trim() || "/images/products/custom-mug.png"],
+    description:
+      input.description?.trim() ||
+      `${input.name.trim()} — available at Oludax Concept in Ile-Ife, Akure & nationwide.`,
+    shortDescription:
+      input.shortDescription?.trim() ||
+      input.description?.trim()?.slice(0, 90) ||
+      input.name.trim(),
+    category: matchedCategory?.name || input.category.trim(),
+    categorySlug:
+      matchedCategory?.slug ||
+      input.categorySlug ||
+      input.category.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    tags: [input.category.toLowerCase(), "customized gift", "oludax"],
+    inStock: input.inStock !== undefined ? input.inStock : (input.stockCount ?? 25) > 0,
+    stockCount: Number(input.stockCount ?? 25),
+    rating: 5.0,
+    reviewCount: 0,
+    customizable: input.customizable ?? true,
+    customizationOptions:
+      input.designs && input.designs.length > 0
+        ? { allowDesign: true, designs: input.designs }
+        : undefined,
+    featured: input.featured ?? false,
+    newArrival: true,
+    bestSeller: false,
+  };
+
+  if (supabaseServerClient) {
+    try {
+      await supabaseServerClient.from("products").insert({
+        id: newProduct.id,
+        name: newProduct.name,
+        slug: newProduct.slug,
+        price: newProduct.price,
+        compare_at_price: newProduct.compareAtPrice || null,
+        primary_image: newProduct.primaryImage || null,
+        images: newProduct.images,
+        description: newProduct.description,
+        short_description: newProduct.shortDescription,
+        category: newProduct.category,
+        category_slug: newProduct.categorySlug,
+        tags: newProduct.tags,
+        in_stock: newProduct.inStock,
+        stock_count: newProduct.stockCount,
+        rating: newProduct.rating,
+        review_count: newProduct.reviewCount,
+        customizable: newProduct.customizable,
+        customization_options: newProduct.customizationOptions || null,
+        featured: newProduct.featured,
+        new_arrival: newProduct.newArrival,
+        best_seller: newProduct.bestSeller,
+      });
+    } catch (err) {
+      console.warn("Supabase createProduct warning (saved in memory):", err);
+    }
+  }
+
+  inMemoryProducts.unshift(newProduct);
+  return newProduct;
+}
+
+export type UpdateProductInput = Partial<CreateProductInput> & {
+  id: string;
+};
+
+export async function updateProduct(input: UpdateProductInput): Promise<Product | null> {
+  const idx = inMemoryProducts.findIndex((p) => p.id === input.id);
+  const existing = idx !== -1 ? inMemoryProducts[idx] : await getProductByIdOrSlug(input.id);
+  if (!existing) return null;
+
+  const matchedCategory = input.category || input.categorySlug
+    ? defaultCategories.find(
+        (c) =>
+          c.slug === input.categorySlug ||
+          c.name.toLowerCase() === (input.category || "").toLowerCase()
+      )
+    : undefined;
+
+  const updated: Product = {
+    ...existing,
+    name: input.name !== undefined ? input.name.trim() : existing.name,
+    price: input.price !== undefined ? Number(input.price) : existing.price,
+    compareAtPrice:
+      input.compareAtPrice !== undefined
+        ? input.compareAtPrice
+          ? Number(input.compareAtPrice)
+          : undefined
+        : existing.compareAtPrice,
+    primaryImage:
+      input.primaryImage !== undefined
+        ? input.primaryImage.trim() || existing.primaryImage
+        : existing.primaryImage,
+    images:
+      input.primaryImage !== undefined && input.primaryImage.trim()
+        ? [input.primaryImage.trim(), ...(existing.images || []).filter((i) => i !== input.primaryImage?.trim())]
+        : existing.images,
+    description:
+      input.description !== undefined ? input.description.trim() : existing.description,
+    shortDescription:
+      input.shortDescription !== undefined
+        ? input.shortDescription.trim()
+        : existing.shortDescription,
+    category: matchedCategory?.name || (input.category !== undefined ? input.category.trim() : existing.category),
+    categorySlug:
+      matchedCategory?.slug ||
+      (input.categorySlug !== undefined ? input.categorySlug : existing.categorySlug),
+    inStock: input.inStock !== undefined ? input.inStock : existing.inStock,
+    stockCount:
+      input.stockCount !== undefined ? Number(input.stockCount) : existing.stockCount,
+    customizable:
+      input.customizable !== undefined ? input.customizable : existing.customizable,
+    featured: input.featured !== undefined ? input.featured : existing.featured,
+    customizationOptions:
+      input.designs !== undefined
+        ? input.designs.length > 0
+          ? { ...(existing.customizationOptions || {}), allowDesign: true, designs: input.designs }
+          : undefined
+        : existing.customizationOptions,
+  };
+
+  if (idx !== -1) {
+    inMemoryProducts[idx] = updated;
+  }
+
+  if (supabaseServerClient) {
+    try {
+      await supabaseServerClient
+        .from("products")
+        .update({
+          name: updated.name,
+          price: updated.price,
+          compare_at_price: updated.compareAtPrice || null,
+          primary_image: updated.primaryImage || null,
+          images: updated.images,
+          description: updated.description,
+          short_description: updated.shortDescription,
+          category: updated.category,
+          category_slug: updated.categorySlug,
+          in_stock: updated.inStock,
+          stock_count: updated.stockCount,
+          customizable: updated.customizable,
+          customization_options: updated.customizationOptions || null,
+          featured: updated.featured,
+        })
+        .eq("id", input.id);
+    } catch (err) {
+      console.warn("Supabase updateProduct warning:", err);
+    }
+  }
+
+  return updated;
+}
+
+export async function deleteProduct(id: string): Promise<boolean> {
+  const idx = inMemoryProducts.findIndex((p) => p.id === id);
+  let existed = idx !== -1;
+  if (idx !== -1) {
+    inMemoryProducts.splice(idx, 1);
+  }
+
+  if (supabaseServerClient) {
+    try {
+      const { error } = await supabaseServerClient.from("products").delete().eq("id", id);
+      if (!error) existed = true;
+    } catch {}
+  }
+
+  return existed;
 }
 
 export async function getCategories(): Promise<Category[]> {

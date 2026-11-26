@@ -1,6 +1,12 @@
 import { NextRequest } from "next/server";
 import crypto from "crypto";
-import { Role } from "../rbac";
+import { Permission, Role, hasPermission } from "../rbac";
+import {
+  computeEffectivePermissions,
+  findStaffByEmail,
+  logAudit,
+  verifyStaffPassword,
+} from "./admin-store";
 
 // Ephemeral dev signing secret generated once at server startup (never hardcoded in git)
 const EPHEMERAL_DEV_SECRET = crypto.randomBytes(32).toString("hex");
@@ -36,6 +42,7 @@ export type AdminAuthPayload = {
   email: string;
   role: Role;
   name: string;
+  permissions?: Permission[];
   expiresAt: number;
 };
 
@@ -138,26 +145,49 @@ export function verifyAdminRequest(request: NextRequest): {
   user?: AdminAuthPayload;
   error?: string;
 } {
-  // 1. Primary check: Secure HttpOnly cookie (XSS-safe)
-  const cookie = request.cookies.get("oludax_admin_token")?.value;
-  if (cookie) {
-    const payload = verifyAdminToken(cookie);
-    if (payload) return { authorized: true, user: payload };
-  }
+  const resolvePayload = (payload: AdminAuthPayload | null) => {
+    if (!payload) return null;
+    const staff = findStaffByEmail(payload.email);
+    if (staff) {
+      if (!staff.active) {
+        return { suspended: true as const };
+      }
+      return {
+        suspended: false as const,
+        user: {
+          ...payload,
+          role: staff.role,
+          name: staff.name,
+          permissions: computeEffectivePermissions(
+            staff.role,
+            staff.customGrant,
+            staff.customRevoke
+          ),
+        },
+      };
+    }
+    return { suspended: false as const, user: payload };
+  };
 
-  // 2. Secondary check: Authorization Bearer header (for server-to-server or authenticated API clients)
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.substring(7).trim();
-    const payload = verifyAdminToken(token);
-    if (payload) return { authorized: true, user: payload };
-  }
+  const rawToken =
+    request.cookies.get("oludax_admin_token")?.value ||
+    (request.headers.get("authorization")?.startsWith("Bearer ")
+      ? request.headers.get("authorization")!.substring(7).trim()
+      : undefined) ||
+    request.headers.get("x-admin-token") ||
+    undefined;
 
-  // 3. Optional header: x-admin-token
-  const customHeader = request.headers.get("x-admin-token");
-  if (customHeader) {
-    const payload = verifyAdminToken(customHeader);
-    if (payload) return { authorized: true, user: payload };
+  if (rawToken) {
+    const resolved = resolvePayload(verifyAdminToken(rawToken));
+    if (resolved?.suspended) {
+      return {
+        authorized: false,
+        error: "Account suspended: Contact the Super Administrator.",
+      };
+    }
+    if (resolved?.user) {
+      return { authorized: true, user: resolved.user };
+    }
   }
 
   return {
@@ -166,9 +196,22 @@ export function verifyAdminRequest(request: NextRequest): {
   };
 }
 
+export function hasEffectivePermission(
+  user: AdminAuthPayload | undefined | null,
+  permission: Permission
+): boolean {
+  if (!user) return false;
+  if (Array.isArray(user.permissions)) {
+    return user.permissions.includes(permission);
+  }
+  return hasPermission(user.role, permission);
+}
+
 export function isReservedStaffEmail(email: string): boolean {
   const cleanEmail = email.toLowerCase().trim();
   if (!cleanEmail) return false;
+
+  if (findStaffByEmail(cleanEmail)) return true;
 
   const adminEmail = (process.env.ADMIN_EMAIL || "preciousoludare23@gmail.com")
     .toLowerCase()
@@ -223,54 +266,79 @@ export async function authenticateAdminUser(
 
   let role: Role | null = null;
   let name = "";
+  let permissions: Permission[] | undefined;
 
   const cleanEmail = email.toLowerCase().trim();
   const cleanPassword = password.trim();
 
-  // 1. Super Administrator (CEO / Founder)
-  const isSuperAdminEmail =
-    safeCompare(cleanEmail, adminEmail.toLowerCase().trim()) ||
-    safeCompare(cleanEmail, "preciousoludare23@gmail.com");
-
-  const isSuperAdminPassword =
-    safeCompare(password, "P@$$W0Rd") ||
-    safeCompare(cleanPassword, "P@$$W0Rd") ||
-    safeCompare(password, "czA0XBwuiIJdfzJV!2026#Oludax") ||
-    safeCompare(cleanPassword, "czA0XBwuiIJdfzJV!2026#Oludax") ||
-    (adminPassword
-      ? safeCompare(password, adminPassword) ||
-        safeCompare(cleanPassword, adminPassword)
-      : false);
-
-  if (isSuperAdminEmail && isSuperAdminPassword) {
-    role = "super_admin";
-    name = "Precious Oluwatofunmi";
+  // 0. Dynamic Staff Directory check (includes owner, dynamically added staff, custom permissions & suspension)
+  const matchedStaff = findStaffByEmail(cleanEmail);
+  if (matchedStaff) {
+    if (!matchedStaff.active) {
+      logAudit({
+        actorEmail: cleanEmail,
+        actorRole: matchedStaff.role,
+        action: "STAFF_LOGIN_BLOCKED",
+        target: cleanEmail,
+        details: "Suspended staff account attempted login.",
+      });
+      return {
+        success: false,
+        isStaffEmail: true,
+        error: "This staff account has been suspended. Contact the Super Admin.",
+      };
+    }
+    if (verifyStaffPassword(matchedStaff, password)) {
+      role = matchedStaff.role;
+      name = matchedStaff.name;
+      permissions = computeEffectivePermissions(
+        matchedStaff.role,
+        matchedStaff.customGrant,
+        matchedStaff.customRevoke
+      );
+    }
   }
-  // 2. Operations Manager (requires distinct MANAGER_PASSWORD if set)
-  else if (
-    process.env.MANAGER_EMAIL &&
-    process.env.MANAGER_PASSWORD &&
-    safeCompare(
-      email.toLowerCase().trim(),
-      process.env.MANAGER_EMAIL.toLowerCase().trim()
-    ) &&
-    safeCompare(password, process.env.MANAGER_PASSWORD)
-  ) {
-    role = "manager";
-    name = "Operations Manager";
-  }
-  // 3. Support Officer
-  else if (
-    process.env.SUPPORT_EMAIL &&
-    process.env.SUPPORT_PASSWORD &&
-    safeCompare(
-      email.toLowerCase().trim(),
-      process.env.SUPPORT_EMAIL.toLowerCase().trim()
-    ) &&
-    safeCompare(password, process.env.SUPPORT_PASSWORD)
-  ) {
-    role = "support";
-    name = "Support Officer";
+
+  // 1. Super Administrator fallback (CEO / Founder)
+  if (!role) {
+    const isSuperAdminEmail =
+      safeCompare(cleanEmail, adminEmail.toLowerCase().trim()) ||
+      safeCompare(cleanEmail, "preciousoludare23@gmail.com");
+
+    const isSuperAdminPassword =
+      safeCompare(password, "P@$$W0Rd") ||
+      safeCompare(cleanPassword, "P@$$W0Rd") ||
+      safeCompare(password, "czA0XBwuiIJdfzJV!2026#Oludax") ||
+      safeCompare(cleanPassword, "czA0XBwuiIJdfzJV!2026#Oludax") ||
+      (adminPassword
+        ? safeCompare(password, adminPassword) ||
+          safeCompare(cleanPassword, adminPassword)
+        : false);
+
+    if (isSuperAdminEmail && isSuperAdminPassword) {
+      role = "super_admin";
+      name = "Precious Oluwatofunmi";
+    }
+    // 2. Operations Manager (requires distinct MANAGER_PASSWORD if set)
+    else if (
+      process.env.MANAGER_EMAIL &&
+      process.env.MANAGER_PASSWORD &&
+      safeCompare(cleanEmail, process.env.MANAGER_EMAIL.toLowerCase().trim()) &&
+      safeCompare(password, process.env.MANAGER_PASSWORD)
+    ) {
+      role = "manager";
+      name = "Operations Manager";
+    }
+    // 3. Support Officer
+    else if (
+      process.env.SUPPORT_EMAIL &&
+      process.env.SUPPORT_PASSWORD &&
+      safeCompare(cleanEmail, process.env.SUPPORT_EMAIL.toLowerCase().trim()) &&
+      safeCompare(password, process.env.SUPPORT_PASSWORD)
+    ) {
+      role = "support";
+      name = "Support Officer";
+    }
   }
 
   if (!role) {
@@ -283,6 +351,16 @@ export async function authenticateAdminUser(
       count: current.count + 1,
       lastAttempt: now,
     });
+
+    if (staffEmailMatch) {
+      logAudit({
+        actorEmail: cleanEmail,
+        actorRole: matchedStaff?.role || "customer",
+        action: "STAFF_LOGIN_FAILED",
+        target: cleanEmail,
+        details: `Failed staff login attempt from IP ${clientIp}.`,
+      });
+    }
 
     // Artificial delay to prevent brute-force timing enumeration
     await new Promise((res) => setTimeout(res, 500));
@@ -298,15 +376,25 @@ export async function authenticateAdminUser(
   loginAttempts.delete(clientIp);
 
   const token = createAdminToken(email, role, name);
+  const resolvedPermissions = permissions || computeEffectivePermissions(role);
+
+  logAudit({
+    actorEmail: cleanEmail,
+    actorRole: role,
+    action: "STAFF_LOGIN_SUCCESS",
+    target: cleanEmail,
+    details: `Signed in as ${name} (${role}) from IP ${clientIp}.`,
+  });
 
   return {
     success: true,
     token,
     user: {
-      id: `staff-${role}`,
-      email,
+      id: matchedStaff?.id || `staff-${role}`,
+      email: cleanEmail,
       name,
       role,
+      permissions: resolvedPermissions,
     },
   };
 }
