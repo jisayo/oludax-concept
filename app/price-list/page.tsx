@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -15,7 +15,7 @@ import {
   Maximize2,
   X,
 } from "lucide-react";
-import { products, formatPrice } from "@/lib/products";
+import { products, formatPrice, Product } from "@/lib/products";
 
 const PRICE_SHEETS = [
   {
@@ -69,11 +69,23 @@ const PRICE_SHEETS = [
 ];
 
 export default function PriceListPage() {
+  const [liveProducts, setLiveProducts] = useState<Product[]>(products);
   const [selectedSheet, setSelectedSheet] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"catalog" | "sheets">("catalog");
 
-  const filteredProducts = products.filter((p) => {
+  useEffect(() => {
+    fetch("/api/products", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products)) {
+          setLiveProducts(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const filteredProducts = liveProducts.filter((p) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -145,7 +157,7 @@ export default function PriceListPage() {
                   : "text-cloud/60 hover:text-cloud"
               }`}
             >
-              Interactive Catalog ({products.length})
+              Interactive Catalog ({liveProducts.length})
             </button>
             <button
               onClick={() => setActiveTab("sheets")}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -24,9 +24,9 @@ import {
   products,
   getProductBySlug,
   getProductById,
-  getProductsByCategory,
   formatPrice,
   extractPriceFromVariant,
+  Product,
 } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 
@@ -39,8 +39,8 @@ export default function ProductDetailPage({
   const { addItem } = useCart();
   const { isInWishlist, toggleItem } = useWishlist();
 
-  // Look up product by either slug or id
-  const product =
+  // Look up product by either slug or id (initial instant match + live sync from API)
+  const initialProduct =
     getProductBySlug(params.id) ||
     getProductById(params.id) ||
     products.find(
@@ -49,6 +49,11 @@ export default function ProductDetailPage({
         p.slug?.toLowerCase() === params.id.toLowerCase()
     );
 
+  const [liveProduct, setLiveProduct] = useState<Product | undefined>(initialProduct);
+  const [allProducts, setAllProducts] = useState<Product[]>(products);
+  const [isLoadingLive, setIsLoadingLive] = useState(!initialProduct);
+
+  const product = liveProduct;
   const options = product?.customizationOptions;
   const galleryImages =
     product?.images && product.images.length > 0
@@ -64,6 +69,38 @@ export default function ProductDetailPage({
   const [activeTab, setActiveTab] = useState<"description" | "specs" | "delivery">(
     "description"
   );
+
+  useEffect(() => {
+    fetch(`/api/products/${encodeURIComponent(params.id)}`, { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && data.product) {
+          setLiveProduct(data.product);
+          if (data.product.customizationOptions?.designs?.length) {
+            setSelectedDesign((prev) => prev || data.product.customizationOptions.designs[0]);
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoadingLive(false));
+
+    fetch("/api/products", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products)) {
+          setAllProducts(data.products);
+        }
+      })
+      .catch(() => {});
+  }, [params.id]);
+
+  if (isLoadingLive && !product) {
+    return (
+      <div className="min-h-screen bg-base text-cloud flex items-center justify-center p-4 pt-20 font-mono text-xs">
+        Loading product...
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -87,8 +124,8 @@ export default function ProductDetailPage({
   }
 
   const inWishlist = isInWishlist(product.id);
-  const relatedProducts = getProductsByCategory(product.categorySlug || "")
-    .filter((p) => p.id !== product.id)
+  const relatedProducts = allProducts
+    .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
     .slice(0, 4);
 
   // Dynamic price based on variant selection

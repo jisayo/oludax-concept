@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Heart,
@@ -16,8 +17,20 @@ import { products, formatPrice, Product } from "@/lib/products";
 export default function WishlistPage() {
   const { items: wishlistIds, removeItem } = useWishlist();
   const { addItem } = useCart();
+  const [liveProducts, setLiveProducts] = useState<Product[]>(products);
 
-  const wishlistProducts = products.filter((p) => wishlistIds.includes(p.id));
+  useEffect(() => {
+    fetch("/api/products", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products)) {
+          setLiveProducts(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const wishlistProducts = liveProducts.filter((p) => wishlistIds.includes(p.id));
 
   const handleMoveToCart = (product: Product) => {
     addItem({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -16,7 +16,6 @@ import ProductCard from "@/components/ProductCard";
 import {
   products,
   categories,
-  searchProducts,
   formatPrice,
   Product,
 } from "@/lib/products";
@@ -54,6 +53,7 @@ function ShopContent() {
     // Graceful fallback for unexpected param parsing
   }
 
+  const [liveProducts, setLiveProducts] = useState<Product[]>(products);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [sortBy, setSortBy] = useState<SortOption>(initialSort);
@@ -63,11 +63,30 @@ function ShopContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
+  useEffect(() => {
+    fetch("/api/products", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.products)) {
+          setLiveProducts(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
-    let result: Product[] = searchQuery.trim()
-      ? searchProducts(searchQuery)
-      : [...products];
+    let result: Product[] = [...liveProducts];
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.description && p.description.toLowerCase().includes(q)) ||
+          (p.category && p.category.toLowerCase().includes(q)) ||
+          (p.tags && p.tags.some((t) => t.toLowerCase().includes(q)))
+      );
+    }
 
     // Category filter
     if (selectedCategory) {
@@ -107,7 +126,7 @@ function ShopContent() {
     }
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy, priceRange, inStockOnly]);
+  }, [liveProducts, searchQuery, selectedCategory, sortBy, priceRange, inStockOnly]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = useMemo(() => {

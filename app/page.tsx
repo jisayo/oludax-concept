@@ -19,16 +19,15 @@ import {
   ExternalLink,
 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import {
-  categories,
-  getFeaturedProducts,
-  getBestSellers,
-  getNewArrivals,
-} from "@/lib/products";
+import { categories } from "@/lib/products";
+import { getProducts } from "@/lib/server/db";
 
-export default function Home() {
-  const bestSellers = getBestSellers().slice(0, 4);
-  const newArrivals = getNewArrivals().slice(0, 4);
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const allProducts = await getProducts();
+  const bestSellers = allProducts.filter((p) => p.bestSeller).slice(0, 4);
+  const newArrivals = allProducts.filter((p) => p.newArrival).slice(0, 4);
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-20 px-3 py-6 pt-20 sm:px-4 sm:pt-24 md:px-6 lg:px-8 lg:py-12 lg:pt-28">

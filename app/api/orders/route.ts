@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createOrder, listOrders, CreateOrderInput } from "@/lib/server/db";
-import { products, extractPriceFromVariant } from "@/lib/products";
+import { createOrder, listOrders, getProducts, CreateOrderInput } from "@/lib/server/db";
+import { extractPriceFromVariant } from "@/lib/products";
 import { verifyAdminRequest } from "@/lib/server/admin-auth";
 import {
   getClientIp,
@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Server-enforced price and inventory validation (Customer cannot dictate prices)
+    const catalogProducts = await getProducts();
     let computedSubtotal = 0;
     const validatedItems = [];
 
@@ -109,8 +110,8 @@ export async function POST(request: NextRequest) {
 
       // Match genuine product in official catalog
       const matchedProduct =
-        products.find((p) => p.id === (item.productId || item.id)) ||
-        products.find(
+        catalogProducts.find((p) => p.id === (item.productId || item.id)) ||
+        catalogProducts.find(
           (p) =>
             p.name.toLowerCase().trim() ===
             (item.name || "").toLowerCase().trim()

@@ -37,8 +37,14 @@ import {
   Settings,
   Activity,
   UserPlus,
+  Upload,
 } from "lucide-react";
-import { products, categories as defaultCategories, formatPrice, Product } from "@/lib/products";
+import {
+  products,
+  categories as defaultCategories,
+  formatPrice,
+  Product,
+} from "@/lib/products";
 import { useAuth, Role } from "@/lib/auth-context";
 import { ROLES, Permission } from "@/lib/rbac";
 
@@ -234,7 +240,9 @@ export default function AdminDashboardPage() {
       .then((r) => r.json())
       .then((data) => {
         if (data?.success && Array.isArray(data.orders)) {
-          setOrdersList(data.orders.map((o: any) => mapApiOrderToAdminOrder(o)));
+          setOrdersList(
+            data.orders.map((o: any) => mapApiOrderToAdminOrder(o)),
+          );
         }
       })
       .catch(() => {});
@@ -546,7 +554,9 @@ export default function AdminDashboardPage() {
       setProductList((prev) =>
         prev.map((p) => (p.id === prod.id ? data.product : p)),
       );
-      showToast(`${prod.name} marked ${nextInStock ? "In Stock" : "Out of Stock"}.`);
+      showToast(
+        `${prod.name} marked ${nextInStock ? "In Stock" : "Out of Stock"}.`,
+      );
       if (role === "super_admin") loadAdminResources();
     } catch {
       showToast("Network error updating product stock.");
@@ -609,19 +619,60 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Compress and convert local photo file to compact data URL for product image
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingProductModal) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const src = event.target?.result;
+      if (typeof src !== "string") return;
+
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 900;
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL("image/jpeg", 0.82);
+        setEditingProductModal((prev) =>
+          prev ? { ...prev, primaryImage: compressed } : prev,
+        );
+        showToast("Photo ready — click Save to apply.");
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   // Delete product (goods)
   const handleDeleteProduct = async (id: string, name: string) => {
     if (!hasPermission("manage_inventory")) {
       showToast("Access Denied: Inventory permission required.");
       return;
     }
-    if (!confirm(`Delete "${name}" permanently from the store catalog?`)) return;
+    if (!confirm(`Delete "${name}" permanently from the store catalog?`))
+      return;
 
     try {
-      const res = await fetch(`/api/admin/products?id=${encodeURIComponent(id)}`, {
-        method: "DELETE",
-        headers: getAdminHeaders(),
-      });
+      const res = await fetch(
+        `/api/admin/products?id=${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+          headers: getAdminHeaders(),
+        },
+      );
       const data = await res.json();
       if (!res.ok || !data.success) {
         showToast(data.error || "Failed to delete product.");
@@ -698,7 +749,9 @@ export default function AdminDashboardPage() {
         return;
       }
       setStaffList((prev) => prev.map((s) => (s.id === id ? data.staff : s)));
-      showToast(active ? "Staff account reactivated." : "Staff account suspended.");
+      showToast(
+        active ? "Staff account reactivated." : "Staff account suspended.",
+      );
       loadAdminResources();
     } catch {
       showToast("Network error updating staff status.");
@@ -1528,7 +1581,8 @@ export default function AdminDashboardPage() {
                   Goods, Catalogue & Stock Control
                 </h3>
                 <p className="font-mono text-xs text-gray-400">
-                  Add new goods, edit prices/details, toggle stock, or remove items
+                  Add new goods, edit prices/details, toggle stock, or remove
+                  items
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -1635,7 +1689,10 @@ export default function AdminDashboardPage() {
                                 compareAtPrice: prod.compareAtPrice
                                   ? String(prod.compareAtPrice)
                                   : "",
-                                category: prod.category || defaultCategories[0]?.name || "Custom Frames",
+                                category:
+                                  prod.category ||
+                                  defaultCategories[0]?.name ||
+                                  "Custom Frames",
                                 description: prod.description || "",
                                 primaryImage: prod.primaryImage || "",
                                 stockCount: String(prod.stockCount || 0),
@@ -1699,7 +1756,8 @@ export default function AdminDashboardPage() {
 
             {customersList.length === 0 ? (
               <div className="py-12 text-center font-mono text-xs text-gray-500">
-                No customer orders recorded yet. Customers will appear here automatically after placing an order.
+                No customer orders recorded yet. Customers will appear here
+                automatically after placing an order.
               </div>
             ) : (
               <div className="divide-y divide-white/5 font-mono text-xs">
@@ -1745,7 +1803,10 @@ export default function AdminDashboardPage() {
                           <button
                             type="button"
                             onClick={() =>
-                              handleToggleCustomerSuspended(c.email, !c.suspended)
+                              handleToggleCustomerSuspended(
+                                c.email,
+                                !c.suspended,
+                              )
                             }
                             className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition cursor-pointer ${
                               c.suspended
@@ -1831,7 +1892,9 @@ export default function AdminDashboardPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-gray-400 text-[11px]">{member.email}</p>
+                        <p className="text-gray-400 text-[11px]">
+                          {member.email}
+                        </p>
                         {(member.customGrant.length > 0 ||
                           member.customRevoke.length > 0) && (
                           <p className="text-[10px] text-amber-300">
@@ -1850,7 +1913,10 @@ export default function AdminDashboardPage() {
                             onChange={(e) =>
                               handleUpdateStaffRole(
                                 member.id,
-                                e.target.value as "admin" | "manager" | "support",
+                                e.target.value as
+                                  | "admin"
+                                  | "manager"
+                                  | "support",
                               )
                             }
                             className="px-2.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white text-[11px] cursor-pointer"
@@ -1994,7 +2060,10 @@ export default function AdminDashboardPage() {
                 </h3>
               </div>
 
-              <form onSubmit={handleSaveSystemSettings} className="space-y-4 font-mono text-xs">
+              <form
+                onSubmit={handleSaveSystemSettings}
+                className="space-y-4 font-mono text-xs"
+              >
                 <div>
                   <label className="block text-gray-400 uppercase text-[10px] mb-1">
                     Store Name
@@ -2003,7 +2072,10 @@ export default function AdminDashboardPage() {
                     type="text"
                     value={systemSettings.storeName}
                     onChange={(e) =>
-                      setSystemSettings({ ...systemSettings, storeName: e.target.value })
+                      setSystemSettings({
+                        ...systemSettings,
+                        storeName: e.target.value,
+                      })
                     }
                     className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white"
                   />
@@ -2086,7 +2158,9 @@ export default function AdminDashboardPage() {
                     }
                     className="rounded accent-pink"
                   />
-                  <span className="text-gray-300">Store is accepting new orders</span>
+                  <span className="text-gray-300">
+                    Store is accepting new orders
+                  </span>
                 </label>
 
                 <button
@@ -2095,7 +2169,9 @@ export default function AdminDashboardPage() {
                   className="w-full py-2.5 rounded-xl bg-pink hover:brightness-110 text-white font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>{isSavingSettings ? "Saving..." : "Save Settings"}</span>
+                  <span>
+                    {isSavingSettings ? "Saving..." : "Save Settings"}
+                  </span>
                 </button>
               </form>
             </div>
@@ -2132,7 +2208,8 @@ export default function AdminDashboardPage() {
                       </div>
                       <p className="text-gray-200 text-[11px]">{log.details}</p>
                       <p className="text-[10px] text-gray-500">
-                        Actor: {log.actorEmail} ({log.actorRole}) • Target: {log.target}
+                        Actor: {log.actorEmail} ({log.actorRole}) • Target:{" "}
+                        {log.target}
                       </p>
                     </div>
                   ))}
@@ -2543,8 +2620,8 @@ export default function AdminDashboardPage() {
 
             <p className="text-gray-300 leading-relaxed text-[11px]">
               This will update the order status to <strong>Cancelled</strong>,
-              halt production queue, and log the reason in the customer
-              tracking timeline.
+              halt production queue, and log the reason in the customer tracking
+              timeline.
             </p>
 
             <div>
@@ -2697,7 +2774,11 @@ export default function AdminDashboardPage() {
                     className="w-full px-3 py-2.5 rounded-xl bg-[#1C141E] border border-white/10 text-white"
                   >
                     {defaultCategories.map((c) => (
-                      <option key={c.id} value={c.name} className="bg-[#121216]">
+                      <option
+                        key={c.id}
+                        value={c.name}
+                        className="bg-[#121216]"
+                      >
                         {c.name}
                       </option>
                     ))}
@@ -2722,10 +2803,36 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-gray-400 uppercase text-[10px] mb-1">
-                  Image Path or URL
+              <div className="space-y-2.5">
+                <label className="block text-gray-400 uppercase text-[10px]">
+                  Product Photo (Upload from Device or Paste Path / URL)
                 </label>
+
+                <div className="flex items-center gap-3">
+                  {editingProductModal.primaryImage ? (
+                    <img
+                      src={editingProductModal.primaryImage}
+                      alt="Preview"
+                      className="w-16 h-16 rounded-xl object-cover border border-white/15 shrink-0 bg-white/5"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl border border-dashed border-white/15 bg-white/5 shrink-0 flex items-center justify-center text-[10px] text-gray-500">
+                      No Img
+                    </div>
+                  )}
+
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl border border-dashed border-pink/40 bg-pink/10 hover:bg-pink/15 text-pink cursor-pointer transition font-semibold">
+                    <Upload className="w-4 h-4 shrink-0" />
+                    <span>Upload Photo from Phone / Computer</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProductImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
                 <input
                   type="text"
                   value={editingProductModal.primaryImage}
@@ -2735,7 +2842,7 @@ export default function AdminDashboardPage() {
                       primaryImage: e.target.value,
                     })
                   }
-                  placeholder="/images/products/custom-mug.png"
+                  placeholder="/images/products/custom-mug.png or https://..."
                   className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
                 />
               </div>
@@ -2824,8 +2931,8 @@ export default function AdminDashboardPage() {
                     {isSavingProduct
                       ? "Saving..."
                       : editingProductModal.mode === "create"
-                      ? "Create Good"
-                      : "Save Changes"}
+                        ? "Create Good"
+                        : "Save Changes"}
                   </span>
                 </button>
               </div>
@@ -2877,7 +2984,10 @@ export default function AdminDashboardPage() {
                   required
                   value={newStaffModal.email}
                   onChange={(e) =>
-                    setNewStaffModal({ ...newStaffModal, email: e.target.value })
+                    setNewStaffModal({
+                      ...newStaffModal,
+                      email: e.target.value,
+                    })
                   }
                   className="w-full px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white"
                 />
